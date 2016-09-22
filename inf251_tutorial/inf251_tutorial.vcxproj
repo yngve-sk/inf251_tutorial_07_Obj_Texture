@@ -129,15 +129,24 @@
   <ItemGroup>
     <ClInclude Include="lodepng.h" />
     <ClInclude Include="Matrix4.h" />
+    <ClInclude Include="Model\lodepng.h" />
+    <ClInclude Include="Model\model_obj.h" />
+    <ClInclude Include="Model\Vector3.h" />
     <ClInclude Include="model_obj.h" />
     <ClInclude Include="Vector3.h" />
+    <ClInclude Include="World\World.h" />
+    <ClInclude Include="World\world_object.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lodepng.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Model\lodepng.cpp" />
+    <ClCompile Include="Model\model_obj.cpp" />
     <ClCompile Include="model_obj.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Renderer\shader.f.glsl" />
+    <None Include="Renderer\shader.v.glsl" />
     <None Include="shader.f.glsl" />
     <None Include="shader.v.glsl" />
     <None Include="texture.png" />
