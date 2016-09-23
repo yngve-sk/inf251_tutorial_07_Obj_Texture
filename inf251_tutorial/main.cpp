@@ -152,6 +152,9 @@ Matrix4f computeCameraTransform(const Camera& cam) {
 
 	Matrix4f prj = Matrix4f::createPerspectivePrj(cam.fov, cam.ar, cam.zNear, cam.zFar);
 
+	Matrix4f camZoom = Matrix4f::createScaling(cam.zoom, cam.zoom, 1.f);
+
+	return camZoom * prj * camR * camT;
 }
 
 // ************************************************************************************************
