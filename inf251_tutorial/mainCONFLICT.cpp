@@ -18,6 +18,8 @@ struct Vertex {
 	Vector3f position, normal;
 };
 
+// hello all
+
 struct Camera {
 	Vector3f position, target, up;
 
