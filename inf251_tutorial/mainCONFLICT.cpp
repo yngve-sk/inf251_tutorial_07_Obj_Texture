@@ -16,9 +16,12 @@ using namespace std;
 
 struct Vertex {
 	Vector3f position, normal;
+	float a;
+	float b;
+	int c;
+	string d;
+	string e;
 };
-
-// hello all
 
 struct Camera {
 	Vector3f position, target, up;
