@@ -26,7 +26,7 @@ struct Camera {
 
 	float zNear, zFar; // depthof near/far plane
 
-	float zoom1; // extra scaling param
+	float zoom; // extra scaling param
 };
 
 // --- OpenGL callbacks ---------------------------------------------------------------------------
@@ -68,6 +68,7 @@ float Scaling;			///< Scaling
 int MouseX, MouseY;		///< The last position of the mouse
 int MouseButton;		///< The last mouse button pressed or released
 
+Camera Cam;
 
 // --- main() -------------------------------------------------------------------------------------
 /// The entry point of the application
@@ -117,6 +118,15 @@ int main(int argc, char **argv) {
         getchar();
 		return -1;
     }
+
+	Cam.position.set(0.f, 0.f, 0.f);
+	Cam.target.set(0.f, 0.f, -1.f);
+	Cam.up.set(0.f, 0.f, 0.f);
+	Cam.fov = 30.0f;
+	Cam.ar = 1.f;
+	Cam.zNear = 0.1f;
+	Cam.zFar = 100.f;
+	Cam.zoom = 1.f;
 	
     // Start the main event loop
 	glutMainLoop();
@@ -127,6 +137,22 @@ int main(int argc, char **argv) {
 
 	return 0;
 } 
+
+Matrix4f computeCameraTransform(const Camera& cam) {
+
+	Vector3f t = cam.target.getNormalized();
+	Vector3f u = cam.up.getNormalized();
+	Vector3f r = t.cross(u);
+	Matrix4f camR( r.x(),  r.y(),  r.z(), 0.f,
+			       u.x(),  u.y(),  u.z(), 0.f,
+				  -t.x(), -t.y(), -t.z(), 0.f,
+				     0.f,    0.f,    0.f, 1.f);
+
+	Matrix4f camT = Matrix4f::createTranslation(-cam.position);
+
+	Matrix4f prj = Matrix4f::createPerspectivePrj(cam.fov, cam.ar, cam.zNear, cam.zFar);
+
+}
 
 // ************************************************************************************************
 // *** OpenGL callbacks implementation ************************************************************
