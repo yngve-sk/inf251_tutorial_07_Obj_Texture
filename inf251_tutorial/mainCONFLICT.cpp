@@ -327,6 +327,9 @@ bool initMesh() {
 
 /// Initialize shaders. Return false if initialization fail
 bool initShaders() {
+
+	//NEW GREAT COMMENT FROM ZUZU, I AM COMMENTING BECAUSE I WAS FORCED TO DO THAT
+
 	// Create the shader program and check for errors
 	if(ShaderProgram != 0)
 		glDeleteProgram(ShaderProgram);
