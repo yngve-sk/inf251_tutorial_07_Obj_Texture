@@ -97,6 +97,13 @@ int main(int argc, char **argv) {
 	Translation.set(0.0f, 0.0f, 0.0f);
 	Scaling = 1.0f;
 
+	unsigned int i;
+	char *s = "HOUSE";
+	glRasterPos3f(0, 0, 0);
+	for (i = 0; i < strlen(s); i++) {
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, s[i]);
+	}
+
     // Shaders & mesh
 	if(!initShaders() || !initMesh()) {
         cerr << "An error occurred, press Enter to quit ..." << endl;
@@ -238,6 +245,8 @@ bool initMesh() {
 		cerr << "Error: cannot load model." << endl;
 		return false;
 	}
+
+	Model.normalize();
 	
 	// VBO
 	glGenBuffers(1, &VBO);
