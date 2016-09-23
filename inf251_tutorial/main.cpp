@@ -279,6 +279,8 @@ bool initMesh() {
 		return false;
 	}
 
+	Model.normalize();
+
 	// VBO
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
