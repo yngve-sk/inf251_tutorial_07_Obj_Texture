@@ -240,3 +240,5 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+/inf251_tutorial/mainTEMP.cpp
+/gluts.rar

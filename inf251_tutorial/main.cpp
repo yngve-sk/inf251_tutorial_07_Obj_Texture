@@ -364,7 +364,7 @@ bool initShaders() {
 		glGetShaderInfoLog(fragShader, 1024, nullptr, errorLog);
 		cerr << "Error: cannot compile fragment shader.\nError log:\n" << errorLog << endl;
 		return false;
-	}
+	}//
 
 	// Attach the shader to the program and link it
 	glAttachShader(ShaderProgram, vertShader);
