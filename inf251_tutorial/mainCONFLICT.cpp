@@ -29,6 +29,10 @@ struct Camera {
 	float zNear, zFar; // depthof near/far plane
 
 	float zoom; // extra scaling param
+
+	float a, b, c, d, e, f, g, h, j, k;
+	Vector3f asd, asdfe, weqw, qwewqe, qweqwe, asdasd;
+	GLuint qwqe, wqewq, wqeqweq;
 };
 
 // --- OpenGL callbacks ---------------------------------------------------------------------------
