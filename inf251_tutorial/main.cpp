@@ -202,6 +202,17 @@ void display() {
 		GL_UNSIGNED_INT,
 		0);
 
+	//set the position of the text in the window using the x and y coordinates
+	glRasterPos2f(20, 20);
+	//get the length of the string to display
+	char *s = "CHYT SI SVOJU MACKU :)";
+
+	//loop to display character by character
+	for (int i = 0; i < strlen(s); i++)
+	{
+		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, s[i]);
+	}
+
 	// Disable the "position" vertex attribute (not necessary but recommended)
 	glDisableVertexAttribArray(posLoc);
 	glDisableVertexAttribArray(texLoc);
