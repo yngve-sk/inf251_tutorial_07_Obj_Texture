@@ -40,6 +40,7 @@ void motion(int, int);
 bool initMesh();
 bool initShaders();
 string readTextFile(const string&);
+void printString(float, float, string);
 
 
 // --- Global variables ---------------------------------------------------------------------------
@@ -205,16 +206,10 @@ void display() {
 		GL_UNSIGNED_INT,
 		0);
 
-	//set the position of the text in the window using the x and y coordinates
-	glRasterPos2f(20, 20);
-	//get the length of the string to display
-	char *s = "CHYT SI SVOJU MACKU :)";
+	string s = "House coord: /n 11 \n";
+	s += "AAAAA";
 
-	//loop to display character by character
-	for (int i = 0; i < strlen(s); i++)
-	{
-		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, s[i]);
-	}
+	printString(-0.9,0.9, s);
 
 	// Disable the "position" vertex attribute (not necessary but recommended)
 	glDisableVertexAttribArray(posLoc);
@@ -260,12 +255,15 @@ void mouse(int button, int state, int x, int y) {
 /// Called whenever the mouse is moving while a button is pressed
 void motion(int x, int y) {
 	if (MouseButton == GLUT_RIGHT_BUTTON) {
+		//glTranslatef(0.003f * (x - MouseX), 0.003f * (MouseY - y), 0);
+		//gluLookAt(0.003f * (x - MouseX), 0.003f * (MouseY - y), 0, Translation.x(), Translation.y(), 0, 0, 1, 0);
 		Translation.x() += 0.003f * (x - MouseX); // Accumulate translation amount
 		Translation.y() += 0.003f * (MouseY - y);
 		MouseX = x; // Store the current mouse position
 		MouseY = y;
 	}
 	if (MouseButton == GLUT_MIDDLE_BUTTON) {
+		//glScalef(x, 0.003f * (MouseY - y), 0);
 		Scaling += 0.003f * (MouseY - y); // Accumulate scaling amount
 		MouseX = x; // Store the current mouse position
 		MouseY = y;
@@ -276,6 +274,8 @@ void motion(int x, int y) {
 		ry.rotate(0.1f * (x - MouseX), Vector3f(0, 1, 0));
 		RotationX *= rx;	// accumulate the rotation
 		RotationY *= ry;
+		//glRotatef(-0.1f * (MouseY - y), 0.1f * (x - MouseX), 0, 0);
+		
 		MouseX = x; // Store the current mouse position
 		MouseY = y;
 	}
@@ -493,5 +493,18 @@ string readTextFile(const string& pathAndFileName) {
 
 	return text;
 } /* readTextFile() */
+
+
+void printString(float x, float y, string s) {
+
+	//set the position of the text in the window using the x and y coordinates
+	glRasterPos2f(x, y);
+
+	//loop to display character by character
+	for (int i = 0; i < s.length(); i++)
+	{
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, s[i]);
+	}
+}
 
   /* --- eof main.cpp --- */
