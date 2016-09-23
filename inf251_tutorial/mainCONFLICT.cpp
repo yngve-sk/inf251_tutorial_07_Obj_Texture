@@ -16,11 +16,6 @@ using namespace std;
 
 struct Vertex {
 	Vector3f position, normal;
-	float a;
-	float b;
-	int c;
-	string d;
-	string e;
 };
 
 struct Camera {
@@ -31,11 +26,7 @@ struct Camera {
 
 	float zNear, zFar; // depthof near/far plane
 
-	float zoom; // extra scaling param
-
-	float a, b, c, d, e, f, g, h, j, k;
-	Vector3f asd, asdfe, weqw, qwewqe, qweqwe, asdasd;
-	GLuint qwqe, wqewq, wqeqweq;
+	float zoom1; // extra scaling param
 };
 
 // --- OpenGL callbacks ---------------------------------------------------------------------------
