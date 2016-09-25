@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <iostream>
 
 /// A vector with 3 components of type T
 template <class T>
@@ -35,6 +36,10 @@ public:
         mElements[1] = static_cast<data_t>(fValues[1]);
         mElements[2] = static_cast<data_t>(fValues[2]);
     }
+
+	void print(std::ostream& out) const {
+		out << mElements[0] << " " << mElements[1] << " " << mElements[2] << std::endl;
+	}
 
     /// Copy constructor
 	template <class U> 

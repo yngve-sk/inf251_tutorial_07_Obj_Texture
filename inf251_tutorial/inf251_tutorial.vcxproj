@@ -127,16 +127,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="CameraC.h" />
+    <ClInclude Include="camera.h" />
     <ClInclude Include="lodepng.h" />
     <ClInclude Include="Matrix4.h" />
     <ClInclude Include="model_obj.h" />
     <ClInclude Include="Vector3.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CameraC.cpp" />
+    <ClCompile Include="camera.cpp" />
     <ClCompile Include="lodepng.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="mainGLM.cpp" />
     <ClCompile Include="model_obj.cpp" />
   </ItemGroup>
   <ItemGroup>

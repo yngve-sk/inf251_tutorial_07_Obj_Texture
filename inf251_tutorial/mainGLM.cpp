@@ -9,15 +9,19 @@
 
 #include "lodepng.h"
 #include "model_obj.h"
+
+#include <glm/glm.hpp>
+#include <glm/gtx/extend.hpp>
+
 #include "Vector3.h"
 #include "Matrix4.h"
 
-#include "Camera.h"
+#include "glm_camera.h"
 
 using namespace std;
 
 struct Vertex {
-	Vector3f position, normal;
+	glm::fvec3 position, normal;
 };
 
 //class Camera {
@@ -63,15 +67,15 @@ GLint TrLoc = -1;				///< model-view matrix uniform variable
 GLint SamplerLoc = -1;			///< texture sampler uniform variable
 
 								// Vertex transformation
-Matrix4f RotationX, RotationY;		///< Rotation (along X and Y axis)
-Vector3f Translation;	///< Translation
+glm::fmat4 RotationX, RotationY;		///< Rotation (along X and Y axis)
+glm::fvec3 Translation;	///< Translation
 float Scaling;			///< Scaling
 
 						// Mouse interaction
 int MouseX, MouseY;		///< The last position of the mouse
 int MouseButton;		///< The last mouse button pressed or released
 
-Camera Cam;
+//GLMCamera Cam;
 bool USE_CAM = false;
 
 // --- main() -------------------------------------------------------------------------------------
@@ -113,7 +117,7 @@ int main(int argc, char **argv) {
 		
 								// Transformation
 //	if (USE_CAM) {
-	Cam = *(new Camera());
+	//Cam = *(new GLMCamera());
 		//Cam.position.set(0.f, 0.f, 0.f);
 		//Cam.target.set(0.f, 0.f, -1.f);
 		//Cam.up.set(0.f, 1.f, 0.f);
@@ -124,9 +128,9 @@ int main(int argc, char **argv) {
 		//Cam.zoom = 1.f;
 	//}
 //	else {
-		RotationX.identity();
-		RotationY.identity();
-		Translation.set(0.0f, 0.0f, 0.0f);
+		RotationX = glm::mat4(1.0); 
+		RotationY = glm::mat4(1.0);
+		Translation = glm::fvec3(0.0f, 0.0f, 0.0f);
 		Scaling = 1.0f;
 //	}
 
@@ -180,25 +184,28 @@ void display() {
 	glUseProgram(ShaderProgram);
 
 	//Matrix4f camTransformation = computeCameraTransform(Cam),
-	Matrix4f camTransformation = Cam.computeCameraTransform(),
-		originalTransformation = Matrix4f::createTranslation(Translation) *
-		RotationX * RotationY *
-		Matrix4f::createScaling(Scaling, Scaling, Scaling);
+//	glm::fmat4 camTransformation = Cam.computeCameraTransform(),
+	//glm::fmat4	originalTransformation = glm::vec4(Translation, 1) *
+	//	RotationX * RotationY *
+	//	glm::scale(glm::fmat4(), glm::vec4(1, 1, 1,0));
+		//Matrix4f::createScaling(Scaling, Scaling, Scaling);
+	glm::fmat4 translationMatrix = glm::translate(fmat4(), Translation);
+	glm::fmat4 rotationMatrixX = RotationX;
+	glm::fmat4 rotationMatrixY = RotationY;
+	glm::fmat4 scaleMatrix = glm::scale(fmat4(), vec3(Scaling, Scaling, Scaling));
 
-	cout << "cam transformation = (cam M loc: " << (&Cam) << endl;
-	camTransformation.print(cout);
-	cout << "original transformation = " << endl;
-	originalTransformation.print(cout);
+	glm::fmat4 transformation = translationMatrix *
+		rotationMatrixX * rotationMatrixY *
+		scaleMatrix;
 	//// Set the uniform variable for the vertex transformation
 	//Matrix4f transformation = USE_CAM ? computeCameraTransform(Cam) :
 	//	Matrix4f::createTranslation(Translation) *
-	//	RotationX * RotationY *
+	//	RotationX * RotationY * 
 	//	Matrix4f::createScaling(Scaling, Scaling, Scaling);
 
-	Matrix4f transformation = USE_CAM ? camTransformation : originalTransformation;
+	//Matrix4f transformation = USE_CAM ? camTransformation : originalTransformation;
 
-
-	glUniformMatrix4fv(TrLoc, 1, GL_FALSE, transformation.get());
+	glUniformMatrix4fv(TrLoc, 1, GL_FALSE, &transformation[0][0]);
 
 	// Set the uniform variable for the texture unit (texture unit 0)
 	glUniform1i(SamplerLoc, 0);
@@ -261,12 +268,12 @@ void keyboard(unsigned char key, int x, int y) {
 			glutPostRedisplay();
 		}
 	case 'p':
-		cout << "ROTATION X:" << endl;
-		RotationX.print(cout);
-		cout << "ROTATION Y:" << endl;
-		RotationY.print(cout);
-		cout << "TRANSLATE XYZ" << endl;
-		Translation.print(cout);
+		//cout << "ROTATION X:" << endl;
+		//RotationX.print(cout);
+		//cout << "ROTATION Y:" << endl;
+		//RotationY.print(cout);
+		//cout << "TRANSLATE XYZ" << endl;
+		//Translation.print(cout);
 	case 't':
 		USE_CAM = !USE_CAM;
 		glutPostRedisplay();
@@ -289,20 +296,20 @@ float max(float f1, float f2) {
 void motion(int x, int y) {
 	if (MouseButton == GLUT_RIGHT_BUTTON) {
 		//if(USE_CAM) {
-		Cam.translate(MouseX, MouseY, x, y);
+		//Cam.translate(MouseX, MouseY, x, y);
 	//	Cam.position += Cam.target * 0.003f * (MouseY - y);
 	//	Cam.position += Cam.target.cross(Cam.up) * 0.003f * (x - MouseX);
 		//}
 		//else {
-			Translation.x() += 0.003f * (x - MouseX); // Accumulate translation amount
-			Translation.y() += 0.003f * (MouseY - y);
+			Translation.x += 0.003f * (x - MouseX); // Accumulate translation amount
+			Translation.y += 0.003f * (MouseY - y);
 			MouseX = x; // Store the current mouse position
 			MouseY = y;
 		//}
 	}
 	if (MouseButton == GLUT_MIDDLE_BUTTON) {
 		//if (USE_CAM) {
-		Cam.zoom(MouseX, MouseY, x, y);
+		//Cam.zoom(MouseX, MouseY, x, y);
 	//	Cam.zoom = max(0.001f, Cam.zoom + 0.003f * (y - MouseY));
 		//}
 		//else {
@@ -313,7 +320,7 @@ void motion(int x, int y) {
 	}
 	if (MouseButton == GLUT_LEFT_BUTTON) {
 		//if (USE_CAM) {
-		Cam.rotate(MouseX, MouseY, x, y);
+		//Cam.rotate(MouseX, MouseY, x, y);
 		//Matrix4f rrc, ryc;
 		//
 		//ryc.rotate(0.1f * (MouseX - x), Vector3f(0, 1, 0));
@@ -325,11 +332,19 @@ void motion(int x, int y) {
 		//Cam.target = rrc *Cam.target;
 		//}
 		//else {
-			Matrix4f rx, ry;	// compute the rotation matrices
-			rx.rotate(-0.1f * (MouseY - y), Vector3f(1, 0, 0));
-			ry.rotate(0.1f * (x - MouseX), Vector3f(0, 1, 0));
-			RotationX *= rx;	// accumulate the rotation
-			RotationY *= ry;
+		float rotX = -0.1f * (MouseY - y),
+			rotY = 0.1f * (x - MouseX);
+
+		std::cout << "rotX, rotY = (" << rotX << ", " << rotY << ")" << endl;
+
+			//glm::fmat4 rx, ry;	// compute the rotation matrices
+			RotationX = glm::rotate(RotationX, 0.01f * (MouseY - y), glm::vec3(1, 0, 0));
+	//		rx.rotate(-0.1f * (MouseY - y), Vector3f(1, 0, 0));
+			RotationY = glm::rotate(RotationY, -0.01f * (x - MouseX), glm::vec3(0, 1, 0));
+			//ry.rotate(0.1f * (x - MouseX), Vector3f(0, 1, 0));
+			//RotationX *= rx;	// accumulate the rotation
+			//RotationY *= ry;
+
 			MouseX = x; // Store the current mouse position
 			MouseY = y;
 		//}
