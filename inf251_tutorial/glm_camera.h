@@ -10,56 +10,104 @@ class GLMCamera
 {
 private:
 	vec3 position,
-		viewDirection,
-		up;
+		 target,
+	     up;
 
-	float fov, ar, zNear, zFar, zooming;
-	
-	inline int max(int f1, int f2) {
-		return f1 > f2 ? f1 : f2;
-	}
+	float fov, ar, zNear, zFar, zoom;
 
-	inline float max(float f1, int f2) {
-		return f1 > f2 ? f1 : f2;
-	}
-
-	inline float max(float f1, float f2) {
-		return f1 > f2 ? f1 : f2;
-	}
+	float MOVEMENT_SPEED = 0.05f,
+		ROTATIONAL_SPEED = 0.003f,
+		ZOOM_SPEED = 0.05f;
 public:
 
 	GLMCamera() :
 		position(0.f, 0.f, 0.f),
-		viewDirection(0.f, 0.f, -1.f),
+		target(0.f, 0.f, -1.f),
 		up(0.f, 1.f, 0.f),
-		fov(300.0f),
+		fov(500.0f),
 		ar(1.f),
 		zNear(0.1f),
-		zFar(1000.f),
-		zooming(1.f) {}
+		zFar(4000.f),
+		zoom(1.f) {}
+
+	void setAspectRatio(int width, int height) {
+		ar = (1.0f * width) / height;
+	}
+
+	mat4 computeCameraTransform() {
+		vec3 t = normalize(target),
+			u = normalize(up),
+			r = cross(t, u);
+
+		mat4 camR = mat4(r.x,   r.y,  r.z, 0.f,
+						 u.x,   u.y,  u.z, 0.f,
+						 -t.x, -t.y, -t.z, 0.f,
+						  0.f,  0.f,  0.f, 1.f
+		);
+
+		mat4 camT = glm::translate(-position);
+
+		mat4 prj = perspective(fov, ar, zNear, zFar);
+
+		mat4 camZoom = glm::scale(vec3(zoom, zoom, 1.f));
+
+
+		return camZoom * prj * camR * camT;
+	}
+
+	vec3 getPosition() {
+		return position;
+	}
+
 	
-
-	fmat4 computeCameraTransform() {
-		return glm::lookAt(position, position + viewDirection, up);
-	}
-
-	void rotate(int x0, int y0, int x, int y) {
-		glm::vec2 mouseDelta = vec2((x0 - x), (y0 - y));
-		viewDirection = mat3(glm::rotate(mouseDelta.x, up)) * viewDirection;
-	}
-
-	void zoom(int x0, int y0, int x, int y) {
-		int dx = abs(x0 - x),
-			dy = abs(y0 - y);
-		
-		int maxValue = max(dx, dy);
-
-		zooming = max(0.01f, maxValue);
+	void moveForward() {
+		position += target * MOVEMENT_SPEED;
 	}
 	
-	void translate(int x0, int y0, int x, int y) {
-		position += viewDirection * 0.003f * (float)(y0 - y);
-		position += viewDirection * 0.003f * (float)(x0 - x);
+	void moveBackwards() {
+		position -= (target * MOVEMENT_SPEED);
+	}
+
+	void strafeLeft() {
+		vec3 right = cross(target, up);
+		position -= right * MOVEMENT_SPEED;
+	}
+
+	void strafeRight() {
+		vec3 right = cross(target, up);
+		position += right * MOVEMENT_SPEED;
+	}
+ 
+	void moveDown() {
+		position -= up * MOVEMENT_SPEED;
+	}
+
+	void moveUp() {
+		position += up * MOVEMENT_SPEED;
+	}
+
+	void translate(const vec2& newMousePosition, const vec2& oldMousePosition) {
+		position += target * MOVEMENT_SPEED * (newMousePosition.y - oldMousePosition.y);
+		position += cross(target, up) * MOVEMENT_SPEED * (newMousePosition.x - oldMousePosition.x);
+	}
+
+	void rotate(const vec2& newMousePosition, const vec2& oldMousePosition) {
+		mat4 ry, rr;
+
+		int dx = newMousePosition.x - oldMousePosition.x,
+			dy = newMousePosition.y - oldMousePosition.y;
+
+		ry = glm::rotate(ROTATIONAL_SPEED * dx, vec3(0, 1, 0));
+		target = mat3(ry) * target;
+		up = mat3(ry) * up;
+
+		rr = glm::rotate(ROTATIONAL_SPEED * dy, cross(target, up));
+		up = mat3(rr) * up;
+		target = mat3(rr) * target;
+	}
+
+	void adjustZoom(const vec2& newMousePosition, const vec2& oldMousePosition) {
+		zoom = max(0.001f, zoom + ZOOM_SPEED * (newMousePosition.y - oldMousePosition.y));
 	}
 };
 
