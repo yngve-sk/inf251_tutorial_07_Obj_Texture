@@ -3,6 +3,9 @@
 // model-view transformation
 uniform mat4 transformation;
 
+// camera pos
+uniform vec3 camera_position;
+
 // vertex position
 in vec3 position; 
 

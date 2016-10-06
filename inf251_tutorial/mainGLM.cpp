@@ -13,9 +13,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/extend.hpp>
 
-#include "Vector3.h"
-#include "Matrix4.h"
-
 #include "glm_camera.h"
 
 using namespace std;
@@ -72,7 +69,7 @@ unsigned char *TextureData2 = nullptr;	///< the array where the texture image wi
 GLuint ShaderProgram = 0;	///< A shader program
 GLint TrLoc = -1;				///< model-view matrix uniform variable
 GLint SamplerLoc = -1;			///< texture sampler uniform variable
-
+GLint CameraPositionLoc = -1;
 								// Vertex transformation
 glm::fmat4 RotationX, RotationY;		///< Rotation (along X and Y axis)
 glm::fvec3 Translation;	///< Translation
@@ -82,7 +79,7 @@ float Scaling;			///< Scaling
 int MouseX, MouseY;		///< The last position of the mouse
 int MouseButton;		///< The last mouse button pressed or released
 
-//GLMCamera Cam;
+GLMCamera Cam;
 bool USE_CAM = false;
 
 // --- main() -------------------------------------------------------------------------------------
@@ -121,67 +118,43 @@ int main(int argc, char **argv) {
 	glCullFace(GL_BACK);		// back-faces should be removed
 	//glEnable(GL_CULL_FACE);		// enable back-face culling
 
-		
+
 								// Transformation
-//	if (USE_CAM) {
-	//Cam = *(new GLMCamera());
-		//Cam.position.set(0.f, 0.f, 0.f);
-		//Cam.target.set(0.f, 0.f, -1.f);
-		//Cam.up.set(0.f, 1.f, 0.f);
-		//Cam.fov = 300.0f;
-		//Cam.ar = 1.f;
-		//Cam.zNear = 0.1f;
-		//Cam.zFar = 1000.f;
-		//Cam.zoom = 1.f;
-	//}
-//	else {
-		RotationX = glm::mat4(1.0); 
+	Cam = *(new GLMCamera());
+
+	if (USE_CAM) {
+		// init camera position, rotation, translation
+		// ETC!!
+	}
+	else {
+		RotationX = glm::mat4(1.0);
 		RotationY = glm::mat4(1.0);
 		Translation = glm::fvec3(0.0f, 0.0f, 0.0f);
 		Scaling = 1.0f;
-//	}
+		//	}
 
-	// Shaders & mesh
-	if (!initShaders() || !initMesh()) {
-		cerr << "An error occurred, press Enter to quit ..." << endl;
-		getchar();
-		return -1;
+			// Shaders & mesh
+		if (!initShaders() || !initMesh()) {
+			cerr << "An error occurred, press Enter to quit ..." << endl;
+			getchar();
+			return -1;
+		}
+
+
+
+		// Start the main event loop
+		glutMainLoop();
+
+		// clean-up before exit
+		if (TextureData != nullptr)
+			free(TextureData);
+
+		return 0;
 	}
 
-
-
-	// Start the main event loop
-	glutMainLoop();
-
-	// clean-up before exit
-	if (TextureData != nullptr)
-		free(TextureData);
-
-	return 0;
 }
-
-/*Matrix4f computeCameraTransform(const Camera& cam) {
-
-	Vector3f t = cam.target.getNormalized();
-	Vector3f u = cam.up.getNormalized();
-	Vector3f r = t.cross(u);
-	Matrix4f camR(r.x(), r.y(), r.z(), 0.f,
-		u.x(), u.y(), u.z(), 0.f,
-		-t.x(), -t.y(), -t.z(), 0.f,
-		0.f, 0.f, 0.f, 1.f);
-
-	Matrix4f camT = Matrix4f::createTranslation(-cam.position);
-
-	Matrix4f prj = Matrix4f::createPerspectivePrj(cam.fov, cam.ar, cam.zNear, cam.zFar);
-
-	Matrix4f camZoom = Matrix4f::createScaling(cam.zoom, cam.zoom, 1.f);
-
-	return camZoom * prj * camR * camT;
-}*/
-
 // ************************************************************************************************
 // *** OpenGL callbacks implementation ************************************************************
-/// Called whenever the scene has to be drawn
 void display() {
 	// Clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -196,21 +169,26 @@ void display() {
 	//	RotationX * RotationY *
 	//	glm::scale(glm::fmat4(), glm::vec4(1, 1, 1,0));
 		//Matrix4f::createScaling(Scaling, Scaling, Scaling);
-	glm::fmat4 translationMatrix = glm::translate(fmat4(), Translation);
-	glm::fmat4 rotationMatrixX = RotationX;
-	glm::fmat4 rotationMatrixY = RotationY;
-	glm::fmat4 scaleMatrix = glm::scale(fmat4(), vec3(Scaling, Scaling, Scaling));
+	//glm::fmat4 translationMatrix = glm::translate(fmat4(), Translation);
+	//glm::fmat4 rotationMatrixX = RotationX;
+	//glm::fmat4 rotationMatrixY = RotationY;
+	//glm::fmat4 scaleMatrix = glm::scale(fmat4(), vec3(Scaling, Scaling, Scaling));
+	//
+	//glm::fmat4 transformation = USE_CAM ? Cam.computeCameraTransform() : translationMatrix *
+	//	rotationMatrixX * rotationMatrixY *
+	//	scaleMatrix;
 
-	glm::fmat4 transformation = translationMatrix *
-		rotationMatrixX * rotationMatrixY *
-		scaleMatrix;
+	Cam.setAspectRatio(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+	mat4 transformation = Cam.computeCameraTransform();
+
+	glUniform3fv(CameraPositionLoc, 1, &Cam.getPosition()[0]);
+
 	//// Set the uniform variable for the vertex transformation
 	//Matrix4f transformation = USE_CAM ? computeCameraTransform(Cam) :
 	//	Matrix4f::createTranslation(Translation) *
 	//	RotationX * RotationY * 
 	//	Matrix4f::createScaling(Scaling, Scaling, Scaling);
 
-	//Matrix4f transformation = USE_CAM ? camTransformation : originalTransformation;
 
 	glUniformMatrix4fv(TrLoc, 1, GL_FALSE, &transformation[0][0]);
 
@@ -284,6 +262,7 @@ void keyboard(unsigned char key, int x, int y) {
 			cout << "> done." << endl;
 			glutPostRedisplay();
 		}
+		break;
 	case 'p':
 		//cout << "ROTATION X:" << endl;
 		//RotationX.print(cout);
@@ -291,9 +270,37 @@ void keyboard(unsigned char key, int x, int y) {
 		//RotationY.print(cout);
 		//cout << "TRANSLATE XYZ" << endl;
 		//Translation.print(cout);
+		break;
 	case 't':
 		USE_CAM = !USE_CAM;
 		glutPostRedisplay();
+		break;
+	case 'w':
+		std::cout << "forkwards" << std::endl;
+		Cam.moveForward();
+		glutPostRedisplay();
+		break;
+	case 'a':
+		Cam.strafeLeft();
+		glutPostRedisplay();
+		break;
+	case 's':
+		std::cout << "backwards" << std::endl;
+		Cam.moveBackwards();
+		glutPostRedisplay();
+		break;
+	case 'd':
+		Cam.strafeRight();
+		glutPostRedisplay();
+		break;
+	case 'c':
+		Cam.moveDown();
+		glutPostRedisplay();
+		break;
+	case ' ':
+		Cam.moveUp();
+		glutPostRedisplay();
+		break;
 	}
 }
 
@@ -305,31 +312,26 @@ void mouse(int button, int state, int x, int y) {
 	MouseY = y;
 }
 
-float max(float f1, float f2) {
-	return f1 > f2 ? f1 : f2;
-}
 
 /// Called whenever the mouse is moving while a button is pressed
 void motion(int x, int y) {
 	if (MouseButton == GLUT_RIGHT_BUTTON) {
-		//if(USE_CAM) {
-		//Cam.translate(MouseX, MouseY, x, y);
-	//	Cam.position += Cam.target * 0.003f * (MouseY - y);
-	//	Cam.position += Cam.target.cross(Cam.up) * 0.003f * (x - MouseX);
-		//}
-		//else {
-			Translation.x += 0.003f * (x - MouseX); // Accumulate translation amount
-			Translation.y += 0.003f * (MouseY - y);
-			MouseX = x; // Store the current mouse position
-			MouseY = y;
-		//}
+		Cam.translate(vec2(MouseX, MouseY), vec2(x, y));
+		
+		// normal translation without cam
+	//	Translation.x += 0.003f * (x - MouseX); // Accumulate translation amount
+	//	Translation.y += 0.003f * (MouseY - y);
+		MouseX = x; // Store the current mouse position
+		MouseY = y;
+
 	}
 	if (MouseButton == GLUT_MIDDLE_BUTTON) {
 		//if (USE_CAM) {
-		//Cam.zoom(MouseX, MouseY, x, y);
 	//	Cam.zoom = max(0.001f, Cam.zoom + 0.003f * (y - MouseY));
 		//}
 		//else {
+		Cam.adjustZoom(vec2(x, y), vec2(MouseX, MouseY));
+
 			Scaling += 0.003f * (MouseY - y); // Accumulate scaling amount
 			MouseX = x; // Store the current mouse position
 			MouseY = y;
@@ -349,15 +351,10 @@ void motion(int x, int y) {
 		//Cam.target = rrc *Cam.target;
 		//}
 		//else {
-		float rotX = -0.1f * (MouseY - y),
-			rotY = 0.1f * (x - MouseX);
-
-		std::cout << "rotX, rotY = (" << rotX << ", " << rotY << ")" << endl;
-
-			//glm::fmat4 rx, ry;	// compute the rotation matrices
-			RotationX = glm::rotate(RotationX, 0.01f * (MouseY - y), glm::vec3(1, 0, 0));
-	//		rx.rotate(-0.1f * (MouseY - y), Vector3f(1, 0, 0));
-			RotationY = glm::rotate(RotationY, -0.01f * (x - MouseX), glm::vec3(0, 1, 0));
+		Cam.rotate(glm::vec2(x, y), glm::vec2(MouseX, MouseY));
+		
+			//RotationX = glm::rotate(RotationX, 0.01f * (MouseY - y), glm::vec3(1, 0, 0));
+			//RotationY = glm::rotate(RotationY, -0.01f * (x - MouseX), glm::vec3(0, 1, 0));
 			//ry.rotate(0.1f * (x - MouseX), Vector3f(0, 1, 0));
 			//RotationX *= rx;	// accumulate the rotation
 			//RotationY *= ry;
@@ -636,6 +633,8 @@ bool initShaders() {
 	assert(TrLoc != -1
 		&& SamplerLoc != -1
 	);
+
+	CameraPositionLoc = glGetUniformLocation(ShaderProgram, "camera_position");
 
 	// Shaders can be deleted now
 	glDeleteShader(vertShader);
