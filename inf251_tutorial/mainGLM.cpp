@@ -156,35 +156,23 @@ void display() {
 	assert(ShaderProgram != 0);
 	glUseProgram(ShaderProgram);
 
-	//Matrix4f camTransformation = computeCameraTransform(Cam),
-//	glm::fmat4 camTransformation = Cam.computeCameraTransform(),
-	//glm::fmat4	originalTransformation = glm::vec4(Translation, 1) *
-	//	RotationX * RotationY *
-	//	glm::scale(glm::fmat4(), glm::vec4(1, 1, 1,0));
-		//Matrix4f::createScaling(Scaling, Scaling, Scaling);
-	//glm::fmat4 translationMatrix = glm::translate(fmat4(), Translation);
-	//glm::fmat4 rotationMatrixX = RotationX;
-	//glm::fmat4 rotationMatrixY = RotationY;
-	//glm::fmat4 scaleMatrix = glm::scale(fmat4(), vec3(Scaling, Scaling, Scaling));
-	//
-	//glm::fmat4 transformation = USE_CAM ? Cam.computeCameraTransform() : translationMatrix *
-	//	rotationMatrixX * rotationMatrixY *
-	//	scaleMatrix;
-
 	Cam.setAspectRatio(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
 	mat4 transformation = Cam.computeCameraTransform();
 
 	glUniform3fv(CameraPositionLoc, 1, &Cam.getPosition()[0]);
-
-	//// Set the uniform variable for the vertex transformation
-	//Matrix4f transformation = USE_CAM ? computeCameraTransform(Cam) :
-	//	Matrix4f::createTranslation(Translation) *
-	//	RotationX * RotationY * 
-	//	Matrix4f::createScaling(Scaling, Scaling, Scaling);
-
-
 	glUniformMatrix4fv(TrLoc, 1, GL_FALSE, &transformation[0][0]);
 
+	// lighting!
+//	glUniform3f(DLightDirLoc, 0.5f, -0.5f, -1.0f);
+//	glUniform3f(DLightAColorLoc, 0.05f, 0.03f, 0.0f);
+//	glUniform3f(DLightDColorLoc, 0.f, 0.4f, 0.3f);
+//	glUniform3f(DLightSColorLoc, 0.6f, 0.6f, 0.7f);
+//	glUniform1f(DLightAIntensityLoc, 1.0f);
+//	glUniform1f(DLightDIntensityLoc, 1.0f);
+//	glUniform1f(DLightSIntensityLoc, 1.0f);
+//
+//	glEnableVertexAttribArray(0);
+//	glEnableVertexAttribArray(1);
 	// Set the uniform variable for the texture unit (texture unit 0)
 	glUniform1i(SamplerLoc, 0);
 
