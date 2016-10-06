@@ -55,17 +55,30 @@ GLuint IBO = 0;		///< An index buffer object
 GLuint cubeVBO = 0;		///< A vertex buffer object
 GLuint cubeIBO = 0;		///< An index buffer object
 
-					// Texture
+// Model of the grass
+const int GRASS_VERTS_NUM = 4;
+const int GRASS_TRIS_NUM = 2;
+GLuint GrassVBO = 0;
+GLuint GrassIBO = 0;
+
+// Texture
 GLuint TextureObject = 0;				///< A texture object
 unsigned int TextureWidth = 0;			///< The width of the current texture
 unsigned int TextureHeight = 0;			///< The height of the current texture
 unsigned char *TextureData = nullptr;	///< the array where the texture image will be stored
 
-										// Texture for second object
+// Texture for second object
 GLuint TextureObject2 = 0;				///< A texture object
 unsigned int TextureWidth2 = 0;			///< The width of the current texture
 unsigned int TextureHeight2 = 0;			///< The height of the current texture
 unsigned char *TextureData2 = nullptr;	///< the array where the texture image will be stored
+
+// Texture for the grass
+GLuint TexGrassObj = 0;
+unsigned int TexGrassWidth = 0;
+unsigned int TexGrassHeight = 0;
+unsigned char *TexGrassData = nullptr;
+
 
 										// Shaders
 GLuint ShaderProgram = 0;	///< A shader program
