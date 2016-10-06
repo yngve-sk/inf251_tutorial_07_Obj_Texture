@@ -52,6 +52,8 @@ ModelOBJ Model;		///< A 3D model
 ModelOBJ Model2;		///< A 3D model
 GLuint VBO = 0;		///< A vertex buffer object
 GLuint IBO = 0;		///< An index buffer object
+GLuint cubeVBO = 0;		///< A vertex buffer object
+GLuint cubeIBO = 0;		///< An index buffer object
 
 					// Texture
 GLuint TextureObject = 0;				///< A texture object
@@ -149,6 +151,10 @@ int main(int argc, char **argv) {
 		if (TextureData != nullptr)
 			free(TextureData);
 
+		// clean-up before exit
+		if (TextureData2 != nullptr)
+			free(TextureData2);
+
 		return 0;
 	}
 
@@ -200,37 +206,26 @@ void display() {
 	glEnableVertexAttribArray(posLoc);
 	GLint texLoc = glGetAttribLocation(ShaderProgram, "tex_coords");
 	glEnableVertexAttribArray(texLoc);
-	glVertexAttribPointer(posLoc, 3, GL_FLOAT, GL_FALSE,
-		sizeof(ModelOBJ::Vertex),
-		reinterpret_cast<const GLvoid*>(0));
-	glVertexAttribPointer(texLoc, 2, GL_FLOAT, GL_FALSE,
-		sizeof(ModelOBJ::Vertex),
-		reinterpret_cast<const GLvoid*>(3 * sizeof(float)));
 
-	// Enable texture unit 0 and bind the texture to it
 	glActiveTexture(GL_TEXTURE0);
+
 	glBindTexture(GL_TEXTURE_2D, TextureObject);
-
-
-	// Enable texture unit 0 and bind the texture to it
-	//glActiveTexture(GL_TEXTURE0);
-	//glBindTexture(GL_TEXTURE_2D, TextureObject2);
-
-	// Bind the buffers
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+	glVertexAttribPointer(posLoc, 3, GL_FLOAT, GL_FALSE,
+		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(0));
+	glVertexAttribPointer(texLoc, 2, GL_FLOAT, GL_FALSE,
+		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(sizeof(vec3)));
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,IBO);
+	glDrawElements(GL_TRIANGLES, Model.getNumberOfIndices(), GL_UNSIGNED_INT, 0);
 
-	// Draw the elements on the GPU
-	glDrawElements(
-		GL_TRIANGLES,
-		Model.getNumberOfIndices(),
-		GL_UNSIGNED_INT,
-		0);
-	/*glDrawElements(
-		GL_TRIANGLES,
-		Model2.getNumberOfIndices(),
-		GL_UNSIGNED_INT,
-		(void*)Model.getNumberOfIndices());*/
+	glBindTexture(GL_TEXTURE_2D, TextureObject2);
+	glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeIBO);
+	glVertexAttribPointer(posLoc, 3, GL_FLOAT, GL_FALSE,
+		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(0));
+	glVertexAttribPointer(texLoc, 2, GL_FLOAT, GL_FALSE,
+		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(sizeof(vec3)));
+	glDrawElements(GL_TRIANGLES, Model2.getNumberOfIndices(), GL_UNSIGNED_INT, 0);
 
 	// Disable the "position" vertex attribute (not necessary but recommended)
 	glDisableVertexAttribArray(posLoc);
@@ -343,21 +338,11 @@ void motion(int x, int y) {
 // *** Other methods implementation ***************************************************************
 /// Initialize buffer objects
 bool initMesh() {
-	// Load the OBJ model
-	//if (!Model.import("House-Model\\House.obj")) {
-	if (!Model.import("Objects\\cube-textured\\cube.obj")) {
+	// Load house model
+	if (!Model.import("House-Model\\House.obj")) {
 		cerr << "Error: cannot load model." << endl;
 		return false;
 	}
-
-	Model.normalize();
-
-	/*if (!Model2.import("Objects\\cube-textured\\cubetextured.obj")) {
-		cerr << "Error: cannot load model." << endl;
-		return false;
-	}*/
-
-	Model2.normalize();
 
 	// VBO
 	glGenBuffers(1, &VBO);
@@ -374,40 +359,9 @@ bool initMesh() {
 		Model.getNumberOfIndices() * sizeof(unsigned int),
 		Model.getIndexBuffer(),
 		GL_STATIC_DRAW);
-	
-	/* VBO and IBO for two objects */
-	// VBO
-	/*glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER,
-		(Model.getNumberOfVertices() * sizeof(ModelOBJ::Vertex)) + (Model2.getNumberOfVertices() * sizeof(ModelOBJ::Vertex)),
-		0,
-		GL_STATIC_DRAW);
-	glBufferSubData(GL_ARRAY_BUFFER, 
-		0, 
-		Model.getNumberOfVertices() * sizeof(ModelOBJ::Vertex),
-		&Model.getVertex(0));
-	glBufferSubData(GL_ARRAY_BUFFER,
-		Model.getNumberOfVertices() * sizeof(ModelOBJ::Vertex),
-		Model2.getNumberOfVertices() * sizeof(ModelOBJ::Vertex),
-		&Model2.getVertex(0));
 
-	// IBO
-	glGenBuffers(1, &IBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-		(Model.getNumberOfIndices() * sizeof(unsigned int)) + (Model2.getNumberOfIndices() * sizeof(unsigned int)),
-		0,
-		GL_STATIC_DRAW);
-	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER,
-		0,
-		Model.getNumberOfIndices() * sizeof(unsigned int),
-		&(Model.getIndexBuffer()[0]));
-	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER,
-		Model.getNumberOfIndices() * sizeof(unsigned int),
-		Model2.getNumberOfIndices() * sizeof(unsigned int),
-		&(Model2.getIndexBuffer()[0]));
-		*/
+	Model.normalize();
+
 
 	cout << "number of materials = " << Model.getNumberOfMaterials() << endl;
 	// Check the materials for the texture
@@ -420,10 +374,9 @@ bool initMesh() {
 			if (TextureData != nullptr)
 				free(TextureData);
 
-			//cout << "round " << i << " trying to load @ file path " << "House-Model\\" << Model.getMaterial(i).colorMapFilename.c_str() << endl;
+			cout << "round " << i << " trying to load @ file path " << "House-Model\\" << Model.getMaterial(i).colorMapFilename.c_str() << endl;
 			unsigned int fail = lodepng_decode_file(&TextureData, &TextureWidth, &TextureHeight,
-				//("House-Model\\" + Model.getMaterial(i).colorMapFilename).c_str(),
-				("Objects\\cube-textured\\" + Model.getMaterial(i).colorMapFilename).c_str(),
+				("House-Model\\" + Model.getMaterial(i).colorMapFilename).c_str(),
 				LCT_RGB, 24); // Remember to check the last 2 parameters
 			if (fail != 0) {
 				cerr << "Error: cannot load texture file "
@@ -461,7 +414,30 @@ bool initMesh() {
 		}
 	}
 
-	/*// Load the Wall OBJ model
+	// Load cube model
+	if (!Model2.import("Objects\\cube-textured\\cube.obj")) {
+		cerr << "Error: cannot load model." << endl;
+		return false;
+	}
+
+	Model2.normalize();
+
+	// VBO
+	glGenBuffers(1, &cubeVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+	glBufferData(GL_ARRAY_BUFFER,
+		Model2.getNumberOfVertices() * sizeof(ModelOBJ::Vertex),
+		Model2.getVertexBuffer(),
+		GL_STATIC_DRAW);
+
+	// IBO
+	glGenBuffers(1, &cubeIBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeIBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+		Model2.getNumberOfIndices() * sizeof(unsigned int),
+		Model2.getIndexBuffer(),
+		GL_STATIC_DRAW);
+
 	cout << "number of materials = " << Model2.getNumberOfMaterials() << endl;
 	// Check the materials for the texture
 	for (int i = 0; i < Model2.getNumberOfMaterials(); ++i) {
@@ -470,11 +446,11 @@ bool initMesh() {
 		if (Model2.getMaterial(i).colorMapFilename != "") {
 
 			// Load the texture
-			if (TextureData != nullptr)
-				free(TextureData);
+			if (TextureData2 != nullptr)
+				free(TextureData2);
 
-			cout << "round " << i << " trying to load @ file path " << "Objects\\cube-textured\\" << Model2.getMaterial(i).colorMapFilename.c_str() << endl;
-			unsigned int fail = lodepng_decode_file(&TextureData, &TextureWidth, &TextureHeight,
+			cout << "round " << i << " trying to load @ file path " << "Objects\\cube-textured\\" << Model.getMaterial(i).colorMapFilename.c_str() << endl;
+			unsigned int fail = lodepng_decode_file(&TextureData2, &TextureWidth2, &TextureHeight2,
 				("Objects\\cube-textured\\" + Model2.getMaterial(i).colorMapFilename).c_str(),
 				LCT_RGB, 24); // Remember to check the last 2 parameters
 			if (fail != 0) {
@@ -507,11 +483,9 @@ bool initMesh() {
 			// Configure texture parameter
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-			// For the moment, assumes there is only one texture to be loaded
-			// break;
 		}
-	}*/
+	}
+
 
 	return true;
 } /* initBuffers() */
@@ -519,8 +493,6 @@ bool initMesh() {
 
   /// Initialize shaders. Return false if initialization fail
 bool initShaders() {
-
-	//NEW GREAT COMMENT FROM ZUZU, I AM COMMENTING BECAUSE I WAS FORCED TO DO THAT
 
 	// Create the shader program and check for errors
 	if (ShaderProgram != 0)
