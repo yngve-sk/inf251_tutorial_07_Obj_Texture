@@ -22,9 +22,9 @@ public:
 
 	GLMCamera() :
 		position(0.f, 0.f, 0.f),
-		target(0.f, 0.f, -1.f),
-		up(0.f, 1.f, 0.f),
-		fov(500.0f),
+		target(0.f, 0.f, 1.f),
+		up(0.f, -1.f, 0.f),
+		fov(30.0f),
 		ar(1.f),
 		zNear(0.1f),
 		zFar(4000.f),
@@ -86,12 +86,12 @@ public:
 		position += up * MOVEMENT_SPEED;
 	}
 
-	void translate(const vec2& newMousePosition, const vec2& oldMousePosition) {
-		position += target * MOVEMENT_SPEED * (newMousePosition.y - oldMousePosition.y);
+	void translate(const vec2& oldMousePosition, const vec2& newMousePosition) {
+		position += target * MOVEMENT_SPEED * (oldMousePosition.y - newMousePosition.y);
 		position += cross(target, up) * MOVEMENT_SPEED * (newMousePosition.x - oldMousePosition.x);
 	}
 
-	void rotate(const vec2& newMousePosition, const vec2& oldMousePosition) {
+	void rotate(const vec2& oldMousePosition, const vec2& newMousePosition) {
 		mat4 ry, rr;
 
 		int dx = newMousePosition.x - oldMousePosition.x,
@@ -106,7 +106,7 @@ public:
 		target = mat3(rr) * target;
 	}
 
-	void adjustZoom(const vec2& newMousePosition, const vec2& oldMousePosition) {
+	void adjustZoom(const vec2& oldMousePosition, const vec2& newMousePosition) {
 		zoom = max(0.001f, zoom + ZOOM_SPEED * (newMousePosition.y - oldMousePosition.y));
 	}
 };

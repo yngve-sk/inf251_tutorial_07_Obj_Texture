@@ -312,60 +312,32 @@ void mouse(int button, int state, int x, int y) {
 	MouseY = y;
 }
 
-
+inline void updateMousePosition(int newX, int newY) {
+	MouseX = newX;
+	MouseY = newY;
+}
 /// Called whenever the mouse is moving while a button is pressed
 void motion(int x, int y) {
 	if (MouseButton == GLUT_RIGHT_BUTTON) {
 		Cam.translate(vec2(MouseX, MouseY), vec2(x, y));
-		
-		// normal translation without cam
-	//	Translation.x += 0.003f * (x - MouseX); // Accumulate translation amount
-	//	Translation.y += 0.003f * (MouseY - y);
-		MouseX = x; // Store the current mouse position
-		MouseY = y;
-
+	
+		updateMousePosition(x, y);
 	}
 	if (MouseButton == GLUT_MIDDLE_BUTTON) {
-		//if (USE_CAM) {
-	//	Cam.zoom = max(0.001f, Cam.zoom + 0.003f * (y - MouseY));
-		//}
-		//else {
-		Cam.adjustZoom(vec2(x, y), vec2(MouseX, MouseY));
+		Cam.adjustZoom(vec2(MouseX, MouseY), vec2(x, y));
 
-			Scaling += 0.003f * (MouseY - y); // Accumulate scaling amount
-			MouseX = x; // Store the current mouse position
-			MouseY = y;
-		//}
+		updateMousePosition(x, y);
 	}
 	if (MouseButton == GLUT_LEFT_BUTTON) {
-		//if (USE_CAM) {
-		//Cam.rotate(MouseX, MouseY, x, y);
-		//Matrix4f rrc, ryc;
-		//
-		//ryc.rotate(0.1f * (MouseX - x), Vector3f(0, 1, 0));
-		//Cam.target = ryc * Cam.target;
-		//Cam.up = ryc * Cam.up;
-		//
-		//rrc.rotate(0.1f * (MouseY - y), Cam.target.cross(Cam.up));
-		//Cam.up = rrc * Cam.up;
-		//Cam.target = rrc *Cam.target;
-		//}
-		//else {
-		Cam.rotate(glm::vec2(x, y), glm::vec2(MouseX, MouseY));
+		Cam.rotate(vec2(MouseX, MouseY), glm::vec2(x, y));
 		
-			//RotationX = glm::rotate(RotationX, 0.01f * (MouseY - y), glm::vec3(1, 0, 0));
-			//RotationY = glm::rotate(RotationY, -0.01f * (x - MouseX), glm::vec3(0, 1, 0));
-			//ry.rotate(0.1f * (x - MouseX), Vector3f(0, 1, 0));
-			//RotationX *= rx;	// accumulate the rotation
-			//RotationY *= ry;
-
-			MouseX = x; // Store the current mouse position
-			MouseY = y;
-		//}
+		updateMousePosition(x, y);
 	}
 
 	glutPostRedisplay(); // Specify that the scene needs to be updated
 }
+
+
 
 // ************************************************************************************************
 // *** Other methods implementation ***************************************************************
