@@ -134,6 +134,7 @@ private:
     void buildMeshes();
     void generateNormals();
     void generateTangents();
+	std::vector<float> getNormals();
     void importGeometryFirstPass(FILE *pFile);
     void importGeometrySecondPass(FILE *pFile);
     bool importMaterials(const char *pszFilename);
