@@ -88,12 +88,15 @@ GLint CameraPositionLoc = -1;
 
 // Lighting params
 GLint DLightDirLoc = -1;
+
 GLint DLightAColorLoc = -1;
 GLint DLightDColorLoc = -1;
 GLint DLightSColorLoc = -1;
+
 GLint DLightAIntensityLoc = -1;
 GLint DLightDIntensityLoc = -1;
 GLint DLightSIntensityLoc = -1;
+
 GLint MaterialAColorLoc = -1;
 GLint MaterialDColorLoc = -1;
 GLint MaterialSColorLoc = -1;
@@ -146,55 +149,43 @@ int main(int argc, char **argv) {
 	glFrontFace(GL_CCW);		// Vertex order for the front face
 	glCullFace(GL_BACK);		// back-faces should be removed
 	//glEnable(GL_CULL_FACE);		// enable back-face culling
+	glEnable(GL_LIGHTING);
+	glEnable(GL_TEXTURE_2D);
 
 
 								// Transformation
 	Cam = *(new GLMCamera());
 
-	if (USE_CAM) {
-		// init camera position, rotation, translation
-		// ETC!!
+	
+	// Shaders & mesh
+	if (!initShaders() || !initMesh()) {
+		cerr << "An error occurred, press Enter to quit ..." << endl;
+		getchar();
+		return -1;
 	}
-	else {
-		RotationX = glm::mat4(1.0);
-		RotationY = glm::mat4(1.0);
-		Translation = glm::fvec3(0.0f, 0.0f, 0.0f);
-		Scaling = 1.0f;
-		//	}
 
-			// Shaders & mesh
-		if (!initShaders() || !initMesh()) {
-			cerr << "An error occurred, press Enter to quit ..." << endl;
-			getchar();
-			return -1;
-		}
+	// Start the main event loop
+	glutMainLoop();
 
+	// clean-up before exit
+	if (TextureData != nullptr)
+		free(TextureData);
 
+	// clean-up before exit
+	if (TextureData2 != nullptr)
+		free(TextureData2);
 
-		// Start the main event loop
-		glutMainLoop();
-
-		// clean-up before exit
-		if (TextureData != nullptr)
-			free(TextureData);
-
-		// clean-up before exit
-		if (TextureData2 != nullptr)
-			free(TextureData2);
-
-		return 0;
-	}
+	return 0;
 
 }
 // ************************************************************************************************
 // *** OpenGL callbacks implementation ************************************************************
 void display() {
 	// Clear the screen
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	int width = glutGet(GLUT_WINDOW_WIDTH),
 		height = glutGet(GLUT_WINDOW_HEIGHT);
 	glViewport(0, 0, width, height);
-	
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Enable the shader program
 	assert(ShaderProgram != 0);
@@ -214,11 +205,9 @@ void display() {
 	glUniform1f(DLightAIntensityLoc, 1.0f);
 	glUniform1f(DLightDIntensityLoc, 1.0f);
 	glUniform1f(DLightSIntensityLoc, 1.0f);
-//
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
+
 	// Set the uniform variable for the texture unit (texture unit 0)
-	//glUniform1i(SamplerLoc, 0);
+	//glUniform1i(SamplerLoc, 0);	
 
 	// Enable the vertex attributes and set their format
 	GLint posLoc = glGetAttribLocation(ShaderProgram, "position");
@@ -228,6 +217,13 @@ void display() {
 
 	glActiveTexture(GL_TEXTURE0);
 
+	// Set material parameters for house
+	glUniform3f(MaterialAColorLoc, 0.9f, 1.0f, 0.9f);
+	glUniform3f(MaterialDColorLoc, 0.3f, 1.0f, 0.3f);
+	glUniform3f(MaterialSColorLoc, 0.1f, 0.1f, 0.1f);
+	glUniform1f(MaterialShineLoc, 10.0f);
+
+	// Draw the house
 	glBindTexture(GL_TEXTURE_2D, TextureObject);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glVertexAttribPointer(posLoc, 3, GL_FLOAT, GL_FALSE,
@@ -237,6 +233,13 @@ void display() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,IBO);
 	glDrawElements(GL_TRIANGLES, Model.getNumberOfIndices(), GL_UNSIGNED_INT, 0);
 
+	// Set material parameters for cube
+	glUniform3f(MaterialAColorLoc, 0.9f, 1.0f, 0.9f);
+	glUniform3f(MaterialDColorLoc, 0.3f, 1.0f, 0.3f);
+	glUniform3f(MaterialSColorLoc, 0.1f, 0.1f, 0.1f);
+	glUniform1f(MaterialShineLoc, 10.0f);
+
+	// Draw the cube
 	glBindTexture(GL_TEXTURE_2D, TextureObject2);
 	glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeIBO);
@@ -245,6 +248,12 @@ void display() {
 	glVertexAttribPointer(texLoc, 2, GL_FLOAT, GL_FALSE,
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(sizeof(vec3)));
 	glDrawElements(GL_TRIANGLES, Model2.getNumberOfIndices(), GL_UNSIGNED_INT, 0);
+
+	// Set material parameters for grass
+	glUniform3f(MaterialAColorLoc, 0.9f, 1.0f, 0.9f);
+	glUniform3f(MaterialDColorLoc, 0.3f, 1.0f, 0.3f);
+	glUniform3f(MaterialSColorLoc, 0.1f, 0.1f, 0.1f);
+	glUniform1f(MaterialShineLoc, 10.0f);
 
 	// Draw the grass
 	glBindTexture(GL_TEXTURE_2D, TexGrassObj);
@@ -255,10 +264,12 @@ void display() {
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(sizeof(vec3)));
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, GrassIBO);
 	glDrawElements(GL_TRIANGLES, 3 * GRASS_TRIS_NUM, GL_UNSIGNED_INT, 0);
+	
 
 	// Disable the "position" vertex attribute (not necessary but recommended)
 	glDisableVertexAttribArray(posLoc);
 	glDisableVertexAttribArray(texLoc);
+	cout << "texLoc: " << texLoc << endl;
 
 	// Disable the shader program (not necessary but recommended)
 	glUseProgram(0);
