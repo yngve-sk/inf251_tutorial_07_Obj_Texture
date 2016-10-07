@@ -230,6 +230,16 @@ void display() {
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(sizeof(vec3)));
 	glDrawElements(GL_TRIANGLES, Model2.getNumberOfIndices(), GL_UNSIGNED_INT, 0);
 
+	// Draw the grass
+	glBindTexture(GL_TEXTURE_2D, TexGrassObj);
+	glBindBuffer(GL_ARRAY_BUFFER, GrassVBO);
+	glVertexAttribPointer(posLoc, 3, GL_FLOAT, GL_FALSE,				
+		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(0));
+	glVertexAttribPointer(texLoc, 2, GL_FLOAT, GL_FALSE,
+		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(sizeof(vec3)));
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, GrassIBO);
+	glDrawElements(GL_TRIANGLES, 3 * GRASS_TRIS_NUM, GL_UNSIGNED_INT, 0);
+
 	// Disable the "position" vertex attribute (not necessary but recommended)
 	glDisableVertexAttribArray(posLoc);
 	glDisableVertexAttribArray(texLoc);
@@ -380,7 +390,7 @@ bool initMesh() {
 			cout << "round " << i << " trying to load @ file path " << "House-Model\\" << Model.getMaterial(i).colorMapFilename.c_str() << endl;
 			unsigned int fail = lodepng_decode_file(&TextureData, &TextureWidth, &TextureHeight,
 				("House-Model\\" + Model.getMaterial(i).colorMapFilename).c_str(),
-				LCT_RGB, 24); // Remember to check the last 2 parameters
+				LCT_RGB, 8); // Remember to check the last 2 parameters
 			if (fail != 0) {
 				cerr << "Error: cannot load texture file "
 					<< Model.getMaterial(i).colorMapFilename << endl;
@@ -455,7 +465,7 @@ bool initMesh() {
 			cout << "round " << i << " trying to load @ file path " << "Objects\\cube-textured\\" << Model.getMaterial(i).colorMapFilename.c_str() << endl;
 			unsigned int fail = lodepng_decode_file(&TextureData2, &TextureWidth2, &TextureHeight2,
 				("Objects\\cube-textured\\" + Model2.getMaterial(i).colorMapFilename).c_str(),
-				LCT_RGB, 24); // Remember to check the last 2 parameters
+				LCT_RGB, 8); // Remember to check the last 2 parameters
 			if (fail != 0) {
 				cerr << "Error: cannot load texture file "
 					<< Model2.getMaterial(i).colorMapFilename << endl;
@@ -489,6 +499,84 @@ bool initMesh() {
 		}
 	}
 
+	// Prepare the vertices of the grass
+	ModelOBJ::Vertex grassVerts[GRASS_VERTS_NUM];
+	grassVerts[0].position[0] = -10.f;
+	grassVerts[0].position[1] = -0.5f;
+	grassVerts[0].position[2] = -10.f;
+	grassVerts[1].position[0] = 10.f;
+	grassVerts[1].position[1] = -0.5f;
+	grassVerts[1].position[2] = -10.f;
+	grassVerts[2].position[0] = -10.f;
+	grassVerts[2].position[1] = -0.5f;
+	grassVerts[2].position[2] = 10.f;
+	grassVerts[3].position[0] = 10.f;
+	grassVerts[3].position[1] = -0.5f;
+	grassVerts[3].position[2] = 10.f;
+	grassVerts[0].texCoord[0] = 0.f;
+	grassVerts[0].texCoord[1] = 0.f;
+	grassVerts[1].texCoord[0] = 20.f;
+	grassVerts[1].texCoord[1] = 0.f;
+	grassVerts[2].texCoord[0] = 0.f;
+	grassVerts[2].texCoord[1] = 20.f;
+	grassVerts[3].texCoord[0] = 20.f;
+	grassVerts[3].texCoord[1] = 20.f;
+
+	// Generate a VBO
+	glGenBuffers(1, &GrassVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, GrassVBO);
+	glBufferData(GL_ARRAY_BUFFER,
+		GRASS_VERTS_NUM * sizeof(ModelOBJ::Vertex),
+		grassVerts,
+		GL_STATIC_DRAW);
+
+	// Create an array of indices representing the triangles (faces of the cube)
+	unsigned int grassTris[3 * GRASS_TRIS_NUM] = {
+		0, 2, 1,
+		1, 2, 3
+	};
+
+	// Create an IBO
+	glGenBuffers(1, &GrassIBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, GrassIBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+		3 * GRASS_TRIS_NUM * sizeof(unsigned int),
+		grassTris,
+		GL_DYNAMIC_DRAW);
+
+	// Configure texture parameter
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+
+	// Load the texture image for the grass
+	if (TexGrassData != nullptr)
+		free(TexGrassData);
+	unsigned int fail = lodepng_decode_file(&TexGrassData, &TexGrassWidth, &TexGrassHeight,
+		"grass.png", LCT_RGB, 8);
+	if (fail != 0) {
+		cerr << "Error: cannot load the texture file for the grass. " << endl;
+		return false;
+	}
+
+	// Create the texture object
+	if (TexGrassObj != 0)
+		glDeleteTextures(1, &TexGrassObj);
+	glGenTextures(1, &TexGrassObj);
+
+	// Bind it as a 2D texture (note that other types of textures are supported as well)
+	glBindTexture(GL_TEXTURE_2D, TexGrassObj);
+
+	// Set the texture data
+	glTexImage2D(GL_TEXTURE_2D, 0,
+		GL_RGB,		// remember to check this
+		TexGrassWidth, TexGrassHeight, 0,
+		GL_RGB,		// remember to check this
+		GL_UNSIGNED_BYTE, TexGrassData);
+
+	// Configure texture parameter
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	return true;
 } /* initBuffers() */
