@@ -115,6 +115,8 @@ public:
     bool hasTangents() const;
     bool hasTextureCoords() const;
 
+	std::vector<float> getNormals();
+
 private:
     void addTrianglePos(int index, int material,
         int v0, int v1, int v2);
@@ -134,7 +136,6 @@ private:
     void buildMeshes();
     void generateNormals();
     void generateTangents();
-	std::vector<float> getNormals();
     void importGeometryFirstPass(FILE *pFile);
     void importGeometrySecondPass(FILE *pFile);
     bool importMaterials(const char *pszFilename);

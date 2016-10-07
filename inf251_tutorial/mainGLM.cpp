@@ -55,7 +55,7 @@ GLuint IBO = 0;		///< An index buffer object
 GLuint cubeVBO = 0;		///< A vertex buffer object
 GLuint cubeIBO = 0;		///< An index buffer object
 
-// Model of the grass
+						// Model of the grass
 const int GRASS_VERTS_NUM = 4;
 const int GRASS_TRIS_NUM = 2;
 GLuint GrassVBO = 0;
@@ -67,20 +67,20 @@ unsigned int TextureWidth = 0;			///< The width of the current texture
 unsigned int TextureHeight = 0;			///< The height of the current texture
 unsigned char *TextureData = nullptr;	///< the array where the texture image will be stored
 
-// Texture for second object
+										// Texture for second object
 GLuint TextureObject2 = 0;				///< A texture object
 unsigned int TextureWidth2 = 0;			///< The width of the current texture
 unsigned int TextureHeight2 = 0;			///< The height of the current texture
 unsigned char *TextureData2 = nullptr;	///< the array where the texture image will be stored
 
-// Texture for the grass
+										// Texture for the grass
 GLuint TexGrassObj = 0;
 unsigned int TexGrassWidth = 0;
 unsigned int TexGrassHeight = 0;
 unsigned char *TexGrassData = nullptr;
 
 
-										// Shaders
+// Shaders
 GLuint ShaderProgram = 0;	///< A shader program
 GLint TrLoc = -1;				///< model-view matrix uniform variable
 GLint SamplerLoc = -1;			///< texture sampler uniform variable
@@ -102,7 +102,7 @@ GLint MaterialDColorLoc = -1;
 GLint MaterialSColorLoc = -1;
 GLint MaterialShineLoc = -1;
 
-								// Vertex transformation
+// Vertex transformation
 glm::fmat4 RotationX, RotationY;		///< Rotation (along X and Y axis)
 glm::fvec3 Translation;	///< Translation
 float Scaling;			///< Scaling
@@ -148,15 +148,15 @@ int main(int argc, char **argv) {
 	glEnable(GL_DEPTH_TEST);	// enable depth ordering
 	glFrontFace(GL_CCW);		// Vertex order for the front face
 	glCullFace(GL_BACK);		// back-faces should be removed
-	//glEnable(GL_CULL_FACE);		// enable back-face culling
+								//glEnable(GL_CULL_FACE);		// enable back-face culling
 	glEnable(GL_LIGHTING);
 	glEnable(GL_TEXTURE_2D);
 
 
-								// Transformation
+	// Transformation
 	Cam = *(new GLMCamera());
 
-	
+
 	// Shaders & mesh
 	if (!initShaders() || !initMesh()) {
 		cerr << "An error occurred, press Enter to quit ..." << endl;
@@ -199,12 +199,15 @@ void display() {
 
 	// lighting!
 	glUniform3f(DLightDirLoc, 0.5f, -0.5f, -1.0f);
-	glUniform3f(DLightAColorLoc, 0.05f, 0.03f, 0.0f);
+	glUniform3f(DLightAColorLoc, 0.5f, 0.5f, 0.5f);
 	glUniform3f(DLightDColorLoc, 0.f, 0.4f, 0.3f);
 	glUniform3f(DLightSColorLoc, 0.6f, 0.6f, 0.7f);
 	glUniform1f(DLightAIntensityLoc, 1.0f);
 	glUniform1f(DLightDIntensityLoc, 1.0f);
 	glUniform1f(DLightSIntensityLoc, 1.0f);
+	//	vec3 loc_light_a_color = vec3(1, 1, 1);
+	//	float loc_light_a_intensity = 1.0;
+
 
 	// Set the uniform variable for the texture unit (texture unit 0)
 	//glUniform1i(SamplerLoc, 0);	
@@ -230,7 +233,7 @@ void display() {
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(0));
 	glVertexAttribPointer(texLoc, 2, GL_FLOAT, GL_FALSE,
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(sizeof(vec3)));
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,IBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
 	glDrawElements(GL_TRIANGLES, Model.getNumberOfIndices(), GL_UNSIGNED_INT, 0);
 
 	// Set material parameters for cube
@@ -258,13 +261,13 @@ void display() {
 	// Draw the grass
 	glBindTexture(GL_TEXTURE_2D, TexGrassObj);
 	glBindBuffer(GL_ARRAY_BUFFER, GrassVBO);
-	glVertexAttribPointer(posLoc, 3, GL_FLOAT, GL_FALSE,				
+	glVertexAttribPointer(posLoc, 3, GL_FLOAT, GL_FALSE,
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(0));
 	glVertexAttribPointer(texLoc, 2, GL_FLOAT, GL_FALSE,
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(sizeof(vec3)));
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, GrassIBO);
 	glDrawElements(GL_TRIANGLES, 3 * GRASS_TRIS_NUM, GL_UNSIGNED_INT, 0);
-	
+
 
 	// Disable the "position" vertex attribute (not necessary but recommended)
 	glDisableVertexAttribArray(posLoc);
@@ -355,7 +358,7 @@ inline void updateMousePosition(int newX, int newY) {
 void motion(int x, int y) {
 	if (MouseButton == GLUT_RIGHT_BUTTON) {
 		Cam.translate(vec2(MouseX, MouseY), vec2(x, y));
-	
+
 		updateMousePosition(x, y);
 	}
 	if (MouseButton == GLUT_MIDDLE_BUTTON) {
@@ -365,7 +368,7 @@ void motion(int x, int y) {
 	}
 	if (MouseButton == GLUT_LEFT_BUTTON) {
 		Cam.rotate(vec2(MouseX, MouseY), glm::vec2(x, y));
-		
+
 		updateMousePosition(x, y);
 	}
 
@@ -383,6 +386,7 @@ bool initMesh() {
 		cerr << "Error: cannot load model." << endl;
 		return false;
 	}
+
 
 	// VBO
 	glGenBuffers(1, &VBO);
@@ -518,7 +522,7 @@ bool initMesh() {
 				GL_RGB,			// remember to check this
 				GL_UNSIGNED_BYTE,
 				TextureData2
-				);
+			);
 
 			// Configure texture parameter
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -699,11 +703,11 @@ bool initShaders() {
 	CameraPositionLoc = glGetUniformLocation(ShaderProgram, "camera_position");
 
 	DLightDirLoc = glGetUniformLocation(ShaderProgram, "d_light_direction");
-	
+
 	DLightAColorLoc = glGetUniformLocation(ShaderProgram, "d_light_a_color");
 	DLightDColorLoc = glGetUniformLocation(ShaderProgram, "d_light_d_color");
 	DLightSColorLoc = glGetUniformLocation(ShaderProgram, "d_light_s_color");
-	
+
 	DLightAIntensityLoc = glGetUniformLocation(ShaderProgram, "d_light_a_intensity");
 	DLightDIntensityLoc = glGetUniformLocation(ShaderProgram, "d_light_d_intensity");
 	DLightSIntensityLoc = glGetUniformLocation(ShaderProgram, "d_light_s_intensity");

@@ -161,8 +161,8 @@ void ModelOBJ::destroy()
     m_vertexCache.clear();
 }
 
-std::vector<float> getNormals() {
-	return ;
+std::vector<float> ModelOBJ::getNormals() {
+	return m_normals;
 }
 
 bool ModelOBJ::import(const char *pszFilename, bool rebuildNormals)
@@ -797,9 +797,9 @@ void ModelOBJ::generateTangents(){
     m_hasTangents = true;
 }
 
-std::vector<float> ModelOBJ::getNormals() {
+/*std::vector<float> ModelOBJ::getNormals() {
 	return m_normals;
-}
+}*/
 
 void ModelOBJ::importGeometryFirstPass(FILE *pFile)
 {
