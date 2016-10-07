@@ -86,7 +86,19 @@ GLint TrLoc = -1;				///< model-view matrix uniform variable
 GLint SamplerLoc = -1;			///< texture sampler uniform variable
 GLint CameraPositionLoc = -1;
 
-// 
+// Lighting params
+GLint DLightDirLoc = -1;
+GLint DLightAColorLoc = -1;
+GLint DLightDColorLoc = -1;
+GLint DLightSColorLoc = -1;
+GLint DLightAIntensityLoc = -1;
+GLint DLightDIntensityLoc = -1;
+GLint DLightSIntensityLoc = -1;
+GLint MaterialAColorLoc = -1;
+GLint MaterialDColorLoc = -1;
+GLint MaterialSColorLoc = -1;
+GLint MaterialShineLoc = -1;
+
 								// Vertex transformation
 glm::fmat4 RotationX, RotationY;		///< Rotation (along X and Y axis)
 glm::fvec3 Translation;	///< Translation
@@ -178,6 +190,10 @@ int main(int argc, char **argv) {
 // *** OpenGL callbacks implementation ************************************************************
 void display() {
 	// Clear the screen
+	int width = glutGet(GLUT_WINDOW_WIDTH),
+		height = glutGet(GLUT_WINDOW_HEIGHT);
+	glViewport(0, 0, width, height);
+	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Enable the shader program
@@ -191,18 +207,18 @@ void display() {
 	glUniformMatrix4fv(TrLoc, 1, GL_FALSE, &transformation[0][0]);
 
 	// lighting!
-//	glUniform3f(DLightDirLoc, 0.5f, -0.5f, -1.0f);
-//	glUniform3f(DLightAColorLoc, 0.05f, 0.03f, 0.0f);
-//	glUniform3f(DLightDColorLoc, 0.f, 0.4f, 0.3f);
-//	glUniform3f(DLightSColorLoc, 0.6f, 0.6f, 0.7f);
-//	glUniform1f(DLightAIntensityLoc, 1.0f);
-//	glUniform1f(DLightDIntensityLoc, 1.0f);
-//	glUniform1f(DLightSIntensityLoc, 1.0f);
+	glUniform3f(DLightDirLoc, 0.5f, -0.5f, -1.0f);
+	glUniform3f(DLightAColorLoc, 0.05f, 0.03f, 0.0f);
+	glUniform3f(DLightDColorLoc, 0.f, 0.4f, 0.3f);
+	glUniform3f(DLightSColorLoc, 0.6f, 0.6f, 0.7f);
+	glUniform1f(DLightAIntensityLoc, 1.0f);
+	glUniform1f(DLightDIntensityLoc, 1.0f);
+	glUniform1f(DLightSIntensityLoc, 1.0f);
 //
-//	glEnableVertexAttribArray(0);
-//	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
 	// Set the uniform variable for the texture unit (texture unit 0)
-	glUniform1i(SamplerLoc, 0);
+	//glUniform1i(SamplerLoc, 0);
 
 	// Enable the vertex attributes and set their format
 	GLint posLoc = glGetAttribLocation(ShaderProgram, "position");
@@ -670,6 +686,23 @@ bool initShaders() {
 	);
 
 	CameraPositionLoc = glGetUniformLocation(ShaderProgram, "camera_position");
+
+	DLightDirLoc = glGetUniformLocation(ShaderProgram, "d_light_direction");
+	
+	DLightAColorLoc = glGetUniformLocation(ShaderProgram, "d_light_a_color");
+	DLightDColorLoc = glGetUniformLocation(ShaderProgram, "d_light_d_color");
+	DLightSColorLoc = glGetUniformLocation(ShaderProgram, "d_light_s_color");
+	
+	DLightAIntensityLoc = glGetUniformLocation(ShaderProgram, "d_light_a_intensity");
+	DLightDIntensityLoc = glGetUniformLocation(ShaderProgram, "d_light_d_intensity");
+	DLightSIntensityLoc = glGetUniformLocation(ShaderProgram, "d_light_s_intensity");
+
+	MaterialAColorLoc = glGetUniformLocation(ShaderProgram, "material_a_color");
+	MaterialDColorLoc = glGetUniformLocation(ShaderProgram, "material_d_color");
+	MaterialSColorLoc = glGetUniformLocation(ShaderProgram, "material_s_color");
+
+	MaterialShineLoc = glGetUniformLocation(ShaderProgram, "material_shininess");
+
 
 	// Shaders can be deleted now
 	glDeleteShader(vertShader);
