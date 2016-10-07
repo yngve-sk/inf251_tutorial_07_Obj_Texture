@@ -85,6 +85,8 @@ GLuint ShaderProgram = 0;	///< A shader program
 GLint TrLoc = -1;				///< model-view matrix uniform variable
 GLint SamplerLoc = -1;			///< texture sampler uniform variable
 GLint CameraPositionLoc = -1;
+
+// 
 								// Vertex transformation
 glm::fmat4 RotationX, RotationY;		///< Rotation (along X and Y axis)
 glm::fvec3 Translation;	///< Translation

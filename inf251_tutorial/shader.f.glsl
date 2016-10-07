@@ -12,5 +12,6 @@ out vec4 FragColor;
 void main() { 
 	// Set the output color according to the input
     FragColor = texture2D(sampler, cur_tex_coords.st);
-	
+
+
 }
