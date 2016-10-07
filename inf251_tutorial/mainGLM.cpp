@@ -187,6 +187,8 @@ void display() {
 		height = glutGet(GLUT_WINDOW_HEIGHT);
 	glViewport(0, 0, width, height);
 
+	
+
 	// Enable the shader program
 	assert(ShaderProgram != 0);
 	glUseProgram(ShaderProgram);

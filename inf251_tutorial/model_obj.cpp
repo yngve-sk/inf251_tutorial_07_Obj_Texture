@@ -161,10 +161,6 @@ void ModelOBJ::destroy()
     m_vertexCache.clear();
 }
 
-std::vector<float> getNormals() {
-	return ;
-}
-
 bool ModelOBJ::import(const char *pszFilename, bool rebuildNormals)
 {
     FILE *pFile = fopen(pszFilename, "r");
