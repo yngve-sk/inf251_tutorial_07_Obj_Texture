@@ -102,6 +102,8 @@ GLint MaterialDColorLoc = -1;
 GLint MaterialSColorLoc = -1;
 GLint MaterialShineLoc = -1;
 
+GLfloat  lightPos[] = { 0.0f, 0.0f, 75.0f, 1.0f };
+
 // Vertex transformation
 glm::fmat4 RotationX, RotationY;		///< Rotation (along X and Y axis)
 glm::fvec3 Translation;	///< Translation
@@ -149,9 +151,18 @@ int main(int argc, char **argv) {
 	glFrontFace(GL_CCW);		// Vertex order for the front face
 	glCullFace(GL_BACK);		// back-faces should be removed
 								//glEnable(GL_CULL_FACE);		// enable back-face culling
+	glShadeModel(GL_SMOOTH);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_TEXTURE_2D);
 
+	// Spot Light
+	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);	// Cut off angle is 60 degrees
+	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 60.0f);
+	glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, 100.0f);	// Fairly shiny spot
+
+
+	glEnable(GL_LIGHT0);		// Enable this light in particular
+	glEnable(GL_COLOR_MATERIAL);// Enable color tracking
 
 	// Transformation
 	Cam = *(new GLMCamera());
@@ -207,8 +218,6 @@ void display() {
 	glUniform1f(DLightAIntensityLoc, 1.0f);
 	glUniform1f(DLightDIntensityLoc, 1.0f);
 	glUniform1f(DLightSIntensityLoc, 1.0f);
-	//	vec3 loc_light_a_color = vec3(1, 1, 1);
-	//	float loc_light_a_intensity = 1.0;
 
 
 	// Set the uniform variable for the texture unit (texture unit 0)
@@ -222,11 +231,6 @@ void display() {
 
 	glActiveTexture(GL_TEXTURE0);
 
-	// Set material parameters for house
-	glUniform3f(MaterialAColorLoc, 0.9f, 1.0f, 0.9f);
-	glUniform3f(MaterialDColorLoc, 0.3f, 1.0f, 0.3f);
-	glUniform3f(MaterialSColorLoc, 0.1f, 0.1f, 0.1f);
-	glUniform1f(MaterialShineLoc, 10.0f);
 
 	// Draw the house
 	glBindTexture(GL_TEXTURE_2D, TextureObject);
@@ -238,11 +242,7 @@ void display() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
 	glDrawElements(GL_TRIANGLES, Model.getNumberOfIndices(), GL_UNSIGNED_INT, 0);
 
-	// Set material parameters for cube
-	glUniform3f(MaterialAColorLoc, 0.9f, 1.0f, 0.9f);
-	glUniform3f(MaterialDColorLoc, 0.3f, 1.0f, 0.3f);
-	glUniform3f(MaterialSColorLoc, 0.1f, 0.1f, 0.1f);
-	glUniform1f(MaterialShineLoc, 10.0f);
+	
 
 	// Draw the cube
 	glBindTexture(GL_TEXTURE_2D, TextureObject2);
@@ -253,6 +253,8 @@ void display() {
 	glVertexAttribPointer(texLoc, 2, GL_FLOAT, GL_FALSE,
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(sizeof(vec3)));
 	glDrawElements(GL_TRIANGLES, Model2.getNumberOfIndices(), GL_UNSIGNED_INT, 0);
+
+
 
 	// Set material parameters for grass
 	glUniform3f(MaterialAColorLoc, 0.9f, 1.0f, 0.9f);
@@ -271,10 +273,10 @@ void display() {
 	glDrawElements(GL_TRIANGLES, 3 * GRASS_TRIS_NUM, GL_UNSIGNED_INT, 0);
 
 
+
 	// Disable the "position" vertex attribute (not necessary but recommended)
 	glDisableVertexAttribArray(posLoc);
 	glDisableVertexAttribArray(texLoc);
-	cout << "texLoc: " << texLoc << endl;
 
 	// Disable the shader program (not necessary but recommended)
 	glUseProgram(0);
@@ -455,8 +457,11 @@ bool initMesh() {
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-			// For the moment, assumes there is only one texture to be loaded
-			// break;
+			// Set material parameters for house
+			glUniform3f(MaterialAColorLoc, Model.getMaterial(i).ambient[0], Model.getMaterial(i).ambient[1], Model.getMaterial(i).ambient[2]);
+			glUniform3f(MaterialDColorLoc, Model.getMaterial(i).diffuse[0], Model.getMaterial(i).diffuse[1], Model.getMaterial(i).diffuse[2]);
+			glUniform3f(MaterialSColorLoc, Model.getMaterial(i).specular[0], Model.getMaterial(i).specular[1], Model.getMaterial(i).specular[2]);
+			glUniform1f(MaterialShineLoc, Model.getMaterial(i).shininess);
 		}
 	}
 
@@ -529,6 +534,12 @@ bool initMesh() {
 			// Configure texture parameter
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+			// Set material parameters for cube
+			glUniform3f(MaterialAColorLoc, Model2.getMaterial(i).ambient[0], Model2.getMaterial(i).ambient[1], Model2.getMaterial(i).ambient[2]);
+			glUniform3f(MaterialDColorLoc, Model2.getMaterial(i).diffuse[0], Model2.getMaterial(i).diffuse[1], Model2.getMaterial(i).diffuse[2]);
+			glUniform3f(MaterialSColorLoc, Model2.getMaterial(i).specular[0], Model2.getMaterial(i).specular[1], Model2.getMaterial(i).specular[2]);
+			glUniform1f(MaterialShineLoc, Model2.getMaterial(i).shininess);
 		}
 	}
 
