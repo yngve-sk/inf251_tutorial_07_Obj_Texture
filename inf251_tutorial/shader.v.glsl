@@ -1,5 +1,6 @@
 #version 330	// GLSL version
 
+
 // model-view transformation
 uniform mat4 transformation;
 
@@ -23,10 +24,21 @@ uniform vec3 d_light_a_color;
 uniform float d_light_a_intensity;
 
 uniform vec3 d_light_d_color;
-uniform vec3 d_light_d_intensity;
+uniform float d_light_d_intensity;
 
 uniform vec3 d_light_s_color;
-uniform vec3 d_light_s_intensity;
+uniform float d_light_s_intensity;
+
+// Spotlight
+//uniform vec3 p_light_a_color;
+//uniform float p_light_a_intensity;
+//
+//uniform vec3 p_light_d_color;
+//uniform float p_light_d_intensity;
+//
+//uniform vec3 d_light_s_color;
+//uniform float d_light_s_intensity;
+
 
 // Object material
  uniform vec3 material_a_color;
@@ -38,8 +50,6 @@ uniform float material_shininess;
 
 
 void main() {
-	vec3 loc_light_a_color = d_light_a_color;
-	float loc_light_a_intensity = d_light_a_intensity;
 	// transform the vertex
     gl_Position = transformation * vec4(position, 1.);	
 
@@ -69,8 +79,6 @@ void main() {
 
 
 	//From Sergej  the parameters are not passed
-//	vec3 loc_light_a_color = vec3(1,1,1);
-//	float loc_light_a_intensity = 1.0;
 
 	vec3 color;
 	vec3 ambient_color = clamp(
