@@ -155,10 +155,7 @@ int main(int argc, char **argv) {
 	glEnable(GL_LIGHTING);
 	glEnable(GL_TEXTURE_2D);
 
-	// Spot Light
-	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);	// Cut off angle is 60 degrees
-	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 60.0f);
-	glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, 100.0f);	// Fairly shiny spot
+	
 
 
 	glEnable(GL_LIGHT0);		// Enable this light in particular
@@ -219,6 +216,11 @@ void display() {
 	glUniform1f(DLightDIntensityLoc, 1.0f);
 	glUniform1f(DLightSIntensityLoc, 1.0f);
 
+	// Spot Light
+	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);	// Cut off angle is 60 degrees
+	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 60.0f);
+	glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, 100.0f);	// Fairly shiny spot
+
 
 	// Set the uniform variable for the texture unit (texture unit 0)
 	//glUniform1i(SamplerLoc, 0);	
@@ -247,7 +249,6 @@ void display() {
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(0));
 	glVertexAttribPointer(texLoc, 2, GL_FLOAT, GL_FALSE,
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(3*sizeof(float)));
-
 	glVertexAttribPointer(normalLoc, 3, GL_FLOAT, GL_FALSE,
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(5*sizeof(float)));
 
@@ -260,10 +261,14 @@ void display() {
 	glBindTexture(GL_TEXTURE_2D, TextureObject2);
 	glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeIBO);
+
 	glVertexAttribPointer(posLoc, 3, GL_FLOAT, GL_FALSE,
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(0));
 	glVertexAttribPointer(texLoc, 2, GL_FLOAT, GL_FALSE,
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(sizeof(vec3)));
+	glVertexAttribPointer(normalLoc, 3, GL_FLOAT, GL_FALSE,
+		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(5 * sizeof(float)));
+
 	glDrawElements(GL_TRIANGLES, Model2.getNumberOfIndices(), GL_UNSIGNED_INT, 0);
 
 
@@ -277,10 +282,14 @@ void display() {
 	// Draw the grass
 	glBindTexture(GL_TEXTURE_2D, TexGrassObj);
 	glBindBuffer(GL_ARRAY_BUFFER, GrassVBO);
+
 	glVertexAttribPointer(posLoc, 3, GL_FLOAT, GL_FALSE,
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(0));
 	glVertexAttribPointer(texLoc, 2, GL_FLOAT, GL_FALSE,
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(sizeof(vec3)));
+	glVertexAttribPointer(normalLoc, 3, GL_FLOAT, GL_FALSE,
+		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(5 * sizeof(float)));
+
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, GrassIBO);
 	glDrawElements(GL_TRIANGLES, 3 * GRASS_TRIS_NUM, GL_UNSIGNED_INT, 0);
 
