@@ -109,5 +109,17 @@ public:
 	void adjustZoom(const vec2& oldMousePosition, const vec2& newMousePosition) {
 		zoom = max(0.001f, zoom + ZOOM_SPEED * (newMousePosition.y - oldMousePosition.y));
 	}
+
+	void adjustFov(float delta) {
+		fov += delta;
+	}
+
+	void adjustZNear(float delta) {
+		zNear += delta;
+	}
+
+	void adjustZFar(float delta) {
+		zFar += delta;
+	}
 };
 
