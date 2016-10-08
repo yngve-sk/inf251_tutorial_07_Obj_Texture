@@ -75,7 +75,7 @@ GLint TrLoc = -1;				///< model-view matrix uniform variable
 GLint SamplerLoc = -1;			///< texture sampler uniform variable
 GLint CameraPositionLoc = -1;
 
-// Lighting params
+// Lighting params (DIRECTIONAL)
 GLint DLightDirLoc = -1;
 
 GLint DLightAColorLoc = -1;
@@ -90,6 +90,17 @@ GLint MaterialAColorLoc = -1;
 GLint MaterialDColorLoc = -1;
 GLint MaterialSColorLoc = -1;
 GLint MaterialShineLoc = -1;
+
+// Lighting params (DIRECTIONAL)
+GLint SLightDirLoc = -1;
+	  
+GLint SLightAColorLoc = -1;
+GLint SLightDColorLoc = -1;
+GLint SLightSColorLoc = -1;
+	  
+GLint SLightAIntensityLoc = -1;
+GLint SLightDIntensityLoc = -1;
+GLint SLightSIntensityLoc = -1;
 
 GLfloat  lightPos[] = { 0.0f, 0.0f, 75.0f, 1.0f };
 
@@ -145,12 +156,12 @@ int main(int argc, char **argv) {
 	glEnable(GL_TEXTURE_2D);
 
 	// Spot Light
-	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);	// Cut off angle is 60 degrees
-	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 60.0f);
-	glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, 100.0f);	// Fairly shiny spot
-
-
-	glEnable(GL_LIGHT0);		// Enable this light in particular
+	//glLightfv(GL_LIGHT0, GL_POSITION, lightPos);	// Cut off angle is 60 degrees
+	//glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 60.0f);
+	//glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, 100.0f);	// Fairly shiny spot
+	//
+	//
+	//glEnable(GL_LIGHT0);		// Enable this light in particular
 	glEnable(GL_COLOR_MATERIAL);// Enable color tracking
 
 	// Transformation
@@ -199,7 +210,7 @@ void display() {
 	glUniform3fv(CameraPositionLoc, 1, &Cam.getPosition()[0]);
 	glUniformMatrix4fv(TrLoc, 1, GL_FALSE, &transformation[0][0]);
 
-	// lighting!
+	// lighting (directional)!
 	glUniform3f(DLightDirLoc, 0.5f, -0.5f, -1.0f);
 	glUniform3f(DLightAColorLoc, 0.5f, 0.5f, 0.5f);
 	glUniform3f(DLightDColorLoc, 0.f, 0.4f, 0.3f);
@@ -207,6 +218,15 @@ void display() {
 	glUniform1f(DLightAIntensityLoc, 1.0f);
 	glUniform1f(DLightDIntensityLoc, 1.0f);
 	glUniform1f(DLightSIntensityLoc, 1.0f);
+
+	// lighting (spotlight)!
+	glUniform3f(SLightDirLoc, 0.5f, -0.5f, -1.0f);
+	glUniform3f(SLightAColorLoc, 0.5f, 0.5f, 0.5f);
+	glUniform3f(SLightDColorLoc, 0.f, 0.4f, 0.3f);
+	glUniform3f(SLightSColorLoc, 0.6f, 0.6f, 0.7f);
+	glUniform1f(SLightAIntensityLoc, 1.0f);
+	glUniform1f(SLightDIntensityLoc, 1.0f);
+	glUniform1f(SLightSIntensityLoc, 1.0f);
 
 
 	// Set the uniform variable for the texture unit (texture unit 0)

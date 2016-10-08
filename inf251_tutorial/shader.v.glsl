@@ -30,55 +30,51 @@ uniform vec3 d_light_s_color;
 uniform float d_light_s_intensity;
 
 // Spotlight
-//uniform vec3 p_light_a_color;
-//uniform float p_light_a_intensity;
-//
-//uniform vec3 p_light_d_color;
-//uniform float p_light_d_intensity;
-//
-//uniform vec3 d_light_s_color;
-//uniform float d_light_s_intensity;
+uniform vec3 s_light_a_color;
+uniform float s_light_a_intensity;
+
+uniform vec3 s_light_d_color;
+uniform float s_light_d_intensity;
+
+uniform vec3 s_light_s_color;
+uniform float s_light_s_intensity;
 
 
 // Object material
  uniform vec3 material_a_color;
  uniform vec3 material_d_color;
  uniform vec3 material_s_color;
-uniform float material_shininess;
+ uniform float material_shininess;
 
 
-
+vec3 generateLightColor(vec3 light_dir);
 
 void main() {
 	// transform the vertex
     gl_Position = transformation * vec4(position, 1.);	
 
+	// pass the texture coordinates to the fragment shader
+	cur_tex_coords = tex_coords;
+
+	// calculate light color
+	vec3 color = generateLightColor(d_light_direction);
+
+	f_lighting = vec4(color, 1.0);
+}
+
+vec3 generateLightColor(vec3 light_dir) {
 	//From Sergej
 	vec4 fWorldPosition = transformation * vec4(position, 1.);	   //WorldPosition
 	vec3 normal_nn = normalize((transformation * vec4(normal,0.0)).xyz);	//The normal must be transformed in World coordinates as well
 	
-	// pass the texture coordinates to the fragment shader
-	cur_tex_coords = tex_coords;
 
-	//vec3 normal_nn = normalize(normal);
-	//vec3 d_light_dir_nn = normalize(d_light_direction);
-	//vec3 view_dir_nn = normalize(camera_position - position);
+	vec3 camLightDirection = camera_position - position;
 
-	//float dot_d_light_normal = dot(-d_light_dir_nn, normal);
-	//vec3 d_reflected_dir_nn = d_light_dir_nn + 2. * dot_d_light_normal * normal;
-	//d_reflected_dir_nn = normalize(d_reflected_dir_nn);
-
-
-	vec3 d_light_dir_nn = normalize(d_light_direction);
+	vec3 d_light_dir_nn = normalize(light_dir);
 	vec3 view_dir_nn = normalize(camera_position - fWorldPosition.xyz /*position*/ );		//Transform into world position (Sergej)
 	float dot_d_light_normal = dot(-d_light_dir_nn, normal_nn);   // notice the minus!   //The minus was missing and I used the transformed normal here (Sergej)
-	//vec3 d_reflected_dir_nn = d_light_dir_nn + 2. * dot_d_light_normal * normal_nn;
 	vec3 d_reflected_dir_nn = reflect(d_light_dir_nn,normal_nn);					//There is a reflect function build in (Sergej)
-// should be already normalized, but we "need" to correct numerical errors
-	d_reflected_dir_nn = normalize(d_reflected_dir_nn); 
-
-
-	//From Sergej  the parameters are not passed
+	d_reflected_dir_nn = normalize(d_reflected_dir_nn); // should be already normalized, but we "need" to correct numerical errors
 
 	vec3 color;
 	vec3 ambient_color = clamp(
@@ -93,7 +89,5 @@ void main() {
 		0.0,1.0);
 	color = (ambient_color + diff_color + spec_color); // NOT JUST ONE CHANNEL
 
-	color = clamp(color, 0.0, 1.0);
-
-	f_lighting = vec4(color, 1.0);
+	return(color);
 }
