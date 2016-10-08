@@ -21,17 +21,6 @@ struct Vertex {
 	glm::fvec3 position, normal;
 };
 
-//class Camera {
-//	public:
-//	Vector3f position, target, up;
-//
-//	float fov; // fieldof view
-//	float ar; // aspect ratio
-//
-//	float zNear, zFar; // depthof near/far plane
-//
-//	float zoom; // extra scaling param
-//};
 
 // --- OpenGL callbacks ---------------------------------------------------------------------------
 void display();
@@ -229,6 +218,8 @@ void display() {
 	GLint texLoc = glGetAttribLocation(ShaderProgram, "tex_coords");
 	glEnableVertexAttribArray(texLoc);
 	
+	glActiveTexture(GL_TEXTURE0);
+
 	GLint normalLoc = glGetAttribLocation(ShaderProgram, "normal");
 	glEnableVertexAttribArray(normalLoc);
 
@@ -243,6 +234,9 @@ void display() {
 	cout << "size of float 5 = " << sizeoffloat5 << endl;
 	cout << "size of vec3 = " << sizeofvec3 << endl;
 
+	// Draw the house
+	glBindTexture(GL_TEXTURE_2D, TextureObject);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glVertexAttribPointer(posLoc, 3, GL_FLOAT, GL_FALSE,
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(0));
 	glVertexAttribPointer(texLoc, 2, GL_FLOAT, GL_FALSE,
@@ -250,6 +244,11 @@ void display() {
 
 	glVertexAttribPointer(normalLoc, 3, GL_FLOAT, GL_FALSE,
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(5*sizeof(float)));
+
+//	for (int i = 0; i < Model.getNumberOfVertices(); i++) {
+	//	ModelOBJ::Vertex v = Model.getVertex(i);
+	//	cout << "Vertex with index " << i << " has texture coordinates (" << v.texCoord[0] << ", " << v.texCoord[1] << ")" << endl;
+	//}
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
 	glDrawElements(GL_TRIANGLES, Model.getNumberOfIndices(), GL_UNSIGNED_INT, 0);
@@ -301,6 +300,7 @@ void display() {
 void idle() {
 }
 
+float deltaDefault = 10;
 /// Called whenever a keyboard button is pressed (only ASCII characters)
 void keyboard(unsigned char key, int x, int y) {
 	switch (tolower(key)) {
@@ -316,14 +316,6 @@ void keyboard(unsigned char key, int x, int y) {
 			cout << "> done." << endl;
 			glutPostRedisplay();
 		}
-		break;
-	case 'p':
-		//cout << "ROTATION X:" << endl;
-		//RotationX.print(cout);
-		//cout << "ROTATION Y:" << endl;
-		//RotationY.print(cout);
-		//cout << "TRANSLATE XYZ" << endl;
-		//Translation.print(cout);
 		break;
 	case 't':
 		USE_CAM = !USE_CAM;
@@ -353,6 +345,30 @@ void keyboard(unsigned char key, int x, int y) {
 		break;
 	case ' ':
 		Cam.moveUp();
+		glutPostRedisplay();
+		break;
+	case '+':
+		Cam.adjustFov(deltaDefault);
+		glutPostRedisplay();
+		break;
+	case '-':
+		Cam.adjustFov(-deltaDefault);
+		glutPostRedisplay();
+		break;
+	case 'p':
+		Cam.adjustZFar(deltaDefault);
+		glutPostRedisplay();
+		break;
+	case 'o':
+		Cam.adjustZFar(-deltaDefault);
+		glutPostRedisplay();
+		break;
+	case 'l':
+		Cam.adjustZNear(deltaDefault);
+		glutPostRedisplay();
+		break;
+	case 'k':
+		Cam.adjustZNear(-deltaDefault);
 		glutPostRedisplay();
 		break;
 	}
@@ -399,9 +415,12 @@ void motion(int x, int y) {
 bool initMesh() {
 	// Load house model
 	if (!Model.import("House-Model\\House.obj")) {
-		cerr << "Error: cannot load model." << endl;
+//	if (!Model.import("testOBJ\\building.obj")) {
+			cerr << "Error: cannot load model." << endl;
 		return false;
 	}
+
+	cout << "Imported model..." << endl;
 
 
 	// VBO
