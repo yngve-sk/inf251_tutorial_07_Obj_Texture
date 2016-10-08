@@ -18,6 +18,7 @@ private:
 	float MOVEMENT_SPEED = 0.05f,
 		ROTATIONAL_SPEED = 0.003f,
 		ZOOM_SPEED = 0.05f;
+	bool perspectiveProjection = true;
 public:
 
 	GLMCamera() :
@@ -47,7 +48,12 @@ public:
 
 		mat4 camT = glm::translate(-position);
 
-		mat4 prj = perspective(fov, ar, zNear, zFar);
+		mat4 prj;
+		if (perspectiveProjection) {
+			prj = perspective(fov, ar, zNear, zFar);
+		} else {
+			prj = ortho(-20.0f, 20.0f, -20.0f, 20.0f, 1.0f, 100.0f);
+		}
 		
 		mat4 camZoom = glm::scale(vec3(zoom, zoom, 1.f));
 
@@ -59,6 +65,13 @@ public:
 		return position;
 	}
 
+	void switchPerspective() {
+		perspectiveProjection = !perspectiveProjection;
+	}
+
+	bool isProjectionPerspective() {
+		return perspectiveProjection;
+	}
 	
 	void moveForward() {
 		position += target * MOVEMENT_SPEED;
