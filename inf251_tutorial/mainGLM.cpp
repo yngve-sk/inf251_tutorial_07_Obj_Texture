@@ -228,17 +228,29 @@ void display() {
 	glEnableVertexAttribArray(posLoc);
 	GLint texLoc = glGetAttribLocation(ShaderProgram, "tex_coords");
 	glEnableVertexAttribArray(texLoc);
+	
+	GLint normalLoc = glGetAttribLocation(ShaderProgram, "normal");
+	glEnableVertexAttribArray(normalLoc);
 
-	glActiveTexture(GL_TEXTURE0);
+	cout << "normal loc : " << normalLoc << endl;
+	cout << "tex loc : " << texLoc << endl;
 
+	int sizeoffloat3 = 3 * sizeof(float);
+	int sizeoffloat5 = 5 * sizeof(float);
+	int sizeofvec3 = sizeof(vec3);
+	
+	cout << "size of float 3 = " << sizeoffloat3 << endl;
+	cout << "size of float 5 = " << sizeoffloat5 << endl;
+	cout << "size of vec3 = " << sizeofvec3 << endl;
 
-	// Draw the house
-	glBindTexture(GL_TEXTURE_2D, TextureObject);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glVertexAttribPointer(posLoc, 3, GL_FLOAT, GL_FALSE,
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(0));
 	glVertexAttribPointer(texLoc, 2, GL_FLOAT, GL_FALSE,
-		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(sizeof(vec3)));
+		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(3*sizeof(float)));
+
+	glVertexAttribPointer(normalLoc, 3, GL_FLOAT, GL_FALSE,
+		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(5*sizeof(float)));
+
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
 	glDrawElements(GL_TRIANGLES, Model.getNumberOfIndices(), GL_UNSIGNED_INT, 0);
 
