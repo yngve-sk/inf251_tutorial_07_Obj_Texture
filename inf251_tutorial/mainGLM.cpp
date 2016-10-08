@@ -155,9 +155,6 @@ int main(int argc, char **argv) {
 	glEnable(GL_LIGHTING);
 	glEnable(GL_TEXTURE_2D);
 
-	
-
-
 	glEnable(GL_LIGHT0);		// Enable this light in particular
 	glEnable(GL_COLOR_MATERIAL);// Enable color tracking
 

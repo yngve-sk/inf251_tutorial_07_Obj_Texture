@@ -48,7 +48,7 @@ public:
 		mat4 camT = glm::translate(-position);
 
 		mat4 prj = perspective(fov, ar, zNear, zFar);
-
+		
 		mat4 camZoom = glm::scale(vec3(zoom, zoom, 1.f));
 
 
