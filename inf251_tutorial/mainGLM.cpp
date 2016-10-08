@@ -75,7 +75,7 @@ GLint TrLoc = -1;				///< model-view matrix uniform variable
 GLint SamplerLoc = -1;			///< texture sampler uniform variable
 GLint CameraPositionLoc = -1;
 
-// Lighting params
+// Lighting params (DIRECTIONAL)
 GLint DLightDirLoc = -1;
 
 GLint DLightAColorLoc = -1;
@@ -90,6 +90,17 @@ GLint MaterialAColorLoc = -1;
 GLint MaterialDColorLoc = -1;
 GLint MaterialSColorLoc = -1;
 GLint MaterialShineLoc = -1;
+
+// Lighting params (DIRECTIONAL)
+GLint SLightDirLoc = -1;
+	  
+GLint SLightAColorLoc = -1;
+GLint SLightDColorLoc = -1;
+GLint SLightSColorLoc = -1;
+	  
+GLint SLightAIntensityLoc = -1;
+GLint SLightDIntensityLoc = -1;
+GLint SLightSIntensityLoc = -1;
 
 GLfloat  lightPos[] = { 0.0f, 0.0f, 75.0f, 1.0f };
 
@@ -144,6 +155,12 @@ int main(int argc, char **argv) {
 	glEnable(GL_LIGHTING);
 	glEnable(GL_TEXTURE_2D);
 
+	// Spot Light
+	//glLightfv(GL_LIGHT0, GL_POSITION, lightPos);	// Cut off angle is 60 degrees
+	//glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 60.0f);
+	//glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, 100.0f);	// Fairly shiny spot
+	//
+	//
 	//glEnable(GL_LIGHT0);		// Enable this light in particular
 	glEnable(GL_COLOR_MATERIAL);// Enable color tracking
 
@@ -193,8 +210,8 @@ void display() {
 	glUniform3fv(CameraPositionLoc, 1, &Cam.getPosition()[0]);
 	glUniformMatrix4fv(TrLoc, 1, GL_FALSE, &transformation[0][0]);
 
-	// lighting!
-	glUniform3f(DLightDirLoc, 0.2f, -0.2f, -0.2f);
+	// lighting (directional)!
+	glUniform3f(DLightDirLoc, 0.5f, -0.5f, -1.0f);
 	glUniform3f(DLightAColorLoc, 0.5f, 0.5f, 0.5f);
 	glUniform3f(DLightDColorLoc, 0.f, 0.4f, 0.3f);
 	glUniform3f(DLightSColorLoc, 0.6f, 0.6f, 0.7f);
@@ -202,22 +219,14 @@ void display() {
 	glUniform1f(DLightDIntensityLoc, 1.0f);
 	glUniform1f(DLightSIntensityLoc, 1.0f);
 
-	//Zuzana: Trying to add only spotlight
-	glDisable(GL_LIGHT0);
-	glEnable(GL_LIGHT1);
-
-	GLfloat _light_position[] = { Cam.getPosition()[0], Cam.getPosition()[0], Cam.getPosition()[0], 1.0 }; // Last argument 0.0 for directional ligt, non-zero (1.0) for spotlight
-	float _spotlight_position[] = { 0.0, -1.0, 0.0 };
-
-	glLightfv(GL_LIGHT1, GL_POSITION, _light_position);
-	glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 10.0);
-	glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 2.0);
-	glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, _spotlight_position);
-
-	// Spot Light
-	/*glLightfv(GL_LIGHT0, GL_POSITION, lightPos);	// Cut off angle is 60 degrees
-	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 60.0f);
-	glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, 100.0f);	// Fairly shiny spot*/
+	// lighting (spotlight)!
+	glUniform3f(SLightDirLoc, 0.5f, -0.5f, -1.0f);
+	glUniform3f(SLightAColorLoc, 0.5f, 0.5f, 0.5f);
+	glUniform3f(SLightDColorLoc, 0.f, 0.4f, 0.3f);
+	glUniform3f(SLightSColorLoc, 0.6f, 0.6f, 0.7f);
+	glUniform1f(SLightAIntensityLoc, 1.0f);
+	glUniform1f(SLightDIntensityLoc, 1.0f);
+	glUniform1f(SLightSIntensityLoc, 1.0f);
 
 
 	// Set the uniform variable for the texture unit (texture unit 0)
@@ -252,6 +261,7 @@ void display() {
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(0));
 	glVertexAttribPointer(texLoc, 2, GL_FLOAT, GL_FALSE,
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(3*sizeof(float)));
+
 	glVertexAttribPointer(normalLoc, 3, GL_FLOAT, GL_FALSE,
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(5*sizeof(float)));
 
@@ -269,14 +279,10 @@ void display() {
 	glBindTexture(GL_TEXTURE_2D, TextureObject2);
 	glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeIBO);
-
 	glVertexAttribPointer(posLoc, 3, GL_FLOAT, GL_FALSE,
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(0));
 	glVertexAttribPointer(texLoc, 2, GL_FLOAT, GL_FALSE,
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(sizeof(vec3)));
-	glVertexAttribPointer(normalLoc, 3, GL_FLOAT, GL_FALSE,
-		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(5 * sizeof(float)));
-
 	glDrawElements(GL_TRIANGLES, Model2.getNumberOfIndices(), GL_UNSIGNED_INT, 0);
 
 
@@ -290,31 +296,14 @@ void display() {
 	// Draw the grass
 	glBindTexture(GL_TEXTURE_2D, TexGrassObj);
 	glBindBuffer(GL_ARRAY_BUFFER, GrassVBO);
-
 	glVertexAttribPointer(posLoc, 3, GL_FLOAT, GL_FALSE,
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(0));
 	glVertexAttribPointer(texLoc, 2, GL_FLOAT, GL_FALSE,
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(sizeof(vec3)));
-	glVertexAttribPointer(normalLoc, 3, GL_FLOAT, GL_FALSE,
-		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(5 * sizeof(float)));
-
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, GrassIBO);
 	glDrawElements(GL_TRIANGLES, 3 * GRASS_TRIS_NUM, GL_UNSIGNED_INT, 0);
 
 
-	// Draw text
-	unsigned int i;
-	char *projection;
-	if (Cam.isProjectionPerspective()) {
-		projection = "You are using perspective projection. Press 'p' for change.";
-	}
-	else {
-		projection = "You are using orthogonal projection. Press 'p' for change.";
-	}
-	glRasterPos3f(-0.9, 0.9, 0);
-	for (i = 0; i < strlen(projection); i++) {
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, projection[i]);
-	}
 
 	// Disable the "position" vertex attribute (not necessary but recommended)
 	glDisableVertexAttribArray(posLoc);
@@ -386,11 +375,11 @@ void keyboard(unsigned char key, int x, int y) {
 		Cam.adjustFov(-deltaDefault);
 		glutPostRedisplay();
 		break;
-	case 'f':
+	case 'p':
 		Cam.adjustZFar(deltaDefault);
 		glutPostRedisplay();
 		break;
-	case 'n':
+	case 'o':
 		Cam.adjustZFar(-deltaDefault);
 		glutPostRedisplay();
 		break;
@@ -400,10 +389,6 @@ void keyboard(unsigned char key, int x, int y) {
 		break;
 	case 'k':
 		Cam.adjustZNear(-deltaDefault);
-		glutPostRedisplay();
-		break;
-	case 'p':
-		Cam.switchPerspective();
 		glutPostRedisplay();
 		break;
 	}
@@ -605,24 +590,24 @@ bool initMesh() {
 			glUniform3f(MaterialAColorLoc, Model2.getMaterial(i).ambient[0], Model2.getMaterial(i).ambient[1], Model2.getMaterial(i).ambient[2]);
 			glUniform3f(MaterialDColorLoc, Model2.getMaterial(i).diffuse[0], Model2.getMaterial(i).diffuse[1], Model2.getMaterial(i).diffuse[2]);
 			glUniform3f(MaterialSColorLoc, Model2.getMaterial(i).specular[0], Model2.getMaterial(i).specular[1], Model2.getMaterial(i).specular[2]);
-			glUniform1f(MaterialShineLoc, Model.getMaterial(i).shininess);
+			glUniform1f(MaterialShineLoc, Model2.getMaterial(i).shininess);
 		}
 	}
 
 	// Prepare the vertices of the grass
 	ModelOBJ::Vertex grassVerts[GRASS_VERTS_NUM];
-	grassVerts[0].position[0] = -20.f;
+	grassVerts[0].position[0] = -10.f;
 	grassVerts[0].position[1] = -0.5f;
-	grassVerts[0].position[2] = -20.f;
-	grassVerts[1].position[0] = 20.f;
+	grassVerts[0].position[2] = -10.f;
+	grassVerts[1].position[0] = 10.f;
 	grassVerts[1].position[1] = -0.5f;
-	grassVerts[1].position[2] = -20.f;
-	grassVerts[2].position[0] = -20.f;
+	grassVerts[1].position[2] = -10.f;
+	grassVerts[2].position[0] = -10.f;
 	grassVerts[2].position[1] = -0.5f;
-	grassVerts[2].position[2] = 20.f;
-	grassVerts[3].position[0] = 20.f;
+	grassVerts[2].position[2] = 10.f;
+	grassVerts[3].position[0] = 10.f;
 	grassVerts[3].position[1] = -0.5f;
-	grassVerts[3].position[2] = 20.f;
+	grassVerts[3].position[2] = 10.f;
 	grassVerts[0].texCoord[0] = 0.f;
 	grassVerts[0].texCoord[1] = 0.f;
 	grassVerts[1].texCoord[0] = 20.f;
