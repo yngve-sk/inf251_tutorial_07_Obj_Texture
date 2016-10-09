@@ -25,22 +25,15 @@ uniform float d_light_d_intensity;
 uniform vec3 d_light_s_color;
 uniform float d_light_s_intensity;
 
-// Spotlight
-//uniform vec3 s_light_a_color;
-//uniform float s_light_a_intensity;
-//
-//uniform vec3 s_light_d_color;
-//uniform float s_light_d_intensity;
-//
-//uniform vec3 s_light_s_color;
-//uniform float s_light_s_intensity;
-
 
 // Object material
- uniform vec3 material_a_color;
- uniform vec3 material_d_color;
- uniform vec3 material_s_color;
- uniform float material_shininess;
+uniform vec3 material_a_color;
+uniform vec3 material_d_color;
+uniform vec3 material_s_color;
+uniform float material_shininess;
+
+//Headlight
+uniform int headlight;
 
 // Per-frgament output color
 out vec4 FragColor;
@@ -82,7 +75,7 @@ void main() {
 
 	// create the spotlight
 	SpotLight sl;
-	sl.vColor = vec3(200, 200, 200);
+	sl.vColor = vec3(200, 200, 200); // White Color
 	sl.vPosition = vec3(camera_position[0]-10, camera_position[1]-10, camera_position[2]-5);
 	sl.bOn = 1;
 	sl.fConeCosine = 0.86602540378;
@@ -92,7 +85,13 @@ void main() {
 	vec4 fWorldPosition = transformation * vec4(fragVert, 1.);
 	vec4 s_lighting = GetSpotLightColor(sl, vec3(fWorldPosition));
 
-	vec4 f_lighting = clamp(s_lighting + vec4(color, 1.0), 0, 255);
+	vec4 f_lighting;
+	if (headlight == 1){
+		f_lighting = clamp(s_lighting + vec4(color, 1.0), 0, 255);
+	} else {
+		f_lighting = vec4(color, 1.0);
+	}
+	
 
     //calculate final color of the pixel, based on:
     // 1. The angle of incidence: brightness
@@ -129,6 +128,20 @@ vec3 generateLightColor(vec3 light_dir, vec3 normal) {
 	vec4 fWorldPosition = transformation * vec4(fragVert, 1.);	   //WorldPosition
 	vec3 normal_nn = normalize((transformation * vec4(normal,0.0)).xyz);	//The normal must be transformed in World coordinates as well
 	
+	float max_dist = 150;
+	float distance = distance(vec3(fWorldPosition), camera_position);
+	
+	float distance_multiplier = 1 - (distance/max_dist);
+
+	float full_light_treshold = 40;
+	float gradial_max_dist = max_dist - full_light_treshold;
+
+	if(distance > full_light_treshold) {
+		distance_multiplier = 1 - (distance/gradial_max_dist);
+	}
+	else {
+		distance_multiplier = 1;
+	}
 
 	vec3 camLightDirection = camera_position - fragVert;
 
@@ -149,7 +162,7 @@ vec3 generateLightColor(vec3 light_dir, vec3 normal) {
 		material_s_color * 
 		pow(dot(d_reflected_dir_nn, view_dir_nn), material_shininess),
 		0.0,1.0);
-	color = (ambient_color + diff_color + spec_color); // NOT JUST ONE CHANNEL
+	color = distance_multiplier*(ambient_color + diff_color + spec_color); // NOT JUST ONE CHANNEL
 
 	return(color);
 }
