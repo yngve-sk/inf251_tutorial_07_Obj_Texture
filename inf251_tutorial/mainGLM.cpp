@@ -102,6 +102,9 @@ GLint SLightAIntensityLoc = -1;
 GLint SLightDIntensityLoc = -1;
 GLint SLightSIntensityLoc = -1;
 
+GLint Headlight = -1;
+bool HeadlightInt = true;
+
 GLfloat  lightPos[] = { 0.0f, 0.0f, 75.0f, 1.0f };
 
 // Vertex transformation
@@ -219,6 +222,8 @@ void display() {
 	glUniform1f(SLightAIntensityLoc, 1.0f);
 	glUniform1f(SLightDIntensityLoc, 1.0f);
 	glUniform1f(SLightSIntensityLoc, 1.0f);
+
+	glUniform1i(Headlight, HeadlightInt ? 1 : 0);
 
 	//Zuzana: Trying to add only spotlight
 	glDisable(GL_LIGHT0);
@@ -352,9 +357,6 @@ float deltaDefault = 10;
 /// Called whenever a keyboard button is pressed (only ASCII characters)
 void keyboard(unsigned char key, int x, int y) {
 	switch (tolower(key)) {
-	case 'g': // show the current OpenGL version
-		cout << "OpenGL version " << glGetString(GL_VERSION) << endl;
-		break;
 	case 'q':  // terminate the application
 		exit(0);
 		break;
@@ -407,20 +409,24 @@ void keyboard(unsigned char key, int x, int y) {
 		Cam.adjustZFar(deltaDefault);
 		glutPostRedisplay();
 		break;
-	case 'n':
+	case 'g':
 		Cam.adjustZFar(-deltaDefault);
 		glutPostRedisplay();
 		break;
-	case 'l':
+	case 'n':
 		Cam.adjustZNear(deltaDefault);
 		glutPostRedisplay();
 		break;
-	case 'k':
+	case 'm':
 		Cam.adjustZNear(-deltaDefault);
 		glutPostRedisplay();
 		break;
 	case 'p':
 		Cam.switchPerspective();
+		glutPostRedisplay();
+		break;
+	case 'l':
+		HeadlightInt = !HeadlightInt;
 		glutPostRedisplay();
 		break;
 	}
@@ -813,6 +819,8 @@ bool initShaders() {
 	MaterialSColorLoc = glGetUniformLocation(ShaderProgram, "material_s_color");
 
 	MaterialShineLoc = glGetUniformLocation(ShaderProgram, "material_shininess");
+
+	Headlight = glGetUniformLocation(ShaderProgram, "headlight");
 
 
 	// Shaders can be deleted now
