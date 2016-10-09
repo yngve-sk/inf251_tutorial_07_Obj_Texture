@@ -73,16 +73,18 @@ void main() {
 
 	// create the spotlight
 	SpotLight sl;
-	sl.vColor = vec3(150, 0, 0);
-//	sl.vPosition = camera_position;
-	sl.vPosition = vec3(0,0,0);
+	sl.vColor = vec3(200, 200, 200);
+	sl.vPosition = vec3(camera_position[0]-10, camera_position[1]-10, camera_position[2]-5);
+//	sl.vPosition = vec3(0,0,0);
 	sl.bOn = 1;
-	sl.fConeCosine = 0.81915204428;
-	sl.fLinearAtt = 0.2;
+	sl.fConeCosine = 0.86602540378;
+	sl.fLinearAtt = 1.0;
 	sl.vDirection = vec3(0,0,1);
 
 	vec4 fWorldPosition = transformation * vec4(position, 1.);
 	vec4 s_lighting = GetSpotLightColor(sl, vec3(fWorldPosition));
+
+	
 
 //	f_lighting = vec4(color, 1.0);
 	f_lighting = clamp(s_lighting + vec4(color, 1.0), 0, 255);
@@ -92,15 +94,14 @@ vec4 GetSpotLightColor(const SpotLight spotLight, vec3 vWorldPos)
 { 
   if(spotLight.bOn == 0)return vec4(0.0, 0.0, 0.0, 0.0); 
 
-  float fDistance = distance(vWorldPos, spotLight.vPosition); 
+  float fDistance = 20;// distance(vWorldPos, spotLight.vPosition); 
 
   vec3 vDir = vWorldPos-spotLight.vPosition; 
   vDir = normalize(vDir); 
    
   float fCosine = dot(spotLight.vDirection, vDir); 
-//  float fCosine = 0.9; 
   float fDif = 1.0-spotLight.fConeCosine; 
-  float fFactor = clamp((fCosine-spotLight.fConeCosine)/fDif, 0.0, 0.5); 
+  float fFactor = clamp((fCosine-spotLight.fConeCosine)/fDif, 0.0, 1.0); 
 
   if(fCosine > spotLight.fConeCosine) 
     return vec4(spotLight.vColor, 1.0)*fFactor/(fDistance*spotLight.fLinearAtt); 

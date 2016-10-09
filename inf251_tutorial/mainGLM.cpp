@@ -329,6 +329,18 @@ void display() {
 		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, projection[i]);
 	}
 
+	// Draw text
+	vec3 CamPosition = Cam.getPosition();
+	string position = "Camera position x: ";
+	position.append(to_string(CamPosition[0]) + ", y: ");
+	position.append(to_string(CamPosition[1])) + ", z: ";
+	position.append(to_string(CamPosition[2]));
+	
+	glRasterPos3f(-0.7, 0.7, 0);
+	for (char& c : position) {
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
+	}
+
 
 
 	// Disable the "position" vertex attribute (not necessary but recommended)
