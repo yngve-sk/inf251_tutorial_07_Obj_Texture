@@ -107,16 +107,16 @@ public:
 	void rotate(const vec2& oldMousePosition, const vec2& newMousePosition) {
 		mat4 ry, rr;
 
-		int dx = newMousePosition.x - oldMousePosition.x,
-			dy = newMousePosition.y - oldMousePosition.y;
+		int dx = oldMousePosition.x - newMousePosition.x,
+			dy = oldMousePosition.y - newMousePosition.y;
 
-		ry = glm::rotate(ROTATIONAL_SPEED * dx, vec3(0, 1, 0));
+		ry = glm::rotate(ROTATIONAL_SPEED * dx, vec3(0,1,0));
 		target = mat3(ry) * target;
 		up = mat3(ry) * up;
 
 		rr = glm::rotate(ROTATIONAL_SPEED * dy, cross(target, up));
 		up = mat3(rr) * up;
-		target = mat3(rr) * target;
+		target = vec3(rr * vec4(target, 1.0f));
 	}
 
 	void adjustZoom(const vec2& oldMousePosition, const vec2& newMousePosition) {
