@@ -60,6 +60,7 @@ uniform float d_light_s_intensity;
 
 vec3 generateLightColor(vec3 light_dir);
 vec4 GetSpotLightColor(const SpotLight spotLight, vec3 vWorldPos); 
+vec3 generateConeLightColor();
 
 void main() {
 	// transform the vertex
@@ -69,7 +70,11 @@ void main() {
 	cur_tex_coords = tex_coords;
 
 	// calculate light color
-	vec3 color = generateLightColor(d_light_direction);
+//	vec3 color = generateLightColor(d_light_direction);
+
+	vec4 fWorldPosition = transformation * vec4(position, 1.);
+	vec3 camera_direction = vec3(fWorldPosition) - camera_position;
+	vec3 color = generateLightColor(camera_direction);
 
 	// create the spotlight
 	SpotLight sl;
@@ -81,11 +86,13 @@ void main() {
 	sl.fLinearAtt = 0.2;
 	sl.vDirection = vec3(0,0,1);
 
-	vec4 fWorldPosition = transformation * vec4(position, 1.);
 	vec4 s_lighting = GetSpotLightColor(sl, vec3(fWorldPosition));
 
+	vec4 cone = vec4(generateConeLightColor(), 1.0);
+
+	f_lighting = cone;
 //	f_lighting = vec4(color, 1.0);
-	f_lighting = clamp(s_lighting + vec4(color, 1.0), 0, 255);
+//	f_lighting = clamp(s_lighting + vec4(color, 1.0), 0, 255);
 }
 
 vec4 GetSpotLightColor(const SpotLight spotLight, vec3 vWorldPos) 
@@ -134,6 +141,46 @@ vec3 generateLightColor(vec3 light_dir) {
 		pow(dot(d_reflected_dir_nn, view_dir_nn), material_shininess),
 		0.0,1.0);
 	color = (ambient_color + diff_color + spec_color); // NOT JUST ONE CHANNEL
+
+	return(color);
+}
+
+vec3 generateConeLightColor() {
+	//From Sergej
+	vec4 fWorldPosition = transformation * vec4(position, 1.);	   //WorldPosition
+	vec3 normal_nn = normalize((transformation * vec4(normal,0.0)).xyz);	//The normal must be transformed in World coordinates as well
+
+	vec3 camLightDirection = camera_position - vec3(fWorldPosition);
+
+	float attentuation = 1.0;
+	float coneAngle = 10;
+	vec3 coneDirection = normalize(camLightDirection);
+	vec3 surfaceToLight = normalize(camera_position.xyz);
+	vec3 rayDirection = -surfaceToLight;
+	float lightToSurfaceAngle = degrees(acos(dot(rayDirection, coneDirection)));
+
+	if(lightToSurfaceAngle > coneAngle) {
+		attentuation = 0;
+	}
+
+	vec3 d_light_dir_nn = normalize(coneDirection);
+	vec3 view_dir_nn = normalize(camera_position - fWorldPosition.xyz /*position*/ );		//Transform into world position (Sergej)
+	float dot_d_light_normal = dot(-d_light_dir_nn, normal_nn);   // notice the minus!   //The minus was missing and I used the transformed normal here (Sergej)
+	vec3 d_reflected_dir_nn = reflect(d_light_dir_nn,normal_nn);					//There is a reflect function build in (Sergej)
+	d_reflected_dir_nn = normalize(d_reflected_dir_nn); // should be already normalized, but we "need" to correct numerical errors
+
+	vec3 color;
+	vec3 ambient_color = clamp(
+		material_a_color * d_light_a_color * d_light_a_intensity, 
+		0.0, 1.0);
+	vec3 diff_color = clamp(
+		material_d_color * dot_d_light_normal * d_light_d_intensity,
+		0.0,1.0);
+	vec3 spec_color = clamp(
+		material_s_color * 
+		pow(dot(d_reflected_dir_nn, view_dir_nn), material_shininess),
+		0.0,1.0);
+	color = attentuation * (ambient_color + diff_color + spec_color); // NOT JUST ONE CHANNEL
 
 	return(color);
 }
