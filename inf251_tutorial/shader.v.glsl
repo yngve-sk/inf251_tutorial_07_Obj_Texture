@@ -30,14 +30,14 @@ uniform vec3 d_light_s_color;
 uniform float d_light_s_intensity;
 
 // Spotlight
-uniform vec3 s_light_a_color;
-uniform float s_light_a_intensity;
-
-uniform vec3 s_light_d_color;
-uniform float s_light_d_intensity;
-
-uniform vec3 s_light_s_color;
-uniform float s_light_s_intensity;
+//uniform vec3 s_light_a_color;
+//uniform float s_light_a_intensity;
+//
+//uniform vec3 s_light_d_color;
+//uniform float s_light_d_intensity;
+//
+//uniform vec3 s_light_s_color;
+//uniform float s_light_s_intensity;
 
 
 // Object material
@@ -46,8 +46,20 @@ uniform float s_light_s_intensity;
  uniform vec3 material_s_color;
  uniform float material_shininess;
 
+ struct SpotLight 
+{ 
+  vec3 vColor; 
+  vec3 vPosition; 
+  vec3 vDirection; 
+
+  int bOn; 
+   
+  float fConeAngle, fConeCosine; 
+  float fLinearAtt; 
+};
 
 vec3 generateLightColor(vec3 light_dir);
+vec4 GetSpotLightColor(const SpotLight spotLight, vec3 vWorldPos); 
 
 void main() {
 	// transform the vertex
@@ -59,7 +71,41 @@ void main() {
 	// calculate light color
 	vec3 color = generateLightColor(d_light_direction);
 
-	f_lighting = vec4(color, 1.0);
+	// create the spotlight
+	SpotLight sl;
+	sl.vColor = vec3(150, 0, 0);
+//	sl.vPosition = camera_position;
+	sl.vPosition = vec3(0,0,0);
+	sl.bOn = 1;
+	sl.fConeCosine = 0.81915204428;
+	sl.fLinearAtt = 0.2;
+	sl.vDirection = vec3(0,0,1);
+
+	vec4 fWorldPosition = transformation * vec4(position, 1.);
+	vec4 s_lighting = GetSpotLightColor(sl, vec3(fWorldPosition));
+
+//	f_lighting = vec4(color, 1.0);
+	f_lighting = clamp(s_lighting + vec4(color, 1.0), 0, 255);
+}
+
+vec4 GetSpotLightColor(const SpotLight spotLight, vec3 vWorldPos) 
+{ 
+  if(spotLight.bOn == 0)return vec4(0.0, 0.0, 0.0, 0.0); 
+
+  float fDistance = distance(vWorldPos, spotLight.vPosition); 
+
+  vec3 vDir = vWorldPos-spotLight.vPosition; 
+  vDir = normalize(vDir); 
+   
+  float fCosine = dot(spotLight.vDirection, vDir); 
+//  float fCosine = 0.9; 
+  float fDif = 1.0-spotLight.fConeCosine; 
+  float fFactor = clamp((fCosine-spotLight.fConeCosine)/fDif, 0.0, 0.5); 
+
+  if(fCosine > spotLight.fConeCosine) 
+    return vec4(spotLight.vColor, 1.0)*fFactor/(fDistance*spotLight.fLinearAtt); 
+
+  return vec4(0.0, 0.0, 0.0, 0.0); 
 }
 
 vec3 generateLightColor(vec3 light_dir) {
