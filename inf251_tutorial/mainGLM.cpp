@@ -158,13 +158,6 @@ int main(int argc, char **argv) {
 	glEnable(GL_LIGHTING);
 	glEnable(GL_TEXTURE_2D);
 
-	// Spot Light
-	//glLightfv(GL_LIGHT0, GL_POSITION, lightPos);	// Cut off angle is 60 degrees
-	//glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 60.0f);
-	//glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, 100.0f);	// Fairly shiny spot
-	//
-	//
-	//glEnable(GL_LIGHT0);		// Enable this light in particular
 	glEnable(GL_COLOR_MATERIAL);// Enable color tracking
 
 	// Transformation
@@ -259,16 +252,9 @@ void display() {
 	GLint normalLoc = glGetAttribLocation(ShaderProgram, "normal");
 	glEnableVertexAttribArray(normalLoc);
 
-	cout << "normal loc : " << normalLoc << endl;
-	cout << "tex loc : " << texLoc << endl;
-
 	int sizeoffloat3 = 3 * sizeof(float);
 	int sizeoffloat5 = 5 * sizeof(float);
 	int sizeofvec3 = sizeof(vec3);
-	
-	cout << "size of float 3 = " << sizeoffloat3 << endl;
-	cout << "size of float 5 = " << sizeoffloat5 << endl;
-	cout << "size of vec3 = " << sizeofvec3 << endl;
 
 	// Draw the house
 	glBindTexture(GL_TEXTURE_2D, TextureObject);
@@ -281,6 +267,10 @@ void display() {
 	glVertexAttribPointer(normalLoc, 3, GL_FLOAT, GL_FALSE,
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(5*sizeof(float)));
 
+	// PS: TEXTURE COORDINATE PRINTING:
+	// PROBLEM WITH SKETCHUP IS IT DOESNT NORMALIZE TEXTURE
+	// COORDINATES 
+	// :(
 //	for (int i = 0; i < Model.getNumberOfVertices(); i++) {
 	//	ModelOBJ::Vertex v = Model.getVertex(i);
 	//	cout << "Vertex with index " << i << " has texture coordinates (" << v.texCoord[0] << ", " << v.texCoord[1] << ")" << endl;
@@ -640,18 +630,18 @@ bool initMesh() {
 
 	// Prepare the vertices of the grass
 	ModelOBJ::Vertex grassVerts[GRASS_VERTS_NUM];
-	grassVerts[0].position[0] = -10.f;
-	grassVerts[0].position[1] = -0.5f;
+	grassVerts[0].position[0] = -100.f;
+	grassVerts[0].position[1] = 0.f;
 	grassVerts[0].position[2] = -10.f;
-	grassVerts[1].position[0] = 10.f;
+	grassVerts[1].position[0] = 100.f;
 	grassVerts[1].position[1] = -0.5f;
-	grassVerts[1].position[2] = -10.f;
-	grassVerts[2].position[0] = -10.f;
+	grassVerts[1].position[2] = -100.f;
+	grassVerts[2].position[0] = -100.f;
 	grassVerts[2].position[1] = -0.5f;
-	grassVerts[2].position[2] = 10.f;
-	grassVerts[3].position[0] = 10.f;
+	grassVerts[2].position[2] = 100.f;
+	grassVerts[3].position[0] = 100.f;
 	grassVerts[3].position[1] = -0.5f;
-	grassVerts[3].position[2] = 10.f;
+	grassVerts[3].position[2] = 100.f;
 	grassVerts[0].texCoord[0] = 0.f;
 	grassVerts[0].texCoord[1] = 0.f;
 	grassVerts[1].texCoord[0] = 20.f;
