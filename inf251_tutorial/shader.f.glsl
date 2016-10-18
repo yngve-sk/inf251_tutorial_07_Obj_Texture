@@ -5,6 +5,7 @@ uniform sampler2D sampler;
 
 // model-view transformation
 uniform mat4 transformation;
+uniform mat4 transformationLocal;
 
 // camera pos
 uniform vec3 camera_position;
@@ -82,7 +83,7 @@ void main() {
 	sl.fLinearAtt = 1.0;
 	sl.vDirection = vec3(0,0,1);
 
-	vec4 fWorldPosition = transformation * vec4(fragVert, 1.);
+	vec4 fWorldPosition = transformation * transformationLocal * vec4(fragVert, 1.);
 	vec4 s_lighting = GetSpotLightColor(sl, vec3(fWorldPosition));
 
 	vec4 f_lighting;

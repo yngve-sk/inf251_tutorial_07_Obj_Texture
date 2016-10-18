@@ -15,7 +15,7 @@ private:
 
 	float fov, ar, zNear, zFar, zoom;
 
-	float MOVEMENT_SPEED = 0.05f,
+	float MOVEMENT_SPEED = 0.15f,
 		ROTATIONAL_SPEED = 0.003f,
 		ZOOM_SPEED = 0.05f;
 	bool perspectiveProjection = true;
@@ -57,7 +57,7 @@ public:
 		
 		mat4 camZoom = glm::scale(vec3(zoom, zoom, 1.f));
 
-
+//		return camZoom * prj * camR * camT;
 		return camZoom * prj * camR * camT;
 	}
 
@@ -82,13 +82,13 @@ public:
 	}
 
 	void strafeLeft() {
-		vec3 right = cross(target, up);
-		position -= right * MOVEMENT_SPEED;
+		vec3 right = normalize(cross(target, up)); //vec3(1, 0, 0);
+		position += right * MOVEMENT_SPEED;
 	}
 
 	void strafeRight() {
-		vec3 right = cross(target, up);
-		position += right * MOVEMENT_SPEED;
+		vec3 right = normalize(cross(target, up));
+		position -= right * MOVEMENT_SPEED;
 	}
  
 	void moveDown() {
@@ -105,18 +105,41 @@ public:
 	}
 
 	void rotate(const vec2& oldMousePosition, const vec2& newMousePosition) {
-		mat4 ry, rr;
-
+	//mat4 ry, rx;
+	//
 		int dx = oldMousePosition.x - newMousePosition.x,
 			dy = oldMousePosition.y - newMousePosition.y;
+	//
+	//ry = glm::rotate(ROTATIONAL_SPEED * dx, vec3(0,1,0));
+	//target = mat3(ry) * target;
+	//up = mat3(ry) * up;
+	//
+	//rx = glm::rotate(-ROTATIONAL_SPEED * dy, vec3(1, 0, 0));
+	//up = mat3(rx) * up;
+	//target = vec3(rx * vec4(target, 1.0f));
 
-		ry = glm::rotate(ROTATIONAL_SPEED * dx, vec3(0,1,0));
-		target = mat3(ry) * target;
-		up = mat3(ry) * up;
+		float rotY = ROTATIONAL_SPEED * dx,
+			rotX = ROTATIONAL_SPEED * dy;
 
-		rr = glm::rotate(ROTATIONAL_SPEED * dy, cross(target, up));
-		up = mat3(rr) * up;
-		target = vec3(rr * vec4(target, 1.0f));
+		mat4 rx, rz, ry;
+		rx = mat4(1.f,	   0.f,			 0.f, 0.f, 
+				  0.f, cos(rotX), -sin(rotX), 0.f,
+				  0.f, sin(rotX),  cos(rotX), 0.f,
+				  0.f,		 0.f,			 0.f, 1.f
+			);
+
+		ry = mat4( cos(rotY), 0.f, sin(rotY), 0.f, 
+						   0.f, 1.f,		 0.f, 0.f,
+				  -sin(rotY), 0.f, cos(rotY), 0.f,
+						   0.f, 0.f,		 0, 1.f
+			);
+
+		mat4 rt = ry*rx;
+
+		// ry * up, rx * up
+		up = mat3(rt)*up;
+		up.x = 0; // no rotation around z-axis, //TODO!
+		target = vec3(rt * vec4(target, 1.0f));
 	}
 
 	void adjustZoom(const vec2& oldMousePosition, const vec2& newMousePosition) {

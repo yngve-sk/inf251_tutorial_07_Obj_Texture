@@ -127,7 +127,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="camera.h" />
     <ClInclude Include="lodepng.h" />
     <ClInclude Include="Matrix4.h" />
     <ClInclude Include="model_obj.h" />
@@ -142,7 +141,6 @@
   <ItemGroup>
     <None Include="shader.f.glsl" />
     <None Include="shader.v.glsl" />
-    <None Include="texture.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
