@@ -379,10 +379,6 @@ void keyboard(unsigned char key, int x, int y) {
 			glutPostRedisplay();
 		}
 		break;
-	case 't':
-		USE_CAM = !USE_CAM;
-		glutPostRedisplay();
-		break;
 	case 'w':
 		std::cout << "forkwards" << std::endl;
 		Cam.moveForward();

@@ -5,9 +5,6 @@
 uniform mat4 transformation;
 uniform mat4 transformationLocal;
 
-// camera pos
-uniform vec3 camera_position;
-
 // vertex position
 layout (location = 0) in vec3 position; 
 layout (location = 2) in vec3 normal;

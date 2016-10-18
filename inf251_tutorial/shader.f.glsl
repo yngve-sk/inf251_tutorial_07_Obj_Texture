@@ -39,6 +39,7 @@ uniform int headlight;
 // Per-frgament output color
 out vec4 FragColor;
 
+// Spotlight structure
 struct SpotLight 
 { 
   vec3 vColor; 
@@ -71,10 +72,10 @@ void main() {
     brightness = clamp(brightness, 0, 1);
 
 
-	// calculate light color
+	//calculate light color
 	vec3 color = generateLightColor(d_light_direction, normal);
 
-	// create the spotlight
+	//create the spotlight
 	SpotLight sl;
 	sl.vColor = vec3(200, 200, 200); // White Color
 	sl.vPosition = vec3(camera_position[0]-10, camera_position[1]-10, camera_position[2]-5);
@@ -88,6 +89,7 @@ void main() {
 
 	vec4 f_lighting;
 	if (headlight == 1){
+		//Add headlight to camera
 		f_lighting = clamp(s_lighting + vec4(color, 1.0), 0, 255);
 	} else {
 		f_lighting = vec4(color, 1.0);
@@ -101,7 +103,6 @@ void main() {
     vec4 surfaceColor = f_lighting * texture2D(sampler, fragTexCoord);
 
 
-
     FragColor = vec4(brightness * vec3(d_light_a_intensity, d_light_s_intensity, d_light_d_intensity) * surfaceColor.rgb, surfaceColor.a);
 }
 
@@ -109,7 +110,7 @@ vec4 GetSpotLightColor(const SpotLight spotLight, vec3 vWorldPos)
 { 
   if(spotLight.bOn == 0)return vec4(0.0, 0.0, 0.0, 0.0); 
 
-  float fDistance = 20;// distance(vWorldPos, spotLight.vPosition); 
+  float fDistance = distance(vWorldPos, spotLight.vPosition); 
 
   vec3 vDir = vWorldPos-spotLight.vPosition; 
   vDir = normalize(vDir); 
@@ -129,7 +130,10 @@ vec3 generateLightColor(vec3 light_dir, vec3 normal) {
 	vec4 fWorldPosition = transformation * vec4(fragVert, 1.);	   //WorldPosition
 	vec3 normal_nn = normalize((transformation * vec4(normal,0.0)).xyz);	//The normal must be transformed in World coordinates as well
 	
-	float max_dist = 150;
+	// Sophisticated lights
+	// 100% lightning in 0-40m distance
+	// 100% - 0% lightning in 40-100m distance
+	float max_dist = 100;
 	float distance = distance(vec3(fWorldPosition), camera_position);
 	
 	float distance_multiplier = 1 - (distance/max_dist);
