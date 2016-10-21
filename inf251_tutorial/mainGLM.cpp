@@ -40,8 +40,8 @@ void drawText(string, double, double, double);
 void drawObject(int, GLuint, GLuint&, GLuint&, GLuint, GLuint, GLuint);
 ModelOBJ loadObject(const char*, GLuint&, GLuint&);
 void loadGrassObject(GLuint&, GLuint&);
-void loadMaterials(const char*, const ModelOBJ&, GLuint);
-void loadMaterial(const char*, GLuint);
+void loadMaterials(const char*, const ModelOBJ&, GLuint&);
+void loadMaterial(const char*, GLuint&);
 
 
 // --- Global variables ---------------------------------------------------------------------------
@@ -233,7 +233,7 @@ void display() {
 	setDirectionalLight();
 	setSpotLight();
 	setHeadLight();
-
+	
 	// Set the uniform variable for the texture unit (texture unit 0)
 	//glUniform1i(SamplerLoc, 0);	
 
@@ -307,7 +307,7 @@ void display() {
 void idle() {
 	// rotate around Y-axis
 	cout << "idle()" << endl;
-	LocalRotationY *= glm::rotate(0.25f, vec3(0, 1, 0));
+	LocalRotationY *= glm::rotate(0.05f, vec3(0, 1, 0));
 	glutPostRedisplay();
 }
 
@@ -811,6 +811,9 @@ void setHeadLight() {
 	
 	glUniform1i(Headlight, HeadlightInt ? 1 : 0);
 
+	glDisable(GL_LIGHT0);
+	glEnable(GL_LIGHT1);
+
 	GLfloat _light_position[] = { Cam.getPosition()[0], Cam.getPosition()[1], Cam.getPosition()[2], 1.0 }; // Last argument 0.0 for directional ligt, non-zero (1.0) for spotlight
 	float _spotlight_position[] = { Cam.getPosition()[0], Cam.getPosition()[1], Cam.getPosition()[2] };
 
@@ -919,7 +922,7 @@ void loadGrassObject(GLuint &VBO, GLuint &IBO) {
 	return;
 }
 
-void loadMaterials(const char* TextureDirectory, const ModelOBJ& model, GLuint TextureObject) {
+void loadMaterials(const char* TextureDirectory, const ModelOBJ &model, GLuint &TextureObject) {
 
 	unsigned char* TextureData = nullptr;
 	unsigned int TextureWidth = 0;
@@ -981,7 +984,7 @@ void loadMaterials(const char* TextureDirectory, const ModelOBJ& model, GLuint T
 	}
 }
 
-void loadMaterial(const char* textureDirectory, GLuint TextureObject) {
+void loadMaterial(const char* textureDirectory, GLuint &TextureObject) {
 
 	unsigned char* TextureData = nullptr;
 	unsigned int TextureWidth = 0;
