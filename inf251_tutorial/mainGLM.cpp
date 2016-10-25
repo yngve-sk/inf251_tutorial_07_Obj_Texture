@@ -82,7 +82,7 @@ unsigned char *TexGrassData = nullptr;
 GLuint ShaderProgram = 0;	///< A shader program
 GLuint HouseShaderProgram = 0;
 
-GLint TrLoc = -1;				///< model-view matrix uniform variable
+GLint TrLoc = 0;				///< model-view matrix uniform variable
 GLint LocalTrLoc = -1;
 
 GLint SamplerLoc = -1;			///< texture sampler uniform variable
