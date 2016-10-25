@@ -137,6 +137,12 @@ bool USE_CAM = false;
 mat4 LocalRotationX, LocalRotationY, LocalTranslation;
 float LocalScaling;
 
+// Non-transformation matrix
+mat4 NonTransformation = mat4(1, 0, 0, 0,
+							  0, 1, 0, 0,
+							  0, 0, 1, 0,
+							  0, 0, 0, 1);
+
 // --- main() -------------------------------------------------------------------------------------
 /// The entry point of the application
 int main(int argc, char **argv) {
@@ -228,7 +234,7 @@ void display() {
 
 	glUniform3fv(CameraPositionLoc, 1, &Cam.getPosition()[0]);
 	glUniformMatrix4fv(TrLoc, 1, GL_FALSE, &transformation[0][0]);
-	glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &LocalRotationY[0][0]);
+	glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &NonTransformation[0][0]);
 
 	setDirectionalLight();
 	setSpotLight();
@@ -251,10 +257,28 @@ void display() {
 	glActiveTexture(GL_TEXTURE0);
 
 	// Draw the house
+	float centerX, centerY, centerZ;
+
+	Model.getCenter(centerX, centerY, centerZ);
+	GLint centerLoc = glGetAttribLocation(ShaderProgram, "center");
+
+	vec3 centerNone = vec3(0, 0, 0);
+	vec3 centerv = vec3(centerX, centerY, centerZ);
+	glUniform1fv(centerLoc, sizeof(fvec3), &centerv[0]);
+
+	mat4 translateToCenter = glm::translate(vec3(centerX, centerY, centerZ));
+	mat4 translateFromCenter = glm::translate(vec3(-centerX, -centerY, -centerZ));
+
+	mat4 rotateMat = translateFromCenter * LocalRotationY * translateToCenter;
+
+	glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &rotateMat[0][0]);
 	drawObject(Model.getNumberOfIndices(), TextureObject, VBO, IBO, posLoc, texLoc, normalLoc);
 
 	glVertexAttribPointer(normalLoc, 3, GL_FLOAT, GL_FALSE,
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(5*sizeof(float)));
+
+	glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &NonTransformation[0][0]);
+	glUniform1fv(centerLoc, sizeof(fvec3), &centerNone[0]);
 
 	// Draw the cube
 	drawObject(Model2.getNumberOfIndices(), TextureObject2, cubeVBO, cubeIBO, posLoc, texLoc, -1);
