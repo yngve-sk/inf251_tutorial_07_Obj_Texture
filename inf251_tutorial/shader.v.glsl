@@ -37,8 +37,9 @@ void main() {
 									0, 0, 1, -centerWorld.z,
 									0, 0, 0,			  1);
 
-	vec4 position_rotated = translateFromCenter * transformationLocal * translateToCenter * vec4(position, 1.); 
+	//vec4 position_rotated = translateFromCenter * transformationLocal * translateToCenter * vec4(position, 1.); 
+	vec4 position_rotated =  transformationLocal * vec4(position, 1.); 
 
-    gl_Position = transformation * transformationLocal * position_rotated;
+    gl_Position = transformation * position_rotated;
 //	gl_Position = transformation * transformationLocal * vec4(position, 1.); // old version
 }

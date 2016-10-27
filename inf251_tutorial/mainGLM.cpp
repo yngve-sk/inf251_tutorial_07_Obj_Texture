@@ -134,7 +134,7 @@ bool USE_CAM = false;
 
 // House transformation
 
-mat4 LocalRotationX, LocalRotationY, LocalTranslation;
+mat4 LocalRotationX, LocalRotationY = mat4(1.), LocalTranslation;
 float LocalScaling;
 
 // Non-transformation matrix
@@ -142,6 +142,8 @@ mat4 NonTransformation = mat4(1, 0, 0, 0,
 							  0, 1, 0, 0,
 							  0, 0, 1, 0,
 							  0, 0, 0, 1);
+
+float centerX, centerY, centerZ;
 
 // --- main() -------------------------------------------------------------------------------------
 /// The entry point of the application
@@ -248,16 +250,12 @@ void display() {
 	glEnableVertexAttribArray(posLoc);
 	GLint texLoc = glGetAttribLocation(ShaderProgram, "tex_coords");
 	glEnableVertexAttribArray(texLoc);
-	
-	glActiveTexture(GL_TEXTURE0);
-
 	GLint normalLoc = glGetAttribLocation(ShaderProgram, "normal");
 	glEnableVertexAttribArray(normalLoc);
 
 	glActiveTexture(GL_TEXTURE0);
 
 	// Draw the house
-	float centerX, centerY, centerZ;
 
 	Model.getCenter(centerX, centerY, centerZ);
 	GLint centerLoc = glGetAttribLocation(ShaderProgram, "center");
@@ -265,24 +263,32 @@ void display() {
 	vec3 centerNone = vec3(0, 0, 0);
 	vec3 centerv = vec3(centerX, centerY, centerZ);
 	glUniform1fv(centerLoc, sizeof(fvec3), &centerv[0]);
+	//
+	mat4 translateToCenter = glm::translate(vec3(0.0f, -50, 0.0f));
+	//mat4 translateFromCenter = glm::translate(vec3(-centerX, -centerY, -centerZ));
+	//
+	//mat4 rotateMat = translateFromCenter * LocalRotationY * translateToCenter;
 
-	mat4 translateToCenter = glm::translate(vec3(centerX, centerY, centerZ));
-	mat4 translateFromCenter = glm::translate(vec3(-centerX, -centerY, -centerZ));
-
-	mat4 rotateMat = translateFromCenter * LocalRotationY * translateToCenter;
-
-	glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &rotateMat[0][0]);
+	glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &NonTransformation[0][0]);
 	drawObject(Model.getNumberOfIndices(), TextureObject, VBO, IBO, posLoc, texLoc, normalLoc);
 
 	glVertexAttribPointer(normalLoc, 3, GL_FLOAT, GL_FALSE,
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(5*sizeof(float)));
 
+	
 	glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &NonTransformation[0][0]);
-	glUniform1fv(centerLoc, sizeof(fvec3), &centerNone[0]);
+	float x, y, z;
+	Model2.getCenter(x, y, z);
+	centerv = vec3(x, y, z);
+	glUniform1fv(centerLoc, sizeof(fvec3), &centerv[0]);
 
+	//mat4 translateToCenter = glm::translate(vec3(centerX, centerY, centerZ));
+	//glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &LocalRotationY[0][0]);
 	// Draw the cube
 	drawObject(Model2.getNumberOfIndices(), TextureObject2, cubeVBO, cubeIBO, posLoc, texLoc, -1);
 
+	glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &NonTransformation[0][0]);
+	glUniform1fv(centerLoc, sizeof(fvec3), &centerNone[0]);
 
 	// Set material parameters for grass
 	glUniform3f(MaterialAColorLoc, 0.9f, 1.0f, 0.9f);
@@ -330,8 +336,16 @@ void display() {
 /// Called at regular intervals (can be used for animations)
 void idle() {
 	// rotate around Y-axis
-	cout << "idle()" << endl;
-	LocalRotationY *= glm::rotate(0.05f, vec3(0, 1, 0));
+	//cout << "idle()" << endl;
+	//LocalRotationY *= glm::rotate(0.05f, vec3(0, 1, 0));
+
+	//LocalRotationY *= translate(vec3(0.05f, 0.0f, 0.0f)); //subtract origin position
+//	LocalRotationY = translate(vec3(centerX, centerY, centerZ)) * rotate(LocalRotationY, 0.005f, vec3(0.0f, 1.0f, 0.0f)) * translate(vec3(-centerX, -centerY, -centerZ)); //rotate
+	//LocalRotationY = rotate(LocalRotationY, 0.005f, vec3(0.0f, 1.0f, 0.0f)); //rotate	
+//LocalRotationY *= translate(vec3(centerX, centerY, centerZ)); //return object on it's place
+
+	LocalRotationY;
+
 	glutPostRedisplay();
 }
 
@@ -872,6 +886,8 @@ ModelOBJ loadObject(const char* directory, GLuint &VBO, GLuint &IBO) {
 		cerr << "Error: cannot load model." << endl;
 		return model;
 	}
+	model.getCenter(centerX, centerY, centerZ);
+	cout << "x: " << centerX << ", y: " << centerY << ", z: " <<  centerZ << endl;
 
 	cout << "Imported model..." << endl;
 
@@ -902,15 +918,15 @@ void loadGrassObject(GLuint &VBO, GLuint &IBO) {
 	ModelOBJ::Vertex grassVerts[GRASS_VERTS_NUM];
 	grassVerts[0].position[0] = -100.f;
 	grassVerts[0].position[1] = 0.f;
-	grassVerts[0].position[2] = -10.f;
+	grassVerts[0].position[2] = -100.f;
 	grassVerts[1].position[0] = 100.f;
-	grassVerts[1].position[1] = -0.5f;
+	grassVerts[1].position[1] = 0.5f;
 	grassVerts[1].position[2] = -100.f;
 	grassVerts[2].position[0] = -100.f;
-	grassVerts[2].position[1] = -0.5f;
+	grassVerts[2].position[1] = 0.5f;
 	grassVerts[2].position[2] = 100.f;
 	grassVerts[3].position[0] = 100.f;
-	grassVerts[3].position[1] = -0.5f;
+	grassVerts[3].position[1] = 0.5f;
 	grassVerts[3].position[2] = 100.f;
 	grassVerts[0].texCoord[0] = 0.f;
 	grassVerts[0].texCoord[1] = 0.f;

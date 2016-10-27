@@ -23,8 +23,8 @@ public:
 
 	GLMCamera() :
 		position(0.f, 0.f, 0.f),
-		target(0.f, 0.f, 1.f),
-		up(0.f, -1.f, 0.f),
+		target(0.f, 0.f, -1.f),
+		up(0.f, 1.f, 0.f),
 		fov(30.0f),
 		ar(1.f),
 		zNear(0.1f),
@@ -46,7 +46,7 @@ public:
 						  0.f,  0.f,  0.f, 1.f
 		);
 
-		mat4 camT = glm::translate(-position);
+		mat4 camT = glm::translate(position);
 
 		mat4 prj;
 		if (perspectiveProjection) {
@@ -74,21 +74,21 @@ public:
 	}
 	
 	void moveForward() {
-		position += target * MOVEMENT_SPEED;
+		position -= target * MOVEMENT_SPEED;
 	}
 	
 	void moveBackwards() {
-		position -= (target * MOVEMENT_SPEED);
+		position += (target * MOVEMENT_SPEED);
 	}
 
 	void strafeLeft() {
 		vec3 right = normalize(cross(target, up)); //vec3(1, 0, 0);
-		position += right * MOVEMENT_SPEED;
+		position -= right * MOVEMENT_SPEED;
 	}
 
 	void strafeRight() {
 		vec3 right = normalize(cross(target, up));
-		position -= right * MOVEMENT_SPEED;
+		position += right * MOVEMENT_SPEED;
 	}
  
 	void moveDown() {
@@ -100,7 +100,7 @@ public:
 	}
 
 	void translate(const vec2& oldMousePosition, const vec2& newMousePosition) {
-		position += target * MOVEMENT_SPEED * (oldMousePosition.y - newMousePosition.y);
+		position += target * MOVEMENT_SPEED * (newMousePosition.y - oldMousePosition.y);
 		position += cross(target, up) * MOVEMENT_SPEED * (newMousePosition.x - oldMousePosition.x);
 	}
 
@@ -138,8 +138,9 @@ public:
 
 		// ry * up, rx * up
 		up = mat3(rt)*up;
-		up.x = 0; // no rotation around z-axis, //TODO!
+		//up.x = 0; // no rotation around z-axis, //TODO!
 		target = vec3(rt * vec4(target, 1.0f));
+		target;
 	}
 
 	void adjustZoom(const vec2& oldMousePosition, const vec2& newMousePosition) {
