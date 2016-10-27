@@ -1,10 +1,15 @@
 #pragma once
 #include <cmath>
 
+#include <fstream>
+#include <iostream>
+#include <string>
+
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 
 using namespace glm;
+using namespace std;
 
 class GLMCamera
 {
@@ -38,12 +43,12 @@ public:
 	mat4 computeCameraTransform() {
 		vec3 t = normalize(target),
 			u = normalize(up),
-			r = cross(t, u);
+			r = normalize(cross(t, u));
 
-		mat4 camR = mat4(r.x,   r.y,  r.z, 0.f,
-						 u.x,   u.y,  u.z, 0.f,
-						 -t.x, -t.y, -t.z, 0.f,
-						  0.f,  0.f,  0.f, 1.f
+		mat4 camR = mat4(r.x,  r.y,  r.z,  0.f,
+						 u.x,  u.y,  u.z,  0.f,
+						 t.x,  t.y,  t.z,  0.f,
+						 0.f,  0.f,	 0.f,  1.f
 		);
 
 		mat4 camT = glm::translate(position);
@@ -74,11 +79,11 @@ public:
 	}
 	
 	void moveForward() {
-		position -= target * MOVEMENT_SPEED;
+		position += target * MOVEMENT_SPEED;
 	}
 	
 	void moveBackwards() {
-		position += (target * MOVEMENT_SPEED);
+		position -= (target * MOVEMENT_SPEED);
 	}
 
 	void strafeLeft() {
@@ -100,7 +105,7 @@ public:
 	}
 
 	void translate(const vec2& oldMousePosition, const vec2& newMousePosition) {
-		position += target * MOVEMENT_SPEED * (newMousePosition.y - oldMousePosition.y);
+		position += target * MOVEMENT_SPEED * (oldMousePosition.y - newMousePosition.y);
 		position += cross(target, up) * MOVEMENT_SPEED * (newMousePosition.x - oldMousePosition.x);
 	}
 
@@ -138,9 +143,8 @@ public:
 
 		// ry * up, rx * up
 		up = mat3(rt)*up;
-		//up.x = 0; // no rotation around z-axis, //TODO!
+		up.x = 0; // no rotation around z-axis, //TODO!
 		target = vec3(rt * vec4(target, 1.0f));
-		target;
 	}
 
 	void adjustZoom(const vec2& oldMousePosition, const vec2& newMousePosition) {
