@@ -109,11 +109,11 @@ GLint MaterialShineLoc = -1;
 
 // Lighting params (DIRECTIONAL)
 GLint SLightDirLoc = -1;
-
+	  
 GLint SLightAColorLoc = -1;
 GLint SLightDColorLoc = -1;
 GLint SLightSColorLoc = -1;
-
+	  
 GLint SLightAIntensityLoc = -1;
 GLint SLightDIntensityLoc = -1;
 GLint SLightSIntensityLoc = -1;
@@ -128,7 +128,7 @@ GLfloat  lightPos[] = { 0.0f, 0.0f, 75.0f, 1.0f };
 //glm::fvec3 Translation;	///< Translation
 //float Scaling;			///< Scaling
 
-// Mouse interaction
+						// Mouse interaction
 int MouseX, MouseY;		///< The last position of the mouse
 int MouseButton;		///< The last mouse button pressed or released
 
@@ -142,9 +142,9 @@ float LocalScaling;
 
 // Non-transformation matrix
 mat4 NonTransformation = mat4(1, 0, 0, 0,
-	0, 1, 0, 0,
-	0, 0, 1, 0,
-	0, 0, 0, 1);
+							  0, 1, 0, 0,
+							  0, 0, 1, 0,
+							  0, 0, 0, 1);
 
 float centerX, centerY, centerZ;
 
@@ -229,7 +229,7 @@ void display() {
 		height = glutGet(GLUT_WINDOW_HEIGHT);
 	glViewport(0, 0, width, height);
 
-
+	
 	// Enable the shader program
 	assert(ShaderProgram != 0);
 	glUseProgram(ShaderProgram);
@@ -244,7 +244,7 @@ void display() {
 	setDirectionalLight();
 	setSpotLight();
 	setHeadLight();
-
+	
 	// Set the uniform variable for the texture unit (texture unit 0)
 	//glUniform1i(SamplerLoc, 0);	
 
@@ -258,6 +258,7 @@ void display() {
 
 	glActiveTexture(GL_TEXTURE0);
 
+	glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &LocalRotationY[0][0]);
 	// Draw the house
 
 	Model.getCenter(centerX, centerY, centerZ);
@@ -284,20 +285,13 @@ void display() {
 	glVertexAttribPointer(normalLoc, 3, GL_FLOAT, GL_FALSE,
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(5 * sizeof(float)));
 
-
+	
 	glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &NonTransformation[0][0]);
-	float x, y, z;
-	Model2.getCenter(x, y, z);
-	centerv = vec3(x, y, z);
-	glUniform1fv(centerLoc, sizeof(fvec3), &centerv[0]);
 
-	//mat4 translateToCenter = glm::translate(vec3(centerX, centerY, centerZ));
-	//glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &LocalRotationY[0][0]);
 	// Draw the cube
 	drawObject(Model2.getNumberOfIndices(), TextureObject2, cubeVBO, cubeIBO, posLoc, texLoc, -1);
 
 	glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &NonTransformation[0][0]);
-	glUniform1fv(centerLoc, sizeof(fvec3), &centerNone[0]);
 
 	// Set material parameters for grass
 	glUniform3f(MaterialAColorLoc, 0.9f, 1.0f, 0.9f);
@@ -326,7 +320,7 @@ void display() {
 	position.append(to_string(CamPosition[0]) + ", y: ");
 	position.append(to_string(CamPosition[1])) + ", z: ";
 	position.append(to_string(CamPosition[2]));
-
+	
 	drawText(position, -0.7, 0.7, 0);
 
 
@@ -345,15 +339,7 @@ void display() {
 /// Called at regular intervals (can be used for animations)
 void idle() {
 	// rotate around Y-axis
-	//cout << "idle()" << endl;
-	//LocalRotationY *= glm::rotate(0.05f, vec3(0, 1, 0));
-
-	//LocalRotationY *= translate(vec3(0.05f, 0.0f, 0.0f)); //subtract origin position
-	//	LocalRotationY = translate(vec3(centerX, centerY, centerZ)) * rotate(LocalRotationY, 0.005f, vec3(0.0f, 1.0f, 0.0f)) * translate(vec3(-centerX, -centerY, -centerZ)); //rotate
-	//LocalRotationY = rotate(LocalRotationY, 0.005f, vec3(0.0f, 1.0f, 0.0f)); //rotate	
-	//LocalRotationY *= translate(vec3(centerX, centerY, centerZ)); //return object on it's place
-
-	LocalRotationY;
+	LocalRotationY *= glm::rotate(0.05f, vec3(0, 1, 0));
 
 	glutPostRedisplay();
 }
@@ -494,17 +480,17 @@ bool initMesh() {
 	return true;
 } /* initBuffers() */
 
-bool initShader(GLuint& program,
-	string vShaderPath, string fShaderPath,
-	GLint& globalTransformationLoc, GLint& localTransformationLoc,
-	GLint& samplerLoc,
-	GLint& cameraPositionLoc,
-	GLint& dLightDirectionLoc,
-	GLint& dLightAColorLoc, GLint& dLightDColorLoc, GLint& dLightSColorLoc,
-	GLint& dLightAIntensityLoc, GLint& dLightDIntensityLoc, GLint& dLightSIntensityLoc,
-	GLint& materialAColorLoc, GLint& materialDColorLoc, GLint& materialSColorLoc,
-	//	vec3& materialADSColorLoc,
-	GLint& materialShineLoc, GLint& headlightLoc) {
+bool initShader(GLuint& program, 
+				string vShaderPath, string fShaderPath, 
+				GLint& globalTransformationLoc, GLint& localTransformationLoc, 
+				GLint& samplerLoc,
+				GLint& cameraPositionLoc,
+				GLint& dLightDirectionLoc,
+				GLint& dLightAColorLoc, GLint& dLightDColorLoc, GLint& dLightSColorLoc,
+				GLint& dLightAIntensityLoc, GLint& dLightDIntensityLoc, GLint& dLightSIntensityLoc,
+				GLint& materialAColorLoc, GLint& materialDColorLoc, GLint& materialSColorLoc,
+			//	vec3& materialADSColorLoc,
+				GLint& materialShineLoc, GLint& headlightLoc) {
 	if (program != 0)
 		glDeleteProgram(program);
 
@@ -591,7 +577,7 @@ bool initShader(GLuint& program,
 	samplerLoc = glGetUniformLocation(ShaderProgram, "sampler");
 	assert(TrLoc != -1
 		&& samplerLoc != -1
-		);
+	);
 
 	cameraPositionLoc = glGetUniformLocation(ShaderProgram, "camera_position");
 
@@ -622,139 +608,19 @@ bool initShader(GLuint& program,
 
 }
 
-/// Initialize shaders. Return false if initialization fail
+  /// Initialize shaders. Return false if initialization fail
 bool initShaders() {
 	if (1)
-		return initShader(ShaderProgram, "shader.v.glsl", "shader.f.glsl",
-			TrLoc, LocalTrLoc, SamplerLoc,
-			CameraPositionLoc,
-			DLightDirLoc,
-			DLightAColorLoc, DLightDColorLoc, DLightSColorLoc,
-			DLightAIntensityLoc, DLightDIntensityLoc, DLightSIntensityLoc,
-			MaterialAColorLoc, MaterialDColorLoc, MaterialSColorLoc,
-			MaterialShineLoc,
-			Headlight);
+	return initShader(ShaderProgram, "shader.v.glsl", "shader.f.glsl", 
+						TrLoc, LocalTrLoc, SamplerLoc,
+						CameraPositionLoc, 
+						DLightDirLoc, 
+						DLightAColorLoc, DLightDColorLoc, DLightSColorLoc,
+						DLightAIntensityLoc, DLightDIntensityLoc, DLightSIntensityLoc,
+						MaterialAColorLoc, MaterialDColorLoc, MaterialSColorLoc,
+						MaterialShineLoc, 
+						Headlight);
 
-	//	// Create the shader program and check for errors
-	//	if (ShaderProgram != 0)
-	//		glDeleteProgram(ShaderProgram);
-	//
-	////	if (HouseShaderProgram != 0)
-	////		glDeleteProgram(HouseShaderProgram);
-	////
-	////	HouseShaderProgram = glCreateProgram();
-	//
-	//	ShaderProgram = glCreateProgram();
-	//	if (ShaderProgram == 0) {
-	//		cerr << "Error: cannot create shader program." << endl;
-	//		return false;
-	//	}
-	//
-	//	// Create the shader objects and check for errors
-	//	GLuint vertShader = glCreateShader(GL_VERTEX_SHADER);
-	//	GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
-	//	if (vertShader == 0 || fragShader == 0) {
-	//		cerr << "Error: cannot create shader objects." << endl;
-	//		return false;
-	//	}
-	//
-	//	// Read and set the source code for the vertex shader
-	//	string text = readTextFile("shader.v.glsl");
-	//	const char* code = text.c_str();
-	//	int length = static_cast<int>(text.length());
-	//	if (length == 0)
-	//		return false;
-	//	glShaderSource(vertShader, 1, &code, &length);
-	//
-	//	// Read and set the source code for the fragment shader
-	//	string text2 = readTextFile("shader.f.glsl");
-	//	const char *code2 = text2.c_str();
-	//	length = static_cast<int>(text2.length());
-	//	if (length == 0)
-	//		return false;
-	//	glShaderSource(fragShader, 1, &code2, &length);
-	//
-	//	// Compile the shaders
-	//	glCompileShader(vertShader);
-	//	glCompileShader(fragShader);
-	//
-	//	// Check for compilation error
-	//	GLint success;
-	//	GLchar errorLog[1024];
-	//	glGetShaderiv(vertShader, GL_COMPILE_STATUS, &success);
-	//	if (!success) {
-	//		glGetShaderInfoLog(vertShader, 1024, nullptr, errorLog);
-	//		cerr << "Error: cannot compile vertex shader.\nError log:\n" << errorLog << endl;
-	//		return false;
-	//	}
-	//	glGetShaderiv(fragShader, GL_COMPILE_STATUS, &success);
-	//	if (!success) {
-	//		glGetShaderInfoLog(fragShader, 1024, nullptr, errorLog);
-	//		cerr << "Error: cannot compile fragment shader.\nError log:\n" << errorLog << endl;
-	//		return false;
-	//	}
-	//
-	//	// Attach the shader to the program and link it
-	//	glAttachShader(ShaderProgram, vertShader);
-	//	glAttachShader(ShaderProgram, fragShader);
-	//	glLinkProgram(ShaderProgram);
-	//
-	//	// Check for linking error
-	//	glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &success);
-	//	if (!success) {
-	//		glGetProgramInfoLog(ShaderProgram, 1024, nullptr, errorLog);
-	//		cerr << "Error: cannot link shader program.\nError log:\n" << errorLog << endl;
-	//		return false;
-	//	}
-	//
-	//	// Make sure that the shader program can run
-	//	glValidateProgram(ShaderProgram);
-	//
-	//	// Check for validation error
-	//	glGetProgramiv(ShaderProgram, GL_VALIDATE_STATUS, &success);
-	//	if (!success) {
-	//		glGetProgramInfoLog(ShaderProgram, 1024, nullptr, errorLog);
-	//		cerr << "Error: cannot validate shader program.\nError log:\n" << errorLog << endl;
-	//		return false;
-	//	}
-	//
-	//	// Get the location of the uniform variables
-	//	TrLoc = glGetUniformLocation(ShaderProgram, "transformation");
-	//	// normal transformation (not camera)
-	//	LocalTrLoc = glGetUniformLocation(ShaderProgram, "transformationLocal");
-	//
-	//
-	//	SamplerLoc = glGetUniformLocation(ShaderProgram, "sampler");
-	//	assert(TrLoc != -1
-	//		&& SamplerLoc != -1
-	//	);
-	//
-	//	CameraPositionLoc = glGetUniformLocation(ShaderProgram, "camera_position");
-	//
-	//	DLightDirLoc = glGetUniformLocation(ShaderProgram, "d_light_direction");
-	//
-	//	DLightAColorLoc = glGetUniformLocation(ShaderProgram, "d_light_a_color");
-	//	DLightDColorLoc = glGetUniformLocation(ShaderProgram, "d_light_d_color");
-	//	DLightSColorLoc = glGetUniformLocation(ShaderProgram, "d_light_s_color");
-	//
-	//	DLightAIntensityLoc = glGetUniformLocation(ShaderProgram, "d_light_a_intensity");
-	//	DLightDIntensityLoc = glGetUniformLocation(ShaderProgram, "d_light_d_intensity");
-	//	DLightSIntensityLoc = glGetUniformLocation(ShaderProgram, "d_light_s_intensity");
-	//
-	//	MaterialAColorLoc = glGetUniformLocation(ShaderProgram, "material_a_color");
-	//	MaterialDColorLoc = glGetUniformLocation(ShaderProgram, "material_d_color");
-	//	MaterialSColorLoc = glGetUniformLocation(ShaderProgram, "material_s_color");
-	//
-	//	MaterialShineLoc = glGetUniformLocation(ShaderProgram, "material_shininess");
-	//
-	//	Headlight = glGetUniformLocation(ShaderProgram, "headlight");
-	//
-	//
-	//	// Shaders can be deleted now
-	//	glDeleteShader(vertShader);
-	//	glDeleteShader(fragShader);
-	//
-	//	return true;
 } /* initShaders() */
 
 
@@ -788,7 +654,7 @@ string readTextFile(const string& pathAndFileName) {
 	return text;
 } /* readTextFile() */
 
-  /// Draw string in specific position on window
+	/// Draw string in specific position on window
 void drawText(string s, double x, double y, double z) {
 	glRasterPos3f(x, y, z);
 	for (char& c : s) {
@@ -796,21 +662,21 @@ void drawText(string s, double x, double y, double z) {
 	}
 }
 
-/// PS: TEXTURE COORDINATE PRINTING:
-/// PROBLEM WITH SKETCHUP IS IT DOESNT NORMALIZE TEXTURE
-/// COORDINATES 
-/// :(
+	/// PS: TEXTURE COORDINATE PRINTING:
+	/// PROBLEM WITH SKETCHUP IS IT DOESNT NORMALIZE TEXTURE
+	/// COORDINATES 
+	/// :(
 void printTextureCoordinates(ModelOBJ model) {
-
+	
 	for (int i = 0; i < model.getNumberOfVertices(); i++) {
 		ModelOBJ::Vertex v = model.getVertex(i);
 		cout << "Vertex with index " << i << " has texture coordinates (" << v.texCoord[0] << ", " << v.texCoord[1] << ")" << endl;
 	}
 }
 
-/// Set up directional light for openGL
+	/// Set up directional light for openGL
 void setDirectionalLight() {
-
+	
 	glUniform3f(DLightDirLoc, 0.5f, -0.5f, -1.0f);
 	glUniform3f(DLightAColorLoc, 0.5f, 0.5f, 0.5f);
 	glUniform3f(DLightDColorLoc, 0.f, 0.4f, 0.3f);
@@ -820,9 +686,9 @@ void setDirectionalLight() {
 	glUniform1f(DLightSIntensityLoc, 1.0f);
 }
 
-/// Set up spot light for openGL
+	/// Set up spot light for openGL
 void setSpotLight() {
-
+	
 	glUniform3f(SLightDirLoc, 0.5f, -0.5f, -1.0f);
 	glUniform3f(SLightAColorLoc, 0.5f, 0.5f, 0.5f);
 	glUniform3f(SLightDColorLoc, 0.f, 0.4f, 0.3f);
@@ -832,9 +698,9 @@ void setSpotLight() {
 	glUniform1f(SLightSIntensityLoc, 1.0f);
 }
 
-/// Set up head light for openGL
+	/// Set up head light for openGL
 void setHeadLight() {
-
+	
 	glUniform1i(Headlight, HeadlightInt ? 1 : 0);
 
 	glDisable(GL_LIGHT0);
@@ -978,7 +844,7 @@ void loadMaterials(const char* TextureDirectory, const ModelOBJ &model, GLuint &
 	unsigned int TextureHeight = 0;
 
 	cout << "number of materials = " << model.getNumberOfMaterials() << endl;
-
+	
 	// Check the materials for the texture
 	for (int i = 0; i < model.getNumberOfMaterials(); ++i) {
 
@@ -1128,4 +994,4 @@ void loadMaterial(const char* textureDirectory, GLuint &TextureObject) {
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }
 
-/* --- eof main.cpp --- */
+  /* --- eof main.cpp --- */
