@@ -65,7 +65,7 @@ ModelOBJ cat;
 GLuint catVBO = 0;
 GLuint catIBO = 0;
 
-// Model of the grass
+						// Model of the grass
 const int GRASS_VERTS_NUM = 4;
 const int GRASS_TRIS_NUM = 2;
 GLuint GrassVBO = 0;
@@ -78,13 +78,13 @@ unsigned int TextureWidth = 0;			///< The width of the current texture
 unsigned int TextureHeight = 0;			///< The height of the current texture
 unsigned char *TextureData = nullptr;	///< the array where the texture image will be stored
 
-// Texture for second object
+										// Texture for second object
 GLuint TextureObject2 = 0;				///< A texture object
 unsigned int TextureWidth2 = 0;			///< The width of the current texture
 unsigned int TextureHeight2 = 0;			///< The height of the current texture
 unsigned char *TextureData2 = nullptr;	///< the array where the texture image will be stored
 
-// Texture for the grass
+										// Texture for the grass
 GLuint TexGrassObj = 0;
 unsigned int TexGrassWidth = 0;
 unsigned int TexGrassHeight = 0;
@@ -432,6 +432,10 @@ void keyboard(unsigned char key, int x, int y) {
 		break;
 	case 'l':
 		HeadlightInt = !HeadlightInt;
+		glutPostRedisplay();
+		break;
+	case '9':
+		Cam.flip();
 		glutPostRedisplay();
 		break;
 	}
