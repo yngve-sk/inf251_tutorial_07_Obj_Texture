@@ -67,6 +67,7 @@ public:
         float normal[3];
         float tangent[4];
         float bitangent[3];
+		int texIndex;
     };
 
     struct Mesh

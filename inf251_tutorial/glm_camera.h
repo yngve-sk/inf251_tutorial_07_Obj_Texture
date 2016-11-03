@@ -57,7 +57,7 @@ public:
 		if (perspectiveProjection) {
 			prj = perspective(fov, ar, zNear, zFar);
 		} else {
-			prj = ortho(-20.0f, 20.0f, -20.0f, 20.0f, 1.0f, 100.0f);
+			prj = ortho(20.0f, -20.0f, 20.0f, -20.0f, zNear, zFar);
 		}
 		
 		mat4 camZoom = glm::scale(vec3(zoom, zoom, 1.f));
