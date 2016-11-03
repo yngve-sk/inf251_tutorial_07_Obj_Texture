@@ -261,20 +261,6 @@ void display() {
 	glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &LocalRotationY[0][0]);
 	// Draw the house
 
-	Model.getCenter(centerX, centerY, centerZ);
-	GLint centerLoc = glGetAttribLocation(ShaderProgram, "center");
-
-	vec3 centerNone = vec3(0, 0, 0);
-	vec3 centerv = vec3(centerX, centerY, centerZ);
-	glUniform1fv(centerLoc, sizeof(fvec3), &centerv[0]);
-	//
-	mat4 translateToCenter = glm::translate(vec3(0.0f, -50, 0.0f));
-	//mat4 translateFromCenter = glm::translate(vec3(-centerX, -centerY, -centerZ));
-	//
-	//mat4 rotateMat = translateFromCenter * LocalRotationY * translateToCenter;
-
-	glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &NonTransformation[0][0]);
-
 	/* Code for multiple textures
 	for (int i = 0; i < Model.getNumberOfMeshes(); i++) {
 		drawMesh(Model.getMesh(i).triangleCount * 3, Model.getMesh(i).startIndex, TextureObjects[i], VBO, IBO, posLoc, texLoc, normalLoc);
@@ -414,6 +400,10 @@ void keyboard(unsigned char key, int x, int y) {
 		break;
 	case 'l':
 		HeadlightInt = !HeadlightInt;
+		glutPostRedisplay();
+		break;
+	case '9':
+		Cam.flip();
 		glutPostRedisplay();
 		break;
 	}

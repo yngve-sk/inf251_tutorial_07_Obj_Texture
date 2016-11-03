@@ -5,7 +5,7 @@
 uniform mat4 transformation;
 uniform mat4 transformationLocal;
 
-// vertex position
+// vertex position	
 layout (location = 0) in vec3 position; 
 layout (location = 2) in vec3 normal;
 
@@ -24,7 +24,5 @@ void main() {
     fragVert = position;
     
     // Apply all matrix transformations to vert
-
-
 	gl_Position = transformation * transformationLocal * vec4(position, 1.); // old version
 }
