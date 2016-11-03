@@ -17,6 +17,8 @@
 
 using namespace std;
 
+#define PI 3.14159265
+
 struct Vertex {
 	glm::fvec3 position, normal;
 };
@@ -48,14 +50,22 @@ void loadMaterial(const char*, GLuint&);
 
 // --- Global variables ---------------------------------------------------------------------------
 // 3D model
+// Model of the house
 ModelOBJ Model;		///< A 3D model
 GLuint VBO = 0;		///< A vertex buffer object
 GLuint IBO = 0;		///< An index buffer object
-ModelOBJ Model2;		///< A 3D model
-GLuint cubeVBO = 0;		///< A vertex buffer object
-GLuint cubeIBO = 0;		///< An index buffer object
 
-						// Model of the grass
+// Model of the cube
+ModelOBJ Model2;
+GLuint cubeVBO = 0;
+GLuint cubeIBO = 0;
+
+// Model of the cat
+ModelOBJ cat;
+GLuint catVBO = 0;
+GLuint catIBO = 0;
+
+// Model of the grass
 const int GRASS_VERTS_NUM = 4;
 const int GRASS_TRIS_NUM = 2;
 GLuint GrassVBO = 0;
@@ -68,17 +78,20 @@ unsigned int TextureWidth = 0;			///< The width of the current texture
 unsigned int TextureHeight = 0;			///< The height of the current texture
 unsigned char *TextureData = nullptr;	///< the array where the texture image will be stored
 
-										// Texture for second object
+// Texture for second object
 GLuint TextureObject2 = 0;				///< A texture object
 unsigned int TextureWidth2 = 0;			///< The width of the current texture
 unsigned int TextureHeight2 = 0;			///< The height of the current texture
 unsigned char *TextureData2 = nullptr;	///< the array where the texture image will be stored
 
-										// Texture for the grass
+// Texture for the grass
 GLuint TexGrassObj = 0;
 unsigned int TexGrassWidth = 0;
 unsigned int TexGrassHeight = 0;
 unsigned char *TexGrassData = nullptr;
+
+// Texture for the cat
+GLuint TexCatObj = 0;
 
 
 // Shaders
@@ -145,6 +158,11 @@ mat4 NonTransformation = mat4(1, 0, 0, 0,
 							  0, 1, 0, 0,
 							  0, 0, 1, 0,
 							  0, 0, 0, 1);
+mat4 LocalRotation = mat4(1, 0, 0, 0,
+							0, cos(180 * PI / 180.0), -sin(180 * PI / 180.0), 0,
+							0, sin(180 * PI / 180.0), -cos(180 * PI / 180.0), 0,
+							0, 0, 0, 1);
+mat4 catTransformation;
 
 float centerX, centerY, centerZ;
 
@@ -272,7 +290,6 @@ void display() {
 	//mat4 translateFromCenter = glm::translate(vec3(-centerX, -centerY, -centerZ));
 	//
 	//mat4 rotateMat = translateFromCenter * LocalRotationY * translateToCenter;
-
 	glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &NonTransformation[0][0]);
 
 	/* Code for multiple textures
@@ -281,16 +298,12 @@ void display() {
 	}*/
 
 	drawObject(Model.getNumberOfIndices(), TextureObject, VBO, IBO, posLoc, texLoc, normalLoc);
-
 	glVertexAttribPointer(normalLoc, 3, GL_FLOAT, GL_FALSE,
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(5 * sizeof(float)));
-
-	
 	glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &NonTransformation[0][0]);
 
 	// Draw the cube
 	drawObject(Model2.getNumberOfIndices(), TextureObject2, cubeVBO, cubeIBO, posLoc, texLoc, -1);
-
 	glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &NonTransformation[0][0]);
 
 	// Set material parameters for grass
@@ -302,6 +315,11 @@ void display() {
 	// Draw the grass
 	drawObject(3 * GRASS_TRIS_NUM, TexGrassObj, GrassVBO, GrassIBO, posLoc, texLoc, -1);
 
+
+	catTransformation = glm::rotate((float)(180 * PI / 180.0), vec3(1, 0, 0)) * glm::translate(vec3(-2, -0.5, 8));
+	// Draw the cat
+	glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &catTransformation[0][0]);
+	drawObject(cat.getNumberOfIndices(), TexCatObj, catVBO, catIBO, posLoc, texLoc, -1);
 
 
 	// Draw projection text
@@ -469,10 +487,13 @@ bool initMesh() {
 	}*/
 	loadMaterials("House-Model\\", Model, TextureObject);
 
-	//This line is causing a problem
 	Model2 = loadObject("Objects\\cube-textured\\cube.obj", cubeVBO, cubeIBO);
-
 	loadMaterials("Objects\\cube-textured\\", Model2, TextureObject2);
+
+	cat = loadObject("Objects\\cat\\cat.obj", catVBO, catIBO);
+	loadMaterials("Objects\\cat\\", cat, TexCatObj);
+	//cat = loadObject("Objects\\Drill\\Drill.obj", catVBO, catIBO);
+	//loadMaterials("Objects\\Drill\\", cat, TexCatObj);
 
 	loadGrassObject(GrassVBO, GrassIBO);
 	loadMaterial("grass.png", TexGrassObj);
