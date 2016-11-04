@@ -41,11 +41,14 @@ void setHeadLight();
 void drawText(string, double, double, double);
 void drawMesh(int, GLuint, GLuint, GLuint&, GLuint&, GLuint, GLuint, GLuint);
 void drawObject(int, GLuint, GLuint&, GLuint&, GLuint, GLuint, GLuint);
+void drawObject(int, GLuint, GLuint, GLuint&, GLuint&, GLuint, GLuint, GLuint);
 ModelOBJ loadObject(const char*, GLuint&, GLuint&);
 void loadGrassObject(GLuint&, GLuint&);
 void loadMaterials(const char*, const ModelOBJ&, GLuint&);
+void loadMaterial(const char*, GLuint&, unsigned int&, unsigned int&);
 void loadMaterial(const char*, GLuint&, const ModelOBJ::Material&);
 void loadMaterial(const char*, GLuint&);
+GLuint LoadTexture(const char*, int, int);
 
 
 // --- Global variables ---------------------------------------------------------------------------
@@ -65,7 +68,7 @@ ModelOBJ cat;
 GLuint catVBO = 0;
 GLuint catIBO = 0;
 
-						// Model of the grass
+// Model of the grass
 const int GRASS_VERTS_NUM = 4;
 const int GRASS_TRIS_NUM = 2;
 GLuint GrassVBO = 0;
@@ -74,24 +77,16 @@ GLuint GrassIBO = 0;
 // Texture
 GLuint TextureObjects[32];
 GLuint TextureObject = 0;				///< A texture object
-unsigned int TextureWidth = 0;			///< The width of the current texture
-unsigned int TextureHeight = 0;			///< The height of the current texture
-unsigned char *TextureData = nullptr;	///< the array where the texture image will be stored
 
-										// Texture for second object
+// Texture for second object
 GLuint TextureObject2 = 0;				///< A texture object
-unsigned int TextureWidth2 = 0;			///< The width of the current texture
-unsigned int TextureHeight2 = 0;			///< The height of the current texture
-unsigned char *TextureData2 = nullptr;	///< the array where the texture image will be stored
 
-										// Texture for the grass
+// Texture for the grass
 GLuint TexGrassObj = 0;
-unsigned int TexGrassWidth = 0;
-unsigned int TexGrassHeight = 0;
-unsigned char *TexGrassData = nullptr;
 
 // Texture for the cat
 GLuint TexCatObj = 0;
+GLuint normal_texture = 0;
 
 
 // Shaders
@@ -223,17 +218,7 @@ int main(int argc, char **argv) {
 
 	// Start the main event loop
 	glutMainLoop();
-
-	// clean-up before exit
-	if (TextureData != nullptr)
-		free(TextureData);
-
-	// clean-up before exit
-	if (TextureData2 != nullptr)
-		free(TextureData2);
-
 	return 0;
-
 }
 
 
@@ -279,7 +264,7 @@ void display() {
 	glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &LocalRotationY[0][0]);
 	// Draw the house
 
-	Model.getCenter(centerX, centerY, centerZ);
+	/*Model.getCenter(centerX, centerY, centerZ);
 	GLint centerLoc = glGetAttribLocation(ShaderProgram, "center");
 
 	vec3 centerNone = vec3(0, 0, 0);
@@ -290,7 +275,7 @@ void display() {
 	//mat4 translateFromCenter = glm::translate(vec3(-centerX, -centerY, -centerZ));
 	//
 	//mat4 rotateMat = translateFromCenter * LocalRotationY * translateToCenter;
-	glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &NonTransformation[0][0]);
+	glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &NonTransformation[0][0]);*/
 
 	/* Code for multiple textures
 	for (int i = 0; i < Model.getNumberOfMeshes(); i++) {
@@ -313,13 +298,15 @@ void display() {
 	glUniform1f(MaterialShineLoc, 10.0f);
 
 	// Draw the grass
-	drawObject(3 * GRASS_TRIS_NUM, TexGrassObj, GrassVBO, GrassIBO, posLoc, texLoc, -1);
+	//drawObject(3 * GRASS_TRIS_NUM, TexGrassObj, GrassVBO, GrassIBO, posLoc, texLoc, -1);
+	drawObject(3 * GRASS_TRIS_NUM, TexGrassObj, normal_texture, GrassVBO, GrassIBO, posLoc, texLoc, normalLoc);
 
 
 	catTransformation = glm::rotate((float)(180 * PI / 180.0), vec3(1, 0, 0)) * glm::translate(vec3(-2, -0.5, 8));
 	// Draw the cat
 	glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &catTransformation[0][0]);
 	drawObject(cat.getNumberOfIndices(), TexCatObj, catVBO, catIBO, posLoc, texLoc, -1);
+	//drawObject(cat.getNumberOfIndices(), TexCatObj, normal_texture, catVBO, catIBO, posLoc, texLoc, -1);
 
 
 	// Draw projection text
@@ -357,7 +344,7 @@ void display() {
 /// Called at regular intervals (can be used for animations)
 void idle() {
 	// rotate around Y-axis
-	LocalRotationY *= glm::rotate(0.05f, vec3(0, 1, 0));
+	LocalRotationY *= glm::rotate(0.005f, vec3(0, 1, 0));
 
 	glutPostRedisplay();
 }
@@ -494,13 +481,21 @@ bool initMesh() {
 	Model2 = loadObject("Objects\\cube-textured\\cube.obj", cubeVBO, cubeIBO);
 	loadMaterials("Objects\\cube-textured\\", Model2, TextureObject2);
 
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+
 	cat = loadObject("Objects\\cat\\cat.obj", catVBO, catIBO);
-	loadMaterials("Objects\\cat\\", cat, TexCatObj);
-	//cat = loadObject("Objects\\Drill\\Drill.obj", catVBO, catIBO);
-	//loadMaterials("Objects\\Drill\\", cat, TexCatObj);
+	//loadMaterials("Objects\\cat\\", cat, TexCatObj);
+	unsigned int width = 1024;
+	unsigned int height = 512;
+	loadMaterial("Objects\\cat\\cat_diff.png", TexCatObj, width, height);
+	//loadMaterial("Objects\\cat\\cat_norm.png",normal_texture, width, height);
+	
 
 	loadGrassObject(GrassVBO, GrassIBO);
 	loadMaterial("grass.png", TexGrassObj);
+	loadMaterial("normalMap.png", normal_texture);
 
 	return true;
 } /* initBuffers() */
@@ -774,6 +769,40 @@ void drawObject(int numberOfIndices, GLuint texture, GLuint &VBO, GLuint &IBO, G
 	glDrawElements(GL_TRIANGLES, numberOfIndices, GL_UNSIGNED_INT, 0);
 }
 
+/// Draw an object with bump mapping
+void drawObject(int numberOfIndices, GLuint texture, GLuint normalTexture, GLuint &VBO, GLuint &IBO, GLuint posLoc, GLuint texLoc, GLuint normalLoc) {
+
+	glActiveTexture(GL_TEXTURE0);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glActiveTexture(GL_TEXTURE1);
+	glEnable(GL_TEXTURE_2D);
+	int normal_location = glGetUniformLocation(ShaderProgram, "normal_texture");
+	glUniform1i(normal_location, 1);
+	glBindTexture(GL_TEXTURE_2D, normalTexture);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+	glVertexAttribPointer(posLoc, 3, GL_FLOAT, GL_FALSE,
+		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(0));
+	glVertexAttribPointer(texLoc, 2, GL_FLOAT, GL_FALSE,
+		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(3 * sizeof(float)));
+	if (normalLoc != -1) {
+		glVertexAttribPointer(normalLoc, 3, GL_FLOAT, GL_FALSE,
+			sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(5 * sizeof(float)));
+	}
+	glDrawElements(GL_TRIANGLES, numberOfIndices, GL_UNSIGNED_INT, 0);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glDisable(GL_TEXTURE_2D);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glDisable(GL_TEXTURE_2D);
+}
+
 ModelOBJ loadObject(const char* directory, GLuint &VBO, GLuint &IBO) {
 
 	ModelOBJ model;
@@ -924,6 +953,49 @@ void loadMaterials(const char* TextureDirectory, const ModelOBJ &model, GLuint &
 	}
 }
 
+void loadMaterial(const char* TextureDirectory, GLuint &TextureObject, unsigned int &width, unsigned int &height) {
+
+	unsigned char* TextureData = nullptr;
+
+	// Load the texture
+	if (TextureData != nullptr)
+		free(TextureData);
+
+	unsigned int fail = lodepng_decode_file(&TextureData, &width, &height,
+		TextureDirectory,
+		LCT_RGB, 8); // Remember to check the last 2 parameters
+	if (fail != 0) {
+		cerr << "Error: cannot load texture file "
+			<< TextureDirectory << endl;
+		return;
+	}
+
+	// Create the texture object
+	if (TextureObject != 0)
+		glDeleteTextures(1, &TextureObject);
+	glGenTextures(1, &TextureObject);
+
+	// Bind it as a 2D texture (note that other types of textures are supported as well)
+	glBindTexture(GL_TEXTURE_2D, TextureObject);
+
+	// Set the texture data
+	glTexImage2D(
+		GL_TEXTURE_2D,
+		0,
+		GL_RGB,			// remember to check this
+		width,
+		height,
+		0,
+		GL_RGB,			// remember to check this
+		GL_UNSIGNED_BYTE,
+		TextureData
+		);
+
+	// Configure texture parameter
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+}
+
 void loadMaterial(const char* TextureDirectory, GLuint &TextureObject, const ModelOBJ::Material &material) {
 
 	unsigned char* TextureData = nullptr;
@@ -1017,6 +1089,45 @@ void loadMaterial(const char* textureDirectory, GLuint &TextureObject) {
 	// Configure texture parameter
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+}
+
+GLuint LoadTexture(const char * filename, int width, int height)
+{
+	GLuint texture;
+	unsigned char * data;
+	FILE * file;
+
+	//The following code will read in our RAW file  
+	file = fopen(filename, "rb");
+
+	if (file == NULL) return 0;
+	data = (unsigned char *)malloc(width * height * 3);
+	fread(data, width * height * 3, 1, file);
+
+	fclose(file);
+
+	glGenTextures(1, &texture); //generate the texture with the loaded data  
+	glBindTexture(GL_TEXTURE_2D, texture); //bind the texture to it’s array  
+
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); //set texture environment parameters  
+
+																 //And if you go and use extensions, you can use Anisotropic filtering textures which are of an  
+																 //even better quality, but this will do for now.  
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	//Here we are setting the parameter to repeat the texture instead of clamping the texture  
+	//to the edge of our shape.  
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	//Generate the texture  
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+	free(data); //free the texture  
+
+	return texture; //return whether it was successfull  
 }
 
   /* --- eof main.cpp --- */
