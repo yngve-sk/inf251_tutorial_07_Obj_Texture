@@ -110,20 +110,20 @@ public:
 	}
 
 	void rotate(const vec2& oldMousePosition, const vec2& newMousePosition) {
-	//mat4 ry, rx;
-	//
+	mat4 ry, rx;
+	
 		int dx = oldMousePosition.x - newMousePosition.x,
 			dy = oldMousePosition.y - newMousePosition.y;
-	//
-	//ry = glm::rotate(ROTATIONAL_SPEED * dx, vec3(0,1,0));
-	//target = mat3(ry) * target;
-	//up = mat3(ry) * up;
-	//
-	//rx = glm::rotate(-ROTATIONAL_SPEED * dy, vec3(1, 0, 0));
-	//up = mat3(rx) * up;
-	//target = vec3(rx * vec4(target, 1.0f));
+	
+	ry = glm::rotate(-ROTATIONAL_SPEED * dx, vec3(0,1,0));
+	target = vec3(ry * vec4(target, 1.f));
+	up = mat3(ry) * up;
+	
+	rx = glm::rotate(-ROTATIONAL_SPEED * dy, vec3(1, 0, 0));
+	up = mat3(rx) * up;
+	target = vec3(rx * vec4(target, 1.0f));
 
-		float rotY = ROTATIONAL_SPEED * dx,
+		/*float rotY = ROTATIONAL_SPEED * dx,
 			rotX = ROTATIONAL_SPEED * dy;
 
 		mat4 rx, rz, ry;
@@ -144,7 +144,7 @@ public:
 		// ry * up, rx * up
 		up = mat3(rt)*up;
 		up.x = 0; // no rotation around z-axis, //TODO!
-		target = vec3(rt * vec4(target, 1.0f));
+		target = vec3(rt * vec4(target, 1.0f));*/
 	}
 
 	void flip() {

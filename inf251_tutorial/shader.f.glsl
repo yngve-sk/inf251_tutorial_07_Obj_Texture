@@ -17,6 +17,7 @@ in vec3 fragVert;
 
 // Normal texture for bump mapping
 uniform sampler2D normal_texture;
+uniform int bump_mapping;
 
 // Lights
 uniform vec3 d_light_direction;
@@ -80,19 +81,25 @@ void main() {
 	// calculate, nomalize normals from bump mapping
 	normal_bump = normalize(texture2D(normal_texture, fragTexCoord).rgb * 2.0 - 1.0);  
 
+	vec3 color;
 	//calculate light color
-	vec3 color = generateLightColor(d_light_direction, normal_bump);
+	if (bump_mapping == 0){
+		color = generateLightColor(d_light_direction, normal);
+	} else if (bump_mapping == 1){
+		color = generateLightColor(d_light_direction, normal_bump);
+	}
 
 	//create the spotlight
 	SpotLight sl;
-	sl.vColor = vec3(200, 200, 200); // White Color
-	sl.vPosition = vec3(camera_position[0]-10, camera_position[1]-10, camera_position[2]-5);
+	sl.vColor = vec3(122, 122, 122); // White Color
+	//sl.vPosition = vec3(camera_position[0]-10, camera_position[1]-10, camera_position[2]-5);
+	sl.vPosition = vec3(0,0,0);
 	sl.bOn = 1;
 	sl.fConeCosine = 0.86602540378;
 	sl.fLinearAtt = 1.0;
 	sl.vDirection = vec3(0,0,1);
 
-	vec4 fWorldPosition = transformation * transformationLocal * vec4(fragVert, 1.);
+	vec4 fWorldPosition = transformation * vec4(fragVert, 1.);
 	vec4 s_lighting = GetSpotLightColor(sl, vec3(fWorldPosition));
 
 	vec4 f_lighting;
