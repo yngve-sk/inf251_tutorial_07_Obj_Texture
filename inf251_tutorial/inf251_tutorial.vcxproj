@@ -142,6 +142,12 @@
     <None Include="shader.f.glsl" />
     <None Include="shader.v.glsl" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="normalMap.png" />
+    <Image Include="normalMap2.png" />
+    <Image Include="normalMap3.png" />
+    <Image Include="normalMap4.png" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
