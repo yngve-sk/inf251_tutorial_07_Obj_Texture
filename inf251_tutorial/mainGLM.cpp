@@ -44,12 +44,15 @@ void drawObject(int, GLuint, GLuint&, GLuint&, GLuint, GLuint, GLuint);
 void drawObject(int, GLuint, GLuint, GLuint&, GLuint&, GLuint, GLuint, GLuint);
 ModelOBJ loadObject(const char*, GLuint&, GLuint&);
 void loadGrassObject(GLuint&, GLuint&);
+void loadCanvasObject(GLuint&, GLuint&);
 void loadMaterials(const char*, const ModelOBJ&, GLuint&);
 void loadMaterial(const char*, GLuint&, unsigned int&, unsigned int&);
 void loadMaterial(const char*, GLuint&, const ModelOBJ::Material&);
 void loadMaterial(const char*, GLuint&);
 GLuint LoadTexture(const char*, int, int);
 
+void loadTexture(const char*, GLuint&);
+void loadCanvasTextures(GLuint*);
 
 // --- Global variables ---------------------------------------------------------------------------
 // 3D model
@@ -68,25 +71,38 @@ ModelOBJ cat;
 GLuint catVBO = 0;
 GLuint catIBO = 0;
 
-// Model of the grass
+						// Model of the grass
 const int GRASS_VERTS_NUM = 4;
 const int GRASS_TRIS_NUM = 2;
 GLuint GrassVBO = 0;
 GLuint GrassIBO = 0;
 
+// Model of the canvas
+const int CANVAS_VERTS_NUM = 4;
+const int CANVAS_TRIS_NUM = 2;
+GLuint CanvasVBO = 0;
+GLuint CanvasIBO = 0;
+
+GLuint CanvasTextureArray[256];
+
+
 // Texture
 GLuint TextureObjects[32];
 GLuint TextureObject = 0;				///< A texture object
 
-// Texture for second object
+
+										// Texture for second object
 GLuint TextureObject2 = 0;				///< A texture object
 
-// Texture for the grass
+										// Texture for the grass
 GLuint TexGrassObj = 0;
 
 // Texture for the cat
 GLuint TexCatObj = 0;
 GLuint normal_texture = 0;
+
+// Active texture for canvas
+GLuint ActiveTexCanvas = -1;
 
 
 // Shaders
@@ -194,7 +210,7 @@ int main(int argc, char **argv) {
 	glClearColor(0.1f, 0.3f, 0.1f, 0.0f); // background color
 	glEnable(GL_DEPTH_TEST);	// enable depth ordering
 	glFrontFace(GL_CCW);		// Vertex order for the front face
-	glCullFace(GL_BACK);		// back-faces should be removed
+	glCullFace(GL_BACK);		// back-faces should be remove
 								//glEnable(GL_CULL_FACE);		// enable back-face culling
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_LIGHTING);
@@ -301,6 +317,8 @@ void display() {
 	//drawObject(3 * GRASS_TRIS_NUM, TexGrassObj, GrassVBO, GrassIBO, posLoc, texLoc, -1);
 	drawObject(3 * GRASS_TRIS_NUM, TexGrassObj, normal_texture, GrassVBO, GrassIBO, posLoc, texLoc, normalLoc);
 
+	// Draw the canvas
+	drawObject(3 * CANVAS_TRIS_NUM, ActiveTexCanvas, CanvasVBO, CanvasIBO, posLoc, texLoc, -1);
 
 	catTransformation = glm::rotate((float)(180 * PI / 180.0), vec3(1, 0, 0)) * glm::translate(vec3(-2, -0.5, 8));
 	// Draw the cat
@@ -341,10 +359,19 @@ void display() {
 	glutSwapBuffers();
 }
 
+int canvas_frame = 0;
+int steps = 10;
+int canvas_frame_wait = 10;
 /// Called at regular intervals (can be used for animations)
 void idle() {
 	// rotate around Y-axis
 	LocalRotationY *= glm::rotate(0.005f, vec3(0, 1, 0));
+
+	if (--steps == 0) {
+		canvas_frame = (++canvas_frame) % 173;
+		steps = canvas_frame_wait;
+	}
+	ActiveTexCanvas = CanvasTextureArray[canvas_frame];
 
 	glutPostRedisplay();
 }
@@ -497,8 +524,30 @@ bool initMesh() {
 	loadMaterial("grass.png", TexGrassObj);
 	loadMaterial("normalMap.png", normal_texture);
 
+	loadCanvasObject(CanvasVBO, CanvasIBO);
+	loadCanvasTextures(&CanvasTextureArray[0]);
+
+	ActiveTexCanvas = CanvasTextureArray[0];
+
 	return true;
 } /* initBuffers() */
+
+void loadCanvasTextures(GLuint* start) {
+	int num_frames = 173;
+
+	GLuint* offset = start;
+	int step = sizeof(GLuint);
+
+	for (int i = 1; i < num_frames + 1; i++) {
+		string path = "Animated-textures\\" + std::to_string(i) + ".png";
+		loadTexture(&path[0], start[i-1]);
+		cout << "loading texture " << i << " filepath: " << path << endl;
+	}
+
+	for (int i = 0; i < num_frames; i++) {
+		cout << "arr[" << std::to_string(i) << "] = " << start[i] << endl;
+	}
+}
 
 bool initShader(GLuint& program, 
 				string vShaderPath, string fShaderPath, 
@@ -891,6 +940,73 @@ void loadGrassObject(GLuint &VBO, GLuint &IBO) {
 	return;
 }
 
+/**
+* Load canvas object...
+*/
+void loadCanvasObject(GLuint &VBO, GLuint &IBO) {
+
+	float width = 36.f*2.f,
+		height = 18.5f*2.f,
+		z = 5.f,
+		x = 20.f,
+		y = -40.f;
+
+	ModelOBJ::Vertex canvasVerts[CANVAS_VERTS_NUM];
+
+	canvasVerts[0].position[0] = x;
+	canvasVerts[0].position[1] = y;
+	canvasVerts[0].position[2] = z;
+
+	canvasVerts[1].position[0] = x + width;
+	canvasVerts[1].position[1] = y;
+	canvasVerts[1].position[2] = z;
+
+	canvasVerts[2].position[0] = x + width;
+	canvasVerts[2].position[1] = y + height;
+	canvasVerts[2].position[2] = z;
+
+	canvasVerts[3].position[0] = x;
+	canvasVerts[3].position[1] = y + height;
+	canvasVerts[3].position[2] = z;
+
+
+	canvasVerts[0].texCoord[0] = 0.f;
+	canvasVerts[0].texCoord[1] = 0.f;
+
+	canvasVerts[1].texCoord[0] = 1.f;
+	canvasVerts[1].texCoord[1] = 0.f;
+
+	canvasVerts[2].texCoord[0] = 1.f;
+	canvasVerts[2].texCoord[1] = 1.f;
+
+	canvasVerts[3].texCoord[0] = 0.f;
+	canvasVerts[3].texCoord[1] = 1.f;
+
+	// Generate a VBO
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER,
+		CANVAS_VERTS_NUM * sizeof(ModelOBJ::Vertex),
+		canvasVerts,
+		GL_STATIC_DRAW);
+
+	// Create an array of indices representing the triangles (faces of the cube)
+	unsigned int canvasTris[3 * CANVAS_TRIS_NUM] = {
+		0, 1, 2,
+		2, 3, 0
+	};
+
+	// Create an IBO
+	glGenBuffers(1, &IBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+		3 * CANVAS_TRIS_NUM * sizeof(unsigned int),
+		canvasTris,
+		GL_DYNAMIC_DRAW);
+
+	return;
+}
+
 void loadMaterials(const char* TextureDirectory, const ModelOBJ &model, GLuint &TextureObject) {
 
 	unsigned char* TextureData = nullptr;
@@ -1054,6 +1170,44 @@ void loadMaterial(const char* TextureDirectory, GLuint &TextureObject, const Mod
 
 	}
 }
+
+/**
+* Loads one texture and puts it @ name
+*/
+void loadTexture(const char* loc, GLuint& name) {
+
+	unsigned char* TextureData = nullptr;
+	unsigned int TextureWidth = 0,
+				 TextureHeight = 0;
+
+	if (TextureData != nullptr)
+		free(TextureData);
+	unsigned int fail = lodepng_decode_file(&TextureData, &TextureWidth, &TextureHeight,
+		loc, LCT_RGB, 8);
+
+	if (fail != 0) {
+		cerr << "Error: cant load the texture at loc " << loc << endl;
+	}
+
+	if (name != 0)
+		glDeleteTextures(1, &name);
+	glGenTextures(1, &name);
+
+	// Bind it as a 2D texture (note that other types of textures are supported as well)
+	glBindTexture(GL_TEXTURE_2D, name);
+
+	// Set the texture data
+	glTexImage2D(GL_TEXTURE_2D, 0,
+		GL_RGB,		// remember to check this
+		TextureWidth, TextureHeight, 0,
+		GL_RGB,		// remember to check this
+		GL_UNSIGNED_BYTE, TextureData);
+
+	// Configure texture parameter
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+}
+
 
 void loadMaterial(const char* textureDirectory, GLuint &TextureObject) {
 
