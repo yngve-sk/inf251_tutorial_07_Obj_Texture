@@ -17,6 +17,7 @@ in vec3 fragVert;
 
 // Normal texture for bump mapping
 uniform sampler2D normal_texture;
+uniform int bump_mapping;
 
 // Lights
 uniform vec3 d_light_direction;
@@ -67,14 +68,11 @@ void main() {
     mat3 normalMatrix = transpose(inverse(mat3(transformation)));
     vec3 normal = normalize(normalMatrix * fragNormal);
 
-//	FragColor = abs(vec4(normal,1.));
-	
 	//calculate the location of this fragment (pixel) in world coordinates
     vec3 fragPosition = vec3(transformation * vec4(fragVert, 1));
 
 	//calculate the vector from this pixels surface to the light source
-//  vec3 surfaceToLight = normalize(d_light_direction - fragPosition);
-    vec3 surfaceToLight = normalize(d_light_direction - fragPosition);
+    vec3 surfaceToLight = d_light_direction - fragPosition;
 
 	//calculate the cosine of the angle of incidence
     float brightness = dot(normal, surfaceToLight) / (length(surfaceToLight) * length(normal));
@@ -83,13 +81,18 @@ void main() {
 	// calculate, nomalize normals from bump mapping
 	normal_bump = normalize(texture2D(normal_texture, fragTexCoord).rgb * 2.0 - 1.0);  
 
+	vec3 color;
 	//calculate light color
-	vec3 color = generateLightColor(d_light_direction, normal_bump);
+	if (bump_mapping == 0){
+		color = generateLightColor(d_light_direction, normal);
+	} else if (bump_mapping == 1){
+		color = generateLightColor(d_light_direction, normal_bump);
+	}
 
 	//create the spotlight
 	SpotLight sl;
 	sl.vColor = vec3(122, 122, 122); // White Color
-//	sl.vPosition = vec3(camera_position[0], camera_position[1], camera_position[2]);
+	//sl.vPosition = vec3(camera_position[0]-10, camera_position[1]-10, camera_position[2]-5);
 	sl.vPosition = vec3(0,0,0);
 	sl.bOn = 1;
 	sl.fConeCosine = 0.86602540378;
@@ -154,13 +157,13 @@ vec3 generateLightColor(vec3 light_dir, vec3 normal) {
 	float gradial_max_dist = max_dist - full_light_treshold;
 
 	if(distance > full_light_treshold) {
-		distance_multiplier = 1;// - (distance/gradial_max_dist);
+		distance_multiplier = 1 - (distance/gradial_max_dist);
 	}
 	else {
 		distance_multiplier = 1;
 	}
 
-	vec3 camLightDirection = camera_position - vec3(fWorldPosition);
+	vec3 camLightDirection = camera_position - fragVert;
 
 	vec3 d_light_dir_nn = normalize(light_dir);
 	vec3 view_dir_nn = normalize(camera_position - fWorldPosition.xyz /*position*/ );		//Transform into world position (Sergej)

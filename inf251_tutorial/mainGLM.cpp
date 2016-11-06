@@ -96,10 +96,11 @@ GLuint TextureObject2 = 0;				///< A texture object
 
 										// Texture for the grass
 GLuint TexGrassObj = 0;
+GLuint normal_texture = 0;
 
 // Texture for the cat
 GLuint TexCatObj = 0;
-GLuint normal_texture = 0;
+GLuint normal_texture_cat = 0;
 
 // Active texture for canvas
 GLuint ActiveTexCanvas = -1;
@@ -176,6 +177,8 @@ mat4 LocalRotation = mat4(1, 0, 0, 0,
 mat4 catTransformation;
 
 float centerX, centerY, centerZ;
+
+GLuint BumpMapping = -1;
 
 // --- main() -------------------------------------------------------------------------------------
 /// The entry point of the application
@@ -299,6 +302,10 @@ void display() {
 		drawMesh(Model.getMesh(i).triangleCount * 3, Model.getMesh(i).startIndex, TextureObjects[i], VBO, IBO, posLoc, texLoc, normalLoc);
 	}*/
 
+	glVertexAttribPointer(normalLoc, 3, GL_FLOAT, GL_FALSE,
+		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(5 * sizeof(float)));
+	glUniform1i(BumpMapping, 0);
+
 	drawObject(Model.getNumberOfIndices(), TextureObject, VBO, IBO, posLoc, texLoc, normalLoc);
 	glVertexAttribPointer(normalLoc, 3, GL_FLOAT, GL_FALSE,
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(5 * sizeof(float)));
@@ -314,20 +321,24 @@ void display() {
 	glUniform3f(MaterialSColorLoc, 0.1f, 0.1f, 0.1f);
 	glUniform1f(MaterialShineLoc, 10.0f);
 
+	glUniform1i(BumpMapping, 1);
 	// Draw the grass
 	//drawObject(3 * GRASS_TRIS_NUM, TexGrassObj, GrassVBO, GrassIBO, posLoc, texLoc, -1);
 	drawObject(3 * GRASS_TRIS_NUM, TexGrassObj, normal_texture, GrassVBO, GrassIBO, posLoc, texLoc, normalLoc);
 
+
+	glUniform1i(BumpMapping, 0);
 	// Draw the canvas
 	drawObject(3 * CANVAS_TRIS_NUM, ActiveTexCanvas, CanvasVBO, CanvasIBO, posLoc, texLoc, -1);
 
-	catTransformation = glm::rotate((float)(180 * PI / 180.0), vec3(1, 0, 0)) * glm::translate(vec3(-2, -0.5, 8));
+	catTransformation = glm::rotate((float)(180 * PI / 180.0), vec3(1, 0, 0)) * glm::translate(vec3(5, -0.5, 8)) * glm::scale(vec3(5, 5, 5));
 	// Draw the cat
+	glUniform1i(BumpMapping, 1);
 	glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &catTransformation[0][0]);
-	drawObject(cat.getNumberOfIndices(), TexCatObj, catVBO, catIBO, posLoc, texLoc, -1);
+	drawObject(cat.getNumberOfIndices(), TexCatObj, normal_texture_cat, catVBO, catIBO, posLoc, texLoc, -1);
 	//drawObject(cat.getNumberOfIndices(), TexCatObj, normal_texture, catVBO, catIBO, posLoc, texLoc, -1);
 
-
+	glUniform1i(BumpMapping, 0);
 	// Draw projection text
 	string projection;
 	if (Cam.isProjectionPerspective()) {
@@ -513,13 +524,13 @@ bool initMesh() {
 	//loadMaterials("Objects\\cat\\", cat, TexCatObj);
 	unsigned int width = 1024;
 	unsigned int height = 512;
-	loadMaterial("Objects\\cat\\cat_diff.png", TexCatObj, width, height);
-	//loadMaterial("Objects\\cat\\cat_norm.png",normal_texture, width, height);
+	loadMaterial("Objects\\cat\\cat_diff.png", TexCatObj);
+	loadMaterial("Objects\\cat\\cat_norm.png", normal_texture);
 	
 
 	loadGrassObject(GrassVBO, GrassIBO);
 	loadMaterial("grass.png", TexGrassObj);
-	loadMaterial("normalMap.png", normal_texture);
+	loadMaterial("normalMap3.png", normal_texture);
 
 	loadCanvasObject(CanvasVBO, CanvasIBO);
 	loadCanvasTextures(&CanvasTextureArray[0]);
@@ -538,11 +549,11 @@ void loadCanvasTextures(GLuint* start) {
 	for (int i = 1; i < num_frames + 1; i++) {
 		string path = "Animated-textures\\" + std::to_string(i) + ".png";
 		loadTexture(&path[0], start[i-1]);
-		cout << "loading texture " << i << " filepath: " << path << endl;
+		//cout << "loading texture " << i << " filepath: " << path << endl;
 	}
 
 	for (int i = 0; i < num_frames; i++) {
-		cout << "arr[" << std::to_string(i) << "] = " << start[i] << endl;
+		//cout << "arr[" << std::to_string(i) << "] = " << start[i] << endl;
 	}
 }
 
@@ -556,7 +567,7 @@ bool initShader(GLuint& program,
 				GLint& dLightAIntensityLoc, GLint& dLightDIntensityLoc, GLint& dLightSIntensityLoc,
 				GLint& materialAColorLoc, GLint& materialDColorLoc, GLint& materialSColorLoc,
 			//	vec3& materialADSColorLoc,
-				GLint& materialShineLoc, GLint& headlightLoc) {
+				GLint& materialShineLoc, GLint& headlightLoc, GLuint& bumpMapping) {
 	if (program != 0)
 		glDeleteProgram(program);
 
@@ -639,6 +650,9 @@ bool initShader(GLuint& program,
 	// normal transformation (not camera)
 	localTransformationLoc = glGetUniformLocation(ShaderProgram, "transformationLocal");
 
+	// bump mapping (0-false, 1-true)
+	bumpMapping = glGetUniformLocation(ShaderProgram, "bump_mapping");
+
 
 	samplerLoc = glGetUniformLocation(ShaderProgram, "sampler");
 	assert(TrLoc != -1
@@ -685,7 +699,8 @@ bool initShaders() {
 						DLightAIntensityLoc, DLightDIntensityLoc, DLightSIntensityLoc,
 						MaterialAColorLoc, MaterialDColorLoc, MaterialSColorLoc,
 						MaterialShineLoc, 
-						Headlight);
+						Headlight,
+						BumpMapping);
 
 } /* initShaders() */
 
