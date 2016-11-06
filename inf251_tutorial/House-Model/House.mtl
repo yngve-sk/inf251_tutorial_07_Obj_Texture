@@ -34,7 +34,7 @@ Ka 0.000000 0.000000 0.000000
 Kd 1.000000 0.996078 0.101961
 Ks 0.330000 0.330000 0.330000
 d 0.600000
-map_Kd House/Translucent_Glass_Gold.png
+map_Kd House/Translucent_Glass_Gold.jpg
 
 newmtl Formica_Speckled_Grey
 Ka 0.000000 0.000000 0.000000

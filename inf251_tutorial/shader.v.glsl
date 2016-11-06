@@ -23,6 +23,8 @@ void main() {
     fragNormal = vec3(transformationLocal * vec4(normal,1.));
     fragVert = vec3(transformationLocal * vec4(position,1.));
     
+
+
     // Apply all matrix transformations to vert
 	gl_Position = transformation * transformationLocal * vec4(position, 1.); // old version
 }
