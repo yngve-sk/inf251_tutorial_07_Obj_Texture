@@ -128,7 +128,7 @@ public:
 
 		up = normalize(vec3(ry*rx*vec4(up, 1.f)));
 		target = normalize(vec3(ry*rx*vec4(target, 1.f)));
-		//up.x = 0.f;
+		up.x = 0.f;
 //	rx = glm::rotate(-ROTATIONAL_SPEED * dy, vec3(1, 0, 0));
 //	up = mat3(rx) * up;
 //	target = vec3(rx * vec4(target, 1.0f));
