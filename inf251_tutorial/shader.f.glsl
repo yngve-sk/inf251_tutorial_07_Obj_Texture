@@ -157,7 +157,7 @@ vec3 generateLightColor(vec3 light_dir, vec3 normal) {
 	float gradial_max_dist = max_dist - full_light_treshold;
 
 	if(distance > full_light_treshold) {
-		distance_multiplier = 1 - (distance/gradial_max_dist);
+		distance_multiplier = 1;// - (distance/gradial_max_dist);
 	}
 	else {
 		distance_multiplier = 1;
