@@ -45,6 +45,10 @@ public:
 			u = normalize(up),
 			r = normalize(cross(t, u));
 
+		//cout << "t: " << t.x << ", " << t.y << ", " << t.z << endl;
+		//cout << "u: " << u.x << ", " << u.y << ", " << u.z << endl;
+		//cout << "r: " << r.x << ", " << r.y << ", " << r.z << endl;
+
 		mat4 camR = mat4(r.x,  r.y,  r.z,  0.f,
 						 u.x,  u.y,  u.z,  0.f,
 						 t.x,  t.y,  t.z,  0.f,
@@ -62,7 +66,6 @@ public:
 		
 		mat4 camZoom = glm::scale(vec3(zoom, zoom, 1.f));
 
-//		return camZoom * prj * camR * camT;
 		return camZoom * prj * camR * camT;
 	}
 

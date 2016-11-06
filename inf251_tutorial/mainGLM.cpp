@@ -96,10 +96,11 @@ GLuint TextureObject2 = 0;				///< A texture object
 
 										// Texture for the grass
 GLuint TexGrassObj = 0;
+GLuint normal_texture = 0;
 
 // Texture for the cat
 GLuint TexCatObj = 0;
-GLuint normal_texture = 0;
+GLuint normal_texture_cat = 0;
 
 // Active texture for canvas
 GLuint ActiveTexCanvas = -1;
@@ -329,13 +330,14 @@ void display() {
 	// Draw the canvas
 	drawObject(3 * CANVAS_TRIS_NUM, ActiveTexCanvas, CanvasVBO, CanvasIBO, posLoc, texLoc, -1);
 
-	catTransformation = glm::rotate((float)(180 * PI / 180.0), vec3(1, 0, 0)) * glm::translate(vec3(-2, -0.5, 8));
+	catTransformation = glm::rotate((float)(180 * PI / 180.0), vec3(1, 0, 0)) * glm::translate(vec3(5, -0.5, 8)) * glm::scale(vec3(5, 5, 5));
 	// Draw the cat
+	glUniform1i(BumpMapping, 1);
 	glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &catTransformation[0][0]);
-	drawObject(cat.getNumberOfIndices(), TexCatObj, catVBO, catIBO, posLoc, texLoc, -1);
+	drawObject(cat.getNumberOfIndices(), TexCatObj, normal_texture_cat, catVBO, catIBO, posLoc, texLoc, -1);
 	//drawObject(cat.getNumberOfIndices(), TexCatObj, normal_texture, catVBO, catIBO, posLoc, texLoc, -1);
 
-
+	glUniform1i(BumpMapping, 0);
 	// Draw projection text
 	string projection;
 	if (Cam.isProjectionPerspective()) {
@@ -525,8 +527,8 @@ bool initMesh() {
 	//loadMaterials("Objects\\cat\\", cat, TexCatObj);
 	unsigned int width = 1024;
 	unsigned int height = 512;
-	loadMaterial("Objects\\cat\\cat_diff.png", TexCatObj, width, height);
-	//loadMaterial("Objects\\cat\\cat_norm.png",normal_texture, width, height);
+	loadMaterial("Objects\\cat\\cat_diff.png", TexCatObj);
+	loadMaterial("Objects\\cat\\cat_norm.png", normal_texture);
 	
 
 	loadGrassObject(GrassVBO, GrassIBO);
@@ -550,11 +552,11 @@ void loadCanvasTextures(GLuint* start) {
 	for (int i = 1; i < num_frames + 1; i++) {
 		string path = "Animated-textures\\" + std::to_string(i) + ".png";
 		loadTexture(&path[0], start[i-1]);
-		cout << "loading texture " << i << " filepath: " << path << endl;
+		//cout << "loading texture " << i << " filepath: " << path << endl;
 	}
 
 	for (int i = 0; i < num_frames; i++) {
-		cout << "arr[" << std::to_string(i) << "] = " << start[i] << endl;
+		//cout << "arr[" << std::to_string(i) << "] = " << start[i] << endl;
 	}
 }
 
