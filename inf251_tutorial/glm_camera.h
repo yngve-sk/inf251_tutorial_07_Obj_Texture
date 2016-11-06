@@ -118,13 +118,15 @@ public:
 		int dx = oldMousePosition.x - newMousePosition.x,
 			dy = oldMousePosition.y - newMousePosition.y;
 	
-	ry = glm::rotate(-ROTATIONAL_SPEED * dx, vec3(0,1,0));
-	target = vec3(ry * vec4(target, 1.f));
-	up = mat3(ry) * up;
+		rx = glm::rotate(-ROTATIONAL_SPEED * dy, vec3(1, 0, 0));
+		up = mat3(rx) * up;
+		target = vec3(rx * vec4(target, 1.0f));
+
+		ry = glm::rotate(-ROTATIONAL_SPEED * dx, vec3(0,1,0));
+		target = vec3(ry * vec4(target, 1.f));
+		up = mat3(ry) * up;
 	
-	rx = glm::rotate(-ROTATIONAL_SPEED * dy, vec3(1, 0, 0));
-	up = mat3(rx) * up;
-	target = vec3(rx * vec4(target, 1.0f));
+	
 
 		/*float rotY = ROTATIONAL_SPEED * dx,
 			rotX = ROTATIONAL_SPEED * dy;

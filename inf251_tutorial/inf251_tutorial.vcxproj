@@ -152,9 +152,6 @@
     <Image Include="Objects\cat\cat_norm.png" />
     <Image Include="Objects\cat\normalMap1.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Object Include="Objects\cat\cat.obj" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
