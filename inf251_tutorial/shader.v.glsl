@@ -20,9 +20,11 @@ out vec3 fragNormal;
 void main() {
     // Pass some variables to the fragment shader
     fragTexCoord = tex_coords;
-    fragNormal = normal;
-    fragVert = position;
+    fragNormal = vec3(transformationLocal * vec4(normal,1.));
+    fragVert = vec3(transformationLocal * vec4(position,1.));
     
+
+
     // Apply all matrix transformations to vert
 	gl_Position = transformation * transformationLocal * vec4(position, 1.); // old version
 }

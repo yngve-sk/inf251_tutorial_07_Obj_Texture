@@ -237,6 +237,7 @@ int main(int argc, char **argv) {
 	return 0;
 }
 
+bool disable_house_rotation = false;
 
 
 // ************************************************************************************************
@@ -365,7 +366,7 @@ int canvas_frame_wait = 10;
 /// Called at regular intervals (can be used for animations)
 void idle() {
 	// rotate around Y-axis
-	LocalRotationY *= glm::rotate(0.005f, vec3(0, 1, 0));
+	LocalRotationY = disable_house_rotation ? LocalRotationY : LocalRotationY * glm::rotate(0.005f, vec3(0, 1, 0));
 
 	if (--steps == 0) {
 		canvas_frame = (++canvas_frame) % 173;
@@ -384,11 +385,7 @@ void keyboard(unsigned char key, int x, int y) {
 		exit(0);
 		break;
 	case 'r':
-		cout << "Re-loading shaders..." << endl;
-		if (initShaders()) {
-			cout << "> done." << endl;
-			glutPostRedisplay();
-		}
+		disable_house_rotation = !disable_house_rotation;
 		break;
 	case 'w':
 		std::cout << "forkwards" << std::endl;
