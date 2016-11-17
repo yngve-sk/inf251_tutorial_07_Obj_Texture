@@ -127,26 +127,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="lodepng.h" />
-    <ClInclude Include="Matrix4.h" />
-    <ClInclude Include="model_obj.h" />
-    <ClInclude Include="Vector3.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="camera.cpp" />
-    <ClCompile Include="lodepng.cpp" />
-    <ClCompile Include="mainGLM.cpp" />
-    <ClCompile Include="model_obj.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Objects\cat\cat.mtl" />
-    <None Include="shader.f.glsl" />
-    <None Include="shader.v.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Objects\cat\cat_diff.png" />
     <Image Include="Objects\cat\cat_norm.png" />
     <Image Include="Objects\cat\normalMap1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="camera.cpp" />
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Drawing.h" />
+    <ClInclude Include="glm_camera.h" />
+    <ClInclude Include="Initializing.h" />
+    <ClInclude Include="Loading.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
