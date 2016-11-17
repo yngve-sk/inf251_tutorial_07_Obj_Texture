@@ -4,8 +4,8 @@
 uniform sampler2D sampler;
 
 // model-view transformation
-uniform mat4 transformation;
-uniform mat4 transformationLocal;
+uniform mat4 worldToProjectionMatrix;
+uniform mat4 modelToWorldMatrix;
 
 // camera pos
 uniform vec3 camera_position;
@@ -18,6 +18,9 @@ in vec3 fragVert;
 // Normal texture for bump mapping
 uniform sampler2D normal_texture;
 uniform int bump_mapping;
+
+// color by height on/off
+uniform int colorByHeight;
 
 // Lights
 uniform vec3 d_light_direction;
@@ -65,18 +68,18 @@ vec4 GetSpotLightColor(const SpotLight spotLight, vec3 vWorldPos);
 void main() { 
 
 	//calculate normal in world coordinates
-    mat3 normalMatrix = transpose(inverse(mat3(transformation)));
+    mat3 normalMatrix = transpose(inverse(mat3(worldToProjectionMatrix)));
     vec3 normal = normalize(normalMatrix * fragNormal);
 
 	//calculate the location of this fragment (pixel) in world coordinates
-    vec3 fragPosition = vec3(transformation * vec4(fragVert, 1));
+    vec3 fragPosition = vec3(worldToProjectionMatrix * vec4(fragVert, 1));
 
 	//calculate the vector from this pixels surface to the light source
     vec3 surfaceToLight = d_light_direction - fragPosition;
 
 	//calculate the cosine of the angle of incidence
     float brightness = dot(normal, surfaceToLight) / (length(surfaceToLight) * length(normal));
-    brightness = clamp(brightness, 0, 1);
+    brightness = 1;//clamp(brightness, 0, 1);
 
 	// calculate, nomalize normals from bump mapping
 	normal_bump = normalize(texture2D(normal_texture, fragTexCoord).rgb * 2.0 - 1.0);  
@@ -86,7 +89,7 @@ void main() {
 	if (bump_mapping == 0){
 		color = generateLightColor(d_light_direction, normal);
 	} else if (bump_mapping == 1){
-		color = generateLightColor(d_light_direction, normal_bump);
+		color = generateLightColor(d_light_direction, normalize(vec3(vec4(normal_bump,1.)*modelToWorldMatrix)));
 	}
 
 	//create the spotlight
@@ -99,7 +102,7 @@ void main() {
 	sl.fLinearAtt = 1.0;
 	sl.vDirection = vec3(0,0,1);
 
-	vec4 fWorldPosition = transformation * vec4(fragVert, 1.);
+	vec4 fWorldPosition = worldToProjectionMatrix * vec4(fragVert, 1.);
 	vec4 s_lighting = GetSpotLightColor(sl, vec3(fWorldPosition));
 
 	vec4 f_lighting;
@@ -117,8 +120,15 @@ void main() {
     // 3. The texture and texture coord: texture(sampler, fragTexCoord)
     vec4 surfaceColor = f_lighting * texture2D(sampler, fragTexCoord);
 
-
-    FragColor = vec4(brightness * vec3(d_light_a_intensity, d_light_s_intensity, d_light_d_intensity) * surfaceColor.rgb, surfaceColor.a);
+	if(colorByHeight == 1){
+		float fy = fragVert.y + 0.;
+		//brightness = fy/41.;
+		FragColor = vec4(brightness * vec3(d_light_a_intensity, d_light_s_intensity, d_light_d_intensity) * surfaceColor.rgb, surfaceColor.a);
+	}
+	else {
+		FragColor = vec4(brightness * vec3(d_light_a_intensity, d_light_s_intensity, d_light_d_intensity) * surfaceColor.rgb, surfaceColor.a);
+	}
+    
 }
 
 vec4 GetSpotLightColor(const SpotLight spotLight, vec3 vWorldPos) 
@@ -142,9 +152,11 @@ vec4 GetSpotLightColor(const SpotLight spotLight, vec3 vWorldPos)
 
 vec3 generateLightColor(vec3 light_dir, vec3 normal) {
 	//From Sergej
-	vec4 fWorldPosition = transformation * vec4(fragVert, 1.);	   //WorldPosition
-	vec3 normal_nn = normalize((transformation * vec4(normal,0.0)).xyz);	//The normal must be transformed in World coordinates as well
+	vec4 fWorldPosition = worldToProjectionMatrix * vec4(fragVert, 1.);	   //WorldPosition
+	//vec3 normal_nn = normalize((worldToProjectionMatrix * vec4(normal,0.0)).xyz);	//The normal must be transformed in World coordinates as well
 	
+	vec3 normal_nn = normalize(normal);	
+
 	// Sophisticated lights
 	// 100% lightning in 0-40m distance
 	// 100% - 0% lightning in 40-100m distance

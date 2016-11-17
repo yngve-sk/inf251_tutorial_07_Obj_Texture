@@ -14,14 +14,13 @@
 #include <glm/gtx/extend.hpp>
 
 #include "glm_camera.h"
+#include "help_structs.h"
 
 using namespace std;
 
 #define PI 3.14159265
 
-struct Vertex {
-	glm::fvec3 position, normal;
-};
+
 
 
 // --- OpenGL callbacks ---------------------------------------------------------------------------
@@ -37,7 +36,7 @@ bool initShaders();
 string readTextFile(const string&);
 void setDirectionalLight();
 void setSpotLight();
-void setHeadLight();
+void setHeaDLight();
 void drawText(string, double, double, double);
 void drawMesh(int, GLuint, GLuint, GLuint&, GLuint&, GLuint, GLuint, GLuint);
 void drawObject(int, GLuint, GLuint&, GLuint&, GLuint, GLuint, GLuint);
@@ -71,7 +70,7 @@ ModelOBJ cat;
 GLuint catVBO = 0;
 GLuint catIBO = 0;
 
-						// Model of the grass
+// Model of the grass
 const int GRASS_VERTS_NUM = 4;
 const int GRASS_TRIS_NUM = 2;
 GLuint GrassVBO = 0;
@@ -117,6 +116,8 @@ GLint SamplerLoc = -1;			///< texture sampler uniform variable
 GLint CameraPositionLoc = -1;
 
 // Lighting params (DIRECTIONAL)
+LightParameters DLight;
+
 GLint DLightDirLoc = -1;
 
 GLint DLightAColorLoc = -1;
@@ -127,12 +128,17 @@ GLint DLightAIntensityLoc = -1;
 GLint DLightDIntensityLoc = -1;
 GLint DLightSIntensityLoc = -1;
 
+MaterialParameters HouseMaterial;
+MaterialParameters GrassMaterial;
+
 GLint MaterialAColorLoc = -1;
 GLint MaterialDColorLoc = -1;
 GLint MaterialSColorLoc = -1;
 GLint MaterialShineLoc = -1;
 
 // Lighting params (DIRECTIONAL)
+LightParameters SLight;
+
 GLint SLightDirLoc = -1;
 	  
 GLint SLightAColorLoc = -1;
@@ -162,7 +168,7 @@ bool USE_CAM = false;
 
 // House transformation
 
-mat4 LocalRotationX, LocalRotationY = mat4(1.), LocalTranslation;
+mat4 LocalRotationX, LocalRotationY, LocalTranslation;
 float LocalScaling;
 
 // Non-transformation matrix
@@ -171,14 +177,15 @@ mat4 NonTransformation = mat4(1, 0, 0, 0,
 							  0, 0, 1, 0,
 							  0, 0, 0, 1);
 mat4 LocalRotation = mat4(1, 0, 0, 0,
-							0, cos(180 * PI / 180.0), -sin(180 * PI / 180.0), 0,
-							0, sin(180 * PI / 180.0), -cos(180 * PI / 180.0), 0,
+							0, cos(180 * PI / 180.0), -sin(PI), 0,
+							0, sin(180 * PI / 180.0), -cos(PI), 0,
 							0, 0, 0, 1);
 mat4 catTransformation;
 
-float centerX, centerY, centerZ;
-
 GLuint BumpMapping = -1;
+GLuint ColorByHeightLoc = -1;
+int colorByHeightOnOff = -1;
+
 
 // --- main() -------------------------------------------------------------------------------------
 /// The entry point of the application
@@ -257,16 +264,18 @@ void display() {
 	assert(ShaderProgram != 0);
 	glUseProgram(ShaderProgram);
 
+	glUniform1i(ColorByHeightLoc, 1);
+
 	Cam.setAspectRatio(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
-	mat4 transformation = Cam.computeCameraTransform();
+	mat4 worldToProjection = Cam.computeCameraTransform();
 
 	glUniform3fv(CameraPositionLoc, 1, &Cam.getPosition()[0]);
-	glUniformMatrix4fv(TrLoc, 1, GL_FALSE, &transformation[0][0]);
+	glUniformMatrix4fv(TrLoc, 1, GL_FALSE, &worldToProjection[0][0]);
 	glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &NonTransformation[0][0]);
 
 	setDirectionalLight();
 	setSpotLight();
-	setHeadLight();
+	setHeaDLight();
 	
 	// Set the uniform variable for the texture unit (texture unit 0)
 	//glUniform1i(SamplerLoc, 0);	
@@ -460,6 +469,10 @@ void keyboard(unsigned char key, int x, int y) {
 		Cam.flip();
 		glutPostRedisplay();
 		break;
+	case 'b': 
+		colorByHeightOnOff *= -1;
+		//glUniform1i(ColorByHeightLoc, colorByHeightOnOff);
+		break;
 	}
 }
 
@@ -529,8 +542,8 @@ bool initMesh() {
 	
 
 	loadGrassObject(GrassVBO, GrassIBO);
-	loadMaterial("grass.png", TexGrassObj);
-	loadMaterial("normalMap3.png", normal_texture);
+	loadMaterial("pngs\\grass.png", TexGrassObj);
+	loadMaterial("pngs\\normalMap3.png", normal_texture);
 
 	loadCanvasObject(CanvasVBO, CanvasIBO);
 	loadCanvasTextures(&CanvasTextureArray[0]);
@@ -559,15 +572,14 @@ void loadCanvasTextures(GLuint* start) {
 
 bool initShader(GLuint& program, 
 				string vShaderPath, string fShaderPath, 
-				GLint& globalTransformationLoc, GLint& localTransformationLoc, 
+				GLint& worldToProjectionMatrixLoc, GLint& modelToWorldMatrixLoc,
 				GLint& samplerLoc,
 				GLint& cameraPositionLoc,
-				GLint& dLightDirectionLoc,
-				GLint& dLightAColorLoc, GLint& dLightDColorLoc, GLint& dLightSColorLoc,
-				GLint& dLightAIntensityLoc, GLint& dLightDIntensityLoc, GLint& dLightSIntensityLoc,
+				LightParameters& DLight,
 				GLint& materialAColorLoc, GLint& materialDColorLoc, GLint& materialSColorLoc,
 			//	vec3& materialADSColorLoc,
-				GLint& materialShineLoc, GLint& headlightLoc, GLuint& bumpMapping) {
+				GLint& materialShineLoc, GLint& headlightLoc, GLuint& bumpMapping, 
+			    GLuint& colorByHeightLoc) {
 	if (program != 0)
 		glDeleteProgram(program);
 
@@ -646,9 +658,9 @@ bool initShader(GLuint& program,
 	}
 
 	// Get the location of the uniform variables
-	globalTransformationLoc = glGetUniformLocation(ShaderProgram, "transformation");
+	worldToProjectionMatrixLoc = glGetUniformLocation(ShaderProgram, "worldToProjectionMatrix");
 	// normal transformation (not camera)
-	localTransformationLoc = glGetUniformLocation(ShaderProgram, "transformationLocal");
+	modelToWorldMatrixLoc = glGetUniformLocation(ShaderProgram, "modelToWorldMatrix");
 
 	// bump mapping (0-false, 1-true)
 	bumpMapping = glGetUniformLocation(ShaderProgram, "bump_mapping");
@@ -661,15 +673,15 @@ bool initShader(GLuint& program,
 
 	cameraPositionLoc = glGetUniformLocation(ShaderProgram, "camera_position");
 
-	dLightDirectionLoc = glGetUniformLocation(ShaderProgram, "d_light_direction");
+	DLight.DirLoc = glGetUniformLocation(ShaderProgram, "d_light_direction");
 
-	dLightAColorLoc = glGetUniformLocation(ShaderProgram, "d_light_a_color");
-	dLightDColorLoc = glGetUniformLocation(ShaderProgram, "d_light_d_color");
-	dLightSColorLoc = glGetUniformLocation(ShaderProgram, "d_light_s_color");
-
-	dLightAIntensityLoc = glGetUniformLocation(ShaderProgram, "d_light_a_intensity");
-	dLightDIntensityLoc = glGetUniformLocation(ShaderProgram, "d_light_d_intensity");
-	dLightSIntensityLoc = glGetUniformLocation(ShaderProgram, "d_light_s_intensity");
+	DLight.AColorLoc = glGetUniformLocation(ShaderProgram, "d_light_a_color");
+	DLight.DColorLoc = glGetUniformLocation(ShaderProgram, "d_light_d_color");
+	DLight.SColorLoc = glGetUniformLocation(ShaderProgram, "d_light_s_color");
+		  
+	DLight.AIntensityLoc = glGetUniformLocation(ShaderProgram, "d_light_a_intensity");
+	DLight.DIntensityLoc = glGetUniformLocation(ShaderProgram, "d_light_d_intensity");
+	DLight.SIntensityLoc = glGetUniformLocation(ShaderProgram, "d_light_s_intensity");
 
 	materialAColorLoc = glGetUniformLocation(ShaderProgram, "material_a_color");
 	materialDColorLoc = glGetUniformLocation(ShaderProgram, "material_d_color");
@@ -679,6 +691,7 @@ bool initShader(GLuint& program,
 
 	headlightLoc = glGetUniformLocation(ShaderProgram, "headlight");
 
+	colorByHeightLoc = glGetUniformLocation(ShaderProgram, "colorByHeight");
 
 	// Shaders can be deleted now
 	glDeleteShader(vertShader);
@@ -694,13 +707,12 @@ bool initShaders() {
 	return initShader(ShaderProgram, "shader.v.glsl", "shader.f.glsl", 
 						TrLoc, LocalTrLoc, SamplerLoc,
 						CameraPositionLoc, 
-						DLightDirLoc, 
-						DLightAColorLoc, DLightDColorLoc, DLightSColorLoc,
-						DLightAIntensityLoc, DLightDIntensityLoc, DLightSIntensityLoc,
+						DLight,
 						MaterialAColorLoc, MaterialDColorLoc, MaterialSColorLoc,
 						MaterialShineLoc, 
 						Headlight,
-						BumpMapping);
+						BumpMapping, 
+						ColorByHeightLoc);
 
 } /* initShaders() */
 
@@ -758,29 +770,29 @@ void printTextureCoordinates(ModelOBJ model) {
 	/// Set up directional light for openGL
 void setDirectionalLight() {
 	
-	glUniform3f(DLightDirLoc, 0.5f, -0.5f, -1.0f);
-	glUniform3f(DLightAColorLoc, 0.5f, 0.5f, 0.5f);
-	glUniform3f(DLightDColorLoc, 0.f, 0.4f, 0.3f);
-	glUniform3f(DLightSColorLoc, 0.6f, 0.6f, 0.7f);
-	glUniform1f(DLightAIntensityLoc, 1.0f);
-	glUniform1f(DLightDIntensityLoc, 1.0f);
-	glUniform1f(DLightSIntensityLoc, 1.0f);
+	glUniform3f(DLight.DirLoc,			0.5f, -0.5f, -1.0f);
+	glUniform3f(DLight.AColorLoc,		0.5f, 0.5f, 0.5f);
+	glUniform3f(DLight.DColorLoc,		0.f, 0.4f, 0.3f);
+	glUniform3f(DLight.SColorLoc,		0.6f, 0.6f, 0.7f);
+	glUniform1f(DLight.AIntensityLoc, 1.0f);
+	glUniform1f(DLight.DIntensityLoc, 1.0f);
+	glUniform1f(DLight.SIntensityLoc, 1.0f);
 }
 
 	/// Set up spot light for openGL
 void setSpotLight() {
 	
-	glUniform3f(SLightDirLoc, 0.5f, -0.5f, -1.0f);
-	glUniform3f(SLightAColorLoc, 0.5f, 0.5f, 0.5f);
-	glUniform3f(SLightDColorLoc, 0.f, 0.4f, 0.3f);
-	glUniform3f(SLightSColorLoc, 0.6f, 0.6f, 0.7f);
-	glUniform1f(SLightAIntensityLoc, 1.0f);
-	glUniform1f(SLightDIntensityLoc, 1.0f);
-	glUniform1f(SLightSIntensityLoc, 1.0f);
+	glUniform3f(SLight.DirLoc, 0.5f, -0.5f, -1.0f);
+	glUniform3f(SLight.AColorLoc, 0.5f, 0.5f, 0.5f);
+	glUniform3f(SLight.DColorLoc, 0.f, 0.4f, 0.3f);
+	glUniform3f(SLight.SColorLoc, 0.6f, 0.6f, 0.7f);
+	glUniform1f(SLight.AIntensityLoc, 1.0f);
+	glUniform1f(SLight.DIntensityLoc, 1.0f);
+	glUniform1f(SLight.SIntensityLoc, 1.0f);
 }
 
 	/// Set up head light for openGL
-void setHeadLight() {
+void setHeaDLight() {
 	
 	glUniform1i(Headlight, HeadlightInt ? 1 : 0);
 
@@ -872,9 +884,6 @@ ModelOBJ loadObject(const char* directory, GLuint &VBO, GLuint &IBO) {
 		cerr << "Error: cannot load model." << endl;
 		return model;
 	}
-	model.getCenter(centerX, centerY, centerZ);
-	cout << "x: " << centerX << ", y: " << centerY << ", z: " << centerZ << endl;
-
 	cout << "Imported model..." << endl;
 
 	// VBO
@@ -926,7 +935,7 @@ void loadGrassObject(GLuint &VBO, GLuint &IBO) {
 	grassVerts[2].texCoord[1] = 20.f;
 	grassVerts[3].texCoord[0] = 20.f;
 	grassVerts[3].texCoord[1] = 20.f;
-
+	
 	// Generate a VBO
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -941,6 +950,12 @@ void loadGrassObject(GLuint &VBO, GLuint &IBO) {
 		1, 2, 3
 	};
 
+	GrassMaterial.MaterialAColor = vec3(0.9f, 1.0f, 0.9f);
+	GrassMaterial.MaterialDColor = vec3(0.3f, 1.0f, 0.3f);
+	GrassMaterial.MaterialSColor = vec3(0.1f, 0.1f, 0.1f);
+	GrassMaterial.MaterialShine = 10.f;
+
+
 	// Create an IBO
 	glGenBuffers(1, &IBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
@@ -950,6 +965,11 @@ void loadGrassObject(GLuint &VBO, GLuint &IBO) {
 		GL_DYNAMIC_DRAW);
 
 	return;
+}
+
+MaterialParameters* activeMaterial;
+void activateMaterial(MaterialParameters* active) {
+	activeMaterial = active;
 }
 
 /**

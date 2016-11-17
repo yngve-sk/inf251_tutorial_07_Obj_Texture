@@ -40,6 +40,7 @@ public:
 		ar = (1.0f * width) / height;
 	}
 
+	bool useLookAt = false;
 	mat4 computeCameraTransform() {
 		vec3 t = normalize(target),
 			u = normalize(up),
@@ -48,7 +49,7 @@ public:
 		//cout << "t: " << t.x << ", " << t.y << ", " << t.z << endl;
 		//cout << "u: " << u.x << ", " << u.y << ", " << u.z << endl;
 		//cout << "r: " << r.x << ", " << r.y << ", " << r.z << endl;
-
+		// hey
 		mat4 camR = mat4(r.x,  r.y,  r.z,  0.f,
 						 u.x,  u.y,  u.z,  0.f,
 						 t.x,  t.y,  t.z,  0.f,
@@ -66,7 +67,43 @@ public:
 		
 		mat4 camZoom = glm::scale(vec3(zoom, zoom, 1.f));
 
-		return camZoom * prj * camR * camT;
+		mat4 lookAt = glm::lookAt(position, target, up);
+
+		return  prj * camZoom * (useLookAt ? lookAt : (camR * camT));
+	}
+
+	mat4 getWorldToViewMatrix() {
+		vec3 t = normalize(target),
+			u = normalize(up),
+			r = normalize(cross(t, u));
+
+		//cout << "t: " << t.x << ", " << t.y << ", " << t.z << endl;
+		//cout << "u: " << u.x << ", " << u.y << ", " << u.z << endl;
+		//cout << "r: " << r.x << ", " << r.y << ", " << r.z << endl;
+
+		mat4 camR = mat4(r.x, r.y, r.z, 0.f,
+			u.x, u.y, u.z, 0.f,
+			t.x, t.y, t.z, 0.f,
+			0.f, 0.f, 0.f, 1.f
+		);
+
+		mat4 camT = glm::translate(position);
+
+		return camT * camR;
+	}
+
+	mat4 getViewToProjectionMatrix() {
+		mat4 prj;
+		if (perspectiveProjection) {
+			prj = perspective(fov, ar, zNear, zFar);
+		}
+		else {
+			prj = ortho(20.0f, -20.0f, 20.0f, -20.0f, zNear, zFar);
+		}
+
+		mat4 camZoom = glm::scale(vec3(zoom, zoom, 1.f));
+		
+		return camZoom * prj;
 	}
 
 	vec3 getPosition() {

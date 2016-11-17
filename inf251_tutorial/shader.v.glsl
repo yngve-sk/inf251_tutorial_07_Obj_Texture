@@ -2,8 +2,8 @@
 
 
 // model-view transformation
-uniform mat4 transformation;
-uniform mat4 transformationLocal;
+uniform mat4 worldToProjectionMatrix;
+uniform mat4 modelToWorldMatrix;
 
 // vertex position	
 layout (location = 0) in vec3 position; 
@@ -20,11 +20,11 @@ out vec3 fragNormal;
 void main() {
     // Pass some variables to the fragment shader
     fragTexCoord = tex_coords;
-    fragNormal = vec3(transformationLocal * vec4(normal,1.));
-    fragVert = vec3(transformationLocal * vec4(position,1.));
+    fragNormal = vec3(modelToWorldMatrix * vec4(normal,1.));
+    fragVert = vec3(modelToWorldMatrix * vec4(position,1.));
     
 
 
     // Apply all matrix transformations to vert
-	gl_Position = transformation * transformationLocal * vec4(position, 1.); // old version
+	gl_Position = worldToProjectionMatrix * modelToWorldMatrix * vec4(position, 1.); // old version
 }
