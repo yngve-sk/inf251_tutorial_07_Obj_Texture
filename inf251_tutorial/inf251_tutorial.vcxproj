@@ -137,12 +137,15 @@
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="model_obj.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Drawing.h" />
     <ClInclude Include="glm_camera.h" />
     <ClInclude Include="Initializing.h" />
     <ClInclude Include="Loading.h" />
+    <ClInclude Include="model_obj.h" />
+    <ClInclude Include="object_container.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
