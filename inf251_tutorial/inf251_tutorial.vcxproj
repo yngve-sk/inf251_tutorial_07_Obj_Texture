@@ -127,9 +127,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="MultiTextureObject.h" />
     <ClInclude Include="lodepng.h" />
     <ClInclude Include="Matrix4.h" />
     <ClInclude Include="model_obj.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Vector3.h" />
   </ItemGroup>
   <ItemGroup>
@@ -137,6 +139,7 @@
     <ClCompile Include="lodepng.cpp" />
     <ClCompile Include="mainGLM.cpp" />
     <ClCompile Include="model_obj.cpp" />
+    <ClCompile Include="MultiTextureObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Objects\cat\cat.mtl" />
@@ -151,6 +154,9 @@
     <Image Include="Objects\cat\cat_diff.png" />
     <Image Include="Objects\cat\cat_norm.png" />
     <Image Include="Objects\cat\normalMap1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="inf251_tutorial.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

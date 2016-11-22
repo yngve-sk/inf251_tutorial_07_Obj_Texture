@@ -51,6 +51,12 @@ void loadMaterial(const char*, GLuint&, const ModelOBJ::Material&);
 void loadMaterial(const char*, GLuint&);
 GLuint LoadTexture(const char*, int, int);
 
+// functions for terrain
+void loadTerrain();
+void createVertices();
+void createTriangles(int, int, int, int, int);
+int rc2index(int, int);
+
 void loadTexture(const char*, GLuint&);
 void loadCanvasTextures(GLuint*);
 
@@ -180,6 +186,16 @@ float centerX, centerY, centerZ;
 
 GLuint BumpMapping = -1;
 
+
+// Global variables for terrain
+int colsNum, rowsNum, NO_DATA, numberOfPoints, numberOfTriangles;
+double xLowLeft, yLowLeft, cellSize;
+float *heights;
+vec3 *vertices;
+unsigned int *trIndices;
+GLuint terrainVBO = 0;
+GLuint terrainIBO = 0;
+
 // --- main() -------------------------------------------------------------------------------------
 /// The entry point of the application
 int main(int argc, char **argv) {
@@ -297,11 +313,6 @@ void display() {
 	//mat4 rotateMat = translateFromCenter * LocalRotationY * translateToCenter;
 	glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &NonTransformation[0][0]);*/
 
-	/* Code for multiple textures
-	for (int i = 0; i < Model.getNumberOfMeshes(); i++) {
-		drawMesh(Model.getMesh(i).triangleCount * 3, Model.getMesh(i).startIndex, TextureObjects[i], VBO, IBO, posLoc, texLoc, normalLoc);
-	}*/
-
 	glVertexAttribPointer(normalLoc, 3, GL_FLOAT, GL_FALSE,
 		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(5 * sizeof(float)));
 	glUniform1i(BumpMapping, 0);
@@ -314,6 +325,9 @@ void display() {
 	// Draw the cube
 	drawObject(Model2.getNumberOfIndices(), TextureObject2, cubeVBO, cubeIBO, posLoc, texLoc, -1);
 	glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &NonTransformation[0][0]);
+
+	// Draw the terrain
+	drawObject(numberOfTriangles * 3, TexGrassObj, terrainVBO, terrainIBO, posLoc, texLoc, -1);
 
 	// Set material parameters for grass
 	glUniform3f(MaterialAColorLoc, 0.9f, 1.0f, 0.9f);
@@ -502,6 +516,8 @@ void motion(int x, int y) {
 // *** Other methods implementation ***************************************************************
 /// Initialize buffer objects
 bool initMesh() {
+
+	loadTerrain();
 
 	Model = loadObject("House-Model\\House.obj", VBO, IBO);
 	/*for (int i = 0; i < Model.getNumberOfMeshes(); i++) {
@@ -885,8 +901,6 @@ ModelOBJ loadObject(const char* directory, GLuint &VBO, GLuint &IBO) {
 		model.getVertexBuffer(),
 		GL_STATIC_DRAW);
 
-	//cout << "starting ibo" << endl;
-
 	// IBO
 	glGenBuffers(1, &IBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
@@ -894,8 +908,6 @@ ModelOBJ loadObject(const char* directory, GLuint &VBO, GLuint &IBO) {
 		model.getNumberOfIndices() * sizeof(unsigned int),
 		model.getIndexBuffer(),
 		GL_STATIC_DRAW);
-
-	//cout << "ibo end" << endl;
 
 	model.normalize();
 
@@ -1294,6 +1306,132 @@ GLuint LoadTexture(const char * filename, int width, int height)
 	free(data); //free the texture  
 
 	return texture; //return whether it was successfull  
+}
+
+void loadTerrain() {
+	
+	// open the file
+	fstream fileIn("terrain\\bergen_1024x918.bin", ifstream::in | ifstream::binary);
+	
+	//check if the file has been opened
+	if (!fileIn.good()) {
+		cout << "Error opening the file." << endl;
+		return;
+	}
+
+	// struct to read values from the file
+	union {
+		char cVals[4];
+		int iVal;
+	} buffer4;
+
+	union {
+		char cVals[8];
+		double dVal;
+	} buffer8;
+
+	union {
+		char *cVals;
+		float *fVals;
+	} bufferX;
+
+	// read the header
+	fileIn.read(buffer4.cVals, 4);
+	colsNum = buffer4.iVal;
+	fileIn.read(buffer4.cVals, 4);
+	rowsNum = buffer4.iVal;
+
+	fileIn.read(buffer8.cVals, 8);
+	xLowLeft = buffer8.dVal;
+	fileIn.read(buffer8.cVals, 8);
+	yLowLeft = buffer8.dVal;
+	fileIn.read(buffer8.cVals, 8);
+	cellSize= buffer8.dVal;
+
+	fileIn.read(buffer4.cVals, 4);
+	NO_DATA = buffer4.iVal;
+
+	// read the height value
+	numberOfPoints = rowsNum * colsNum;
+	bufferX.fVals = new float[numberOfPoints];
+	fileIn.read(bufferX.cVals, 4 * numberOfPoints);
+
+	// copy the height values in the global array
+	heights = new float[numberOfPoints];
+	for (int i = 0; i < numberOfPoints; i++) 
+		heights[i] = bufferX.fVals[i];
+
+
+	vertices = new vec3[numberOfPoints];
+	createVertices();
+	numberOfTriangles = 2 * (rowsNum - 1) * (colsNum - 1);
+	trIndices = new unsigned int[3 * numberOfTriangles];
+	int currentTriangle = 0;
+	for (int r = 0; r < rowsNum - 1; ++r) {
+		for (int c = 0; c < colsNum - 1; ++c) {
+			int i0 = rc2index(r, c);
+			int i1 = rc2index(r + 1, c);
+			int i2 = rc2index(r, c + 1);
+			int i3 = rc2index(r + 1, c + 1);
+
+			createTriangles(i0, i1, i2, i3, currentTriangle);
+			currentTriangle += 2;
+		}
+	}
+
+	// VBO
+	glGenBuffers(1, &terrainVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, terrainVBO);
+	glBufferData(GL_ARRAY_BUFFER,
+		numberOfPoints * sizeof(vec3),
+		vertices,
+		GL_STATIC_DRAW);
+
+	// IBO
+	glGenBuffers(1, &terrainIBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, terrainIBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+		numberOfTriangles * 3 * sizeof(unsigned int),
+		trIndices,
+		GL_STATIC_DRAW);
+
+	// close the file
+	fileIn.close();
+
+}
+
+// compute the vertices from the heights array
+void createVertices() {
+	for (int i = 0; i < numberOfPoints; i++) {
+			vertices[i].x = (i % rowsNum) * cellSize + xLowLeft;
+			if (heights[i] < 0) {
+				vertices[i].y = 0;
+			}
+			else {
+				vertices[i].y = heights[i];
+			}
+			vertices[i].z = (i / rowsNum) * cellSize + yLowLeft;
+	}
+}
+
+void createTriangles(int i0, int i1, int i2, int i3, int currentTriange) {
+	//i1 to i2 --diagonals
+	//i0 to i3 --diagonals
+
+	// check which is the option that leads to the shortest diagonal
+	if (abs(heights[i0] - heights[i3]) <= abs(heights[i1] - heights[i2])) {
+		trIndices[3 * currentTriange] = i0, i3, i1;
+		trIndices[3 * currentTriange + 1] = i0, i2, i3;
+	} 
+	else if (abs(heights[i0] - heights[i3]) > abs(heights[i1] - heights[i2])) {
+		// store the indices for both the ttriangles
+		trIndices[3 * currentTriange] = i0, i2, i1;
+		trIndices[3 * currentTriange + 1] = i1, i2, i3;
+	}
+}
+
+int rc2index(int row, int col) {
+	return col * rowsNum + row;
 }
 
   /* --- eof main.cpp --- */

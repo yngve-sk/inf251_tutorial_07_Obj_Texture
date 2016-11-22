@@ -115,7 +115,7 @@ public:
 	void rotate(const vec2& oldMousePosition, const vec2& newMousePosition) {
 	mat4 ry, rx;
 	
-		int dx = oldMousePosition.x - newMousePosition.x,
+		float dx = oldMousePosition.x - newMousePosition.x,
 			dy = oldMousePosition.y - newMousePosition.y;
 	
 			rx = glm::rotate(-ROTATIONAL_SPEED * dy, vec3(1, 0, 0));

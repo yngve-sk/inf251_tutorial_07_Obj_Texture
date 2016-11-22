@@ -76,7 +76,7 @@ void main() {
 
 	//calculate the cosine of the angle of incidence
     float brightness = dot(normal, surfaceToLight) / (length(surfaceToLight) * length(normal));
-    brightness = clamp(brightness, 0, 1);
+    brightness = clamp(1, 0, 1);
 
 	// calculate, nomalize normals from bump mapping
 	normal_bump = normalize(texture2D(normal_texture, fragTexCoord).rgb * 2.0 - 1.0);  
