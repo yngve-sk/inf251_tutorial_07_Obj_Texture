@@ -142,6 +142,8 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="model_obj.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
+    <ClCompile Include="MultiTextureObject.cpp" />
+    <ClCompile Include="SingleTextureObject.cpp" />
     <ClCompile Include="Spotlight.cpp" />
     <ClCompile Include="Transformation.cpp" />
   </ItemGroup>
@@ -156,7 +158,9 @@
     <ClInclude Include="Loading.h" />
     <ClInclude Include="MainVariableDeclarations.h" />
     <ClInclude Include="model_obj.h" />
+    <ClInclude Include="MultiTextureObject.h" />
     <ClInclude Include="object_container.h" />
+    <ClInclude Include="SingleTextureObject.h" />
     <ClInclude Include="Spotlight.h" />
     <ClInclude Include="Transformation.h" />
   </ItemGroup>
