@@ -137,23 +137,28 @@
     <Image Include="Objects\cat\normalMap1.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Rectangle.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="model_obj.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="Spotlight.cpp" />
+    <ClCompile Include="Transformation.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Rectangle.h" />
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="Drawing.h" />
     <ClInclude Include="FunctionDeclarations.h" />
     <ClInclude Include="glm_camera.h" />
-    <ClInclude Include="HelpStructs.h" />
+    <ClInclude Include="GLLocStructs.h" />
     <ClInclude Include="Initializing.h" />
     <ClInclude Include="Loading.h" />
+    <ClInclude Include="MainVariableDeclarations.h" />
     <ClInclude Include="model_obj.h" />
     <ClInclude Include="object_container.h" />
     <ClInclude Include="Spotlight.h" />
+    <ClInclude Include="Transformation.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -15,7 +15,7 @@
 #include "DirectionalLight.h"
 #include "Spotlight.h"
 
-// Move to own classes, light and spotlight
+#include "FunctionDeclarations.h"
 
 // --- OpenGL callbacks ---------------------------------------------------------------------------
 void display();

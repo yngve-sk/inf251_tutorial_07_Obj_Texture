@@ -4,10 +4,10 @@
 #include <gl/GL.h>
 
 struct MaterialGLLocs {
-	GLint MaterialAColorLoc = -1;
-	GLint MaterialDColorLoc = -1;
-	GLint MaterialSColorLoc = -1;
-	GLint MaterialShineLoc = -1;
+	GLint aColorLoc = -1;
+	GLint dColorLoc = -1;
+	GLint sColorLoc = -1;
+	GLint shineLoc = -1;
 };
 
 struct VertexGLLocs {
