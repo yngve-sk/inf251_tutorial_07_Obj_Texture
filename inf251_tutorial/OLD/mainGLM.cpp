@@ -136,6 +136,9 @@ GLint MaterialDColorLoc = -1;
 GLint MaterialSColorLoc = -1;
 GLint MaterialShineLoc = -1;
 
+
+MaterialGLLoc materialLoc;
+
 // Lighting params (DIRECTIONAL)
 LightParameters SLight;
 

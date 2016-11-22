@@ -10,7 +10,12 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/extend.hpp>
 
+#include "HelpStructs.h"
 #include "glm_camera.h"
+#include "DirectionalLight.h"
+#include "Spotlight.h"
+
+// Move to own classes, light and spotlight
 
 // --- OpenGL callbacks ---------------------------------------------------------------------------
 void display();
@@ -21,6 +26,8 @@ void motion(int, int);
 
 // --- Scene objects ---------------------------------------------------------------------------
 GLMCamera Cam;
+Spotlight spotlight;
+DirectionalLight directionalLight;
 
 // --- main() -------------------------------------------------------------------------------------
 /// The entry point of the application
