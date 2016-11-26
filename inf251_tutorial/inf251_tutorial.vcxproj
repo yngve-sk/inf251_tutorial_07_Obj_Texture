@@ -137,7 +137,7 @@
     <Image Include="Objects\cat\normalMap1.png" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Rectangle.cpp" />
+    <ClCompile Include="TexturedAnimatedRectangle.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="model_obj.cpp" />
@@ -148,7 +148,7 @@
     <ClCompile Include="Transformation.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Rectangle.h" />
+    <ClInclude Include="TexturedAnimatedRectangle.h" />
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="Drawing.h" />
     <ClInclude Include="FunctionDeclarations.h" />

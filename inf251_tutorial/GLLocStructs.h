@@ -15,3 +15,15 @@ struct VertexGLLocs {
 		  texLoc, 
 		  normalLoc;
 };
+
+struct TransformationLocs {
+	GLint modelToWorldMatrixLoc,
+		worldToProjectionMatrixLoc;
+};
+
+
+/* Holds ALL GENERAL uniform locations for a shader!!!!!!!!!!!!!!!! */
+struct ShaderGeneralUniformGLLocs {
+	TransformationLocs transformations;
+	MaterialGLLocs material;
+};

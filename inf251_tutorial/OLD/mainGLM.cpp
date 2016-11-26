@@ -578,10 +578,8 @@ bool initShader(GLuint& program,
 				GLint& worldToProjectionMatrixLoc, GLint& modelToWorldMatrixLoc,
 				GLint& samplerLoc,
 				GLint& cameraPositionLoc,
-				LightParameters& DLight,
-				GLint& materialAColorLoc, GLint& materialDColorLoc, GLint& materialSColorLoc,
-			//	vec3& materialADSColorLoc,
-				GLint& materialShineLoc, GLint& headlightLoc, GLuint& bumpMapping, 
+				MaterialGLLocs& materialLocs, 
+			GLuint& bumpMapping, 
 			    GLuint& colorByHeightLoc) {
 	if (program != 0)
 		glDeleteProgram(program);

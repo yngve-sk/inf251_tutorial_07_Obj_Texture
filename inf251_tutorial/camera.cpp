@@ -187,3 +187,8 @@ void GLMCamera::adjustZNear(float delta) {
 void GLMCamera::adjustZFar(float delta) {
 	zFar += delta;
 }
+
+void GLMCamera::loadToUniformsInShader(GLuint shaderProgram) {
+	GLuint loc = glGetUniformLocation(shaderProgram, "camera_position");
+	glUniform3fv(loc, 1, &position[0]);
+}

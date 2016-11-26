@@ -8,6 +8,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 
+#include <gl/glew.h>
+#include <gl/glut.h>
+#include <gl/GL.h>
+
 using namespace glm;
 using namespace std;
 
@@ -68,5 +72,7 @@ public:
 	void adjustZNear(float delta);
 
 	void adjustZFar(float delta);
+
+	void loadToUniformsInShader(GLuint shaderProgram);
 };
 

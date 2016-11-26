@@ -14,5 +14,5 @@ private:
 public:
 	glm::vec3 aColor, dColor, sColor;
 	
-	void loadToUniformAt(GLuint shaderProgram, std::string uniformName);
+	void loadToUniformsInShader(GLuint shaderProgram, std::string uniformName);
 };
