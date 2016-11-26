@@ -15,7 +15,6 @@
 #include "Spotlight.h"
 
 #include "FunctionDeclarations.h"
-#include "GLLocStructs.h"
 
 // --- OpenGL callbacks ---------------------------------------------------------------------------
 void display();
