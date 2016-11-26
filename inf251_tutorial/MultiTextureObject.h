@@ -12,6 +12,7 @@
 #include "model_obj.h"
 #include "lodepng.h"
 #include "GLLocStructs.h"
+#include "Transformation.h"
 
 using namespace std;
 using namespace glm;
@@ -21,14 +22,12 @@ class MultiTextureObject {
 public:
 	ModelOBJ model;
 
-	GLuint VBO = 0;
-	GLuint IBO = 0;
+	GLuint VBO = -1;
+	GLuint IBO = -1;
 
 	GLuint TextureObjects[64];
 
-	mat4 LocalRotation;
-	mat4 LocalTranslation;
-	mat4 LocalScale;
+	Transformation transformation;
 
 	bool usingBumpMapping;
 
@@ -37,6 +36,6 @@ public:
 	void loadObject(const char*);
 
 private:
-	void loadMaterial(const char*, GLuint&, int, const ModelOBJ::Material&);
+	void loadMaterial(const char*, int, const ModelOBJ::Material&);
 	void drawMesh(int, GLuint, GLuint, GLuint&, GLuint&, VertexGLLocs);
 };

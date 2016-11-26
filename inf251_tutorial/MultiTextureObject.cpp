@@ -36,11 +36,11 @@ void MultiTextureObject::loadMaterials(const char* TextureDirectory) {
 		ModelOBJ::Material mat = *(m.pMaterial);
 
 		//loadMaterial("House-Model\\", TextureObjects[i], *m.pMaterial);
-		loadMaterial(TextureDirectory, TextureObjects[i], i, mat);
+		loadMaterial(TextureDirectory, i, mat);
 	}
 }
 
-void MultiTextureObject::loadMaterial(const char* TextureDirectory, GLuint &TextureObject, int i, const ModelOBJ::Material &material) {
+void MultiTextureObject::loadMaterial(const char* TextureDirectory, int i, const ModelOBJ::Material &material) {
 
 	unsigned char* TextureData = nullptr;
 	unsigned int TextureWidth = 0;

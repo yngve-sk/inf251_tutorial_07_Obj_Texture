@@ -12,6 +12,7 @@
 #include "model_obj.h"
 #include "lodepng.h"
 #include "GLLocStructs.h"
+#include "Transformation.h"
 
 using namespace std;
 using namespace glm;
@@ -21,22 +22,20 @@ class SingleTextureObject {
 public:
 	ModelOBJ model;
 
-	GLuint VBO = 0;
-	GLuint IBO = 0;
+	GLuint VBO = -1;
+	GLuint IBO = -1;
 
-	GLuint TextureObjects[64];
+	GLuint textureObject;
+	GLuint bumpMapObject;
 
-	mat4 LocalRotation;
-	mat4 LocalTranslation;
-	mat4 LocalScale;
+	Transformation transformation;
 
 	bool usingBumpMapping;
 
 	void drawObject(VertexGLLocs, MaterialGLLocs);
-	void loadMaterials(const char*);
 	void loadObject(const char*);
+	void loadMaterial(const char*);
+	void loadBumpMap(const char*);
 
 private:
-	void loadMaterial(const char*, GLuint&, int, const ModelOBJ::Material&);
-	void drawMesh(int, GLuint, GLuint, GLuint&, GLuint&, VertexGLLocs);
 };
