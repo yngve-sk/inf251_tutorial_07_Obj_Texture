@@ -32,6 +32,13 @@ public:
 
 	bool usingBumpMapping;
 
+	//Terrain Object 
+	int colsNum, rowsNum, NO_DATA, numberOfPoints, numberOfTriangles;
+	double xLowLeft, yLowLeft, cellSize;
+	float *heights;
+	vec3 *vertices;
+	unsigned int *trIndices;
+
 	void drawObject(VertexGLLocs, MaterialGLLocs);
 	void loadObject(const char*);
 	void loadTerrain(const char*);
@@ -40,4 +47,7 @@ public:
 	SingleTextureTerrain(const char*, const char*, const char*);
 
 private:
+	void createVertices();
+	void createTriangles(int, int, int, int, int);
+	int rc2index(int, int);
 };
