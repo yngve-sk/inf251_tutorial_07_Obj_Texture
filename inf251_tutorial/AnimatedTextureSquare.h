@@ -52,7 +52,7 @@ public:
 	bool animate;
 
 	void drawObject(VertexGLLocs, MaterialGLLocs);
-	void loadModel();
+	void loadSquare();
 	void loadTextures();
 	void loadTexture(const char*, GLuint&);
 	void loadBumpMap(const char*);
