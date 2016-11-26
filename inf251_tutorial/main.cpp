@@ -28,15 +28,18 @@ void mouse(int, int, int, int);
 void motion(int, int);
 
 // --- Scene objects ---------------------------------------------------------------------------
-GLMCamera Cam;
-Spotlight theSpotlight;
-DirectionalLight theDirectionalLight;
+GLMCamera _cam;
+Spotlight _spotlight;
+DirectionalLight _directionalLight;
 
-SingleTextureObject terrain;
+SingleTextureObject* _terrain;
 
-SingleTextureObject cat;
-SingleTextureObject house;
-AnimatedTextureSquare canvas;
+SingleTextureObject* _cat;
+SingleTextureObject* _house;
+AnimatedTextureSquare* _canvas;
+
+// TODO MOVE THIS
+void initObjects();
 
 
 // --- GL Shader location ----------------------------------------------
@@ -209,16 +212,13 @@ bool initShader(GLuint& program, string vShaderPath, string fShaderPath) {
 
 void initObjects() {
 	
-	terrain = new SingleTextureObject();
-	terrain.loadObject("Objects\\cat\\cat.obj");
+	//Terrain = new SingleTextureObject();
+	//Terrain.loadObject("Objects\\cat\\cat.obj");
 
-	cat = new SingleTextureObject();
+	_cat = new SingleTextureObject("Objects\\cat\\cat.obj", 
+								  "Objects\\cat\\cat_diff.png",
+								  "Objects\\cat\\cat_norm.png");
 }
-
-//void bindUniformLocs(GLint shader) {
-//	GeneralGLLocs.transformations.modelToWorldMatrixLoc
-//}
-
 
 /// Read the specified file and return its content
 string readTextFile(const string& pathAndFileName) {
