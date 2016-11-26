@@ -13,10 +13,14 @@ AnimatedTextureSquare::AnimatedTextureSquare(vec3 position,
 	numberOfFrames(numberOfFrames),
 	numberOfSteps(numberOfSteps),
 	frameWait(frameWait),
-	textureDirectory(textureDirectory)
-{}
+	textureDirectory(textureDirectory){
 
-void AnimatedTextureSquare::loadModel() {
+	loadSquare();
+	loadTextures();
+
+}
+
+void AnimatedTextureSquare::loadSquare() {
 
 
 	square[0].position[0] = position.x;
