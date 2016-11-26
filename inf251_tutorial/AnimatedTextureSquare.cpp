@@ -17,7 +17,6 @@ AnimatedTextureSquare::AnimatedTextureSquare(vec3 position,
 
 	loadSquare();
 	loadTextures();
-
 }
 
 void AnimatedTextureSquare::loadSquare() {

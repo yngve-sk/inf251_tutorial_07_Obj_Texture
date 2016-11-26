@@ -40,15 +40,15 @@ SingleTextureObject _house;
 AnimatedTextureSquare _canvas;
 
 // TODO MOVE THIS
-void initObjects();
-
+bool initObjects();
+bool initLights();
 
 // --- GL Shader location ----------------------------------------------
 GLuint ShaderProgram = -1;
 
 // --- GL uniform locations --------------------------------------------
 GLint ModelToWorldMatrixLoc = -1,
-	  WorldToProjectionMatrixLoc = -1;
+WorldToProjectionMatrixLoc = -1;
 
 GLint MaterialAColorLoc = -1, 
 	  MaterialDColorLoc = -1,
@@ -61,10 +61,17 @@ GLint CameraPositionLoc = -1;
 
 GLint NormalTextureLoc = -1;
 
-// --- GL attrib locations --------------------------------------------
+GLint ColorByHeightLoc = -1;
+
+// --- GL attrib locations --------/------------------------------------
 GLint PosLoc = 0,
 	  NormalLoc = 1,
 	  TexCoordsLoc = 2; 
+
+// --- MICS-----------------------------
+// Non-transformation matrix
+mat4 NonTransformation = mat4();
+
 
 // --- main() -------------------------------------------------------------------------------------
 /// The entry point of the application
@@ -115,7 +122,7 @@ int main(int argc, char **argv) {
 
 
 	// Shaders & mesh
-	if (!initShaders() || !initObjects()) {
+	if (!initShaders() || !initObjects() || !initLights()) {
 		cerr << "An error occurred, press Enter to quit ..." << endl;
 		getchar();
 		return -1;
@@ -124,6 +131,92 @@ int main(int argc, char **argv) {
 	// Start the main event loop
 	glutMainLoop();
 	return 0;
+}
+
+void display() {
+	// Clear the screen
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	int width = glutGet(GLUT_WINDOW_WIDTH),
+		height = glutGet(GLUT_WINDOW_HEIGHT);
+	glViewport(0, 0, width, height);
+
+
+	// Enable the shader program
+	assert(ShaderProgram != 0);
+	glUseProgram(ShaderProgram);
+
+	//NEEDS TO BE REFACTORED
+	glUniform1i(ColorByHeightLoc, 1);
+
+
+	_cam.setAspectRatio(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+	mat4 worldToProjection = _cam.computeCameraTransform();
+
+	glUniform3fv(CameraPositionLoc, 1, &(_cam.getPosition())[0]);
+	glUniformMatrix4fv(WorldToProjectionMatrixLoc, 1, GL_FALSE, &worldToProjection[0][0]);
+	glUniformMatrix4fv(ModelToWorldMatrixLoc, 1, GL_FALSE, &NonTransformation[0][0]);
+
+	glActiveTexture(GL_TEXTURE0);
+
+	_house.transformation.loadToUniformLoc(ModelToWorldMatrixLoc);
+	//glUniformMatrix4fv(ModelToWorldMatrixLoc, 1, GL_FALSE, &_house.transformation.[0][0]);
+	_house.usingBumpMapping = false;
+	_house.drawObject();
+
+	// Set material parameters for grass
+	glUniform3f(MaterialAColorLoc, 0.9f, 1.0f, 0.9f);
+	glUniform3f(MaterialDColorLoc, 0.3f, 1.0f, 0.3f);
+	glUniform3f(MaterialSColorLoc, 0.1f, 0.1f, 0.1f);
+	glUniform1f(MaterialShineLoc, 10.0f);
+
+	glUniform1i(BumpMapping, 1);
+	// Draw the grass
+	//drawObject(3 * GRASS_TRIS_NUM, TexGrassObj, GrassVBO, GrassIBO, posLoc, texLoc, -1);
+	drawObject(3 * GRASS_TRIS_NUM, TexGrassObj, normal_texture, GrassVBO, GrassIBO, posLoc, texLoc, normalLoc);
+
+
+	glUniform1i(BumpMapping, 0);
+	// Draw the canvas
+	drawObject(3 * CANVAS_TRIS_NUM, ActiveTexCanvas, CanvasVBO, CanvasIBO, posLoc, texLoc, -1);
+
+	catTransformation = glm::rotate((float)(180 * PI / 180.0), vec3(1, 0, 0)) * glm::translate(vec3(5, -0.5, 8)) * glm::scale(vec3(5, 5, 5));
+	// Draw the cat
+	glUniform1i(BumpMapping, 1);
+	glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &catTransformation[0][0]);
+	drawObject(cat.getNumberOfIndices(), TexCatObj, normal_texture_cat, catVBO, catIBO, posLoc, texLoc, -1);
+	//drawObject(cat.getNumberOfIndices(), TexCatObj, normal_texture, catVBO, catIBO, posLoc, texLoc, -1);
+
+	glUniform1i(BumpMapping, 0);
+	// Draw projection text
+	string projection;
+	if (Cam.isProjectionPerspective()) {
+		projection = "You are using perspective projection. Press 'p' for change.";
+	}
+	else {
+		projection = "You are using orthogonal projection. Press 'p' for change.";
+	}
+	drawText(projection, -0.9, 0.9, 0);
+
+	// Draw camera position text
+	vec3 CamPosition = Cam.getPosition();
+	string position = "Camera position x: ";
+	position.append(to_string(CamPosition[0]) + ", y: ");
+	position.append(to_string(CamPosition[1])) + ", z: ";
+	position.append(to_string(CamPosition[2]));
+
+	drawText(position, -0.7, 0.7, 0);
+
+
+	// Disable the "position" vertex attribute (not necessary but recommended)
+	glDisableVertexAttribArray(posLoc);
+	glDisableVertexAttribArray(texLoc);
+	glDisableVertexAttribArray(normalLoc);
+
+	// Disable the shader program (not necessary but recommended)
+	glUseProgram(0);
+
+	// Swap the frame buffers (off-screen rendering)
+	glutSwapBuffers();
 }
 
 bool _idle_disable_house_rotation = false;
@@ -222,7 +315,7 @@ bool initShader(GLuint& program, string vShaderPath, string fShaderPath) {
 	return true;
 }
 
-void initObjects() {
+bool initObjects() {
 	_terrain = *(new SingleTextureTerrain("terrain\\bergen_1024x918.bin", 
 										"terrain\\bergen_terrain_texture.png", 
 										nullptr));
@@ -242,8 +335,18 @@ void initObjects() {
 										173,
 										10,
 										10,
-										"Animated-textures\\"));										
+										"Animated-textures\\"));		
+	return true;
 }
+
+bool initLights() {
+
+	_directionalLight = *(new DirectionalLight());
+	_spotlight = *(new Spotlight());
+
+	return true;
+}
+
 
 /// Read the specified file and return its content
 string readTextFile(const string& pathAndFileName) {
@@ -291,7 +394,8 @@ void loadUniformLocationsFromShader(GLuint& shaderProgram) {
 	loadUniformLocation(shaderProgram, SamplerLoc, "sampler");
 
 	loadUniformLocation(shaderProgram, CameraPositionLoc, "cameraPosition");
-	loadUniformLocation(shaderProgram, NormalTextureLoc, "normal_texture");
+	loadUniformLocation(shaderProgram, NormalTextureLoc, "normalTexture");
+	loadUniformLocation(shaderProgram, ColorByHeightLoc, "colorByHeight");
 }
 
 void loadAttribPointersFromShader(GLuint& shaderProgram) {
