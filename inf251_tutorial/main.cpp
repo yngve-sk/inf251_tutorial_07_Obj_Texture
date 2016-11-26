@@ -15,7 +15,6 @@
 #include "Spotlight.h"
 
 #include "FunctionDeclarations.h"
-#include "GLLocStructs.h"
 
 #include "SingleTextureObject.h"
 #include "MultiTextureObject.h"

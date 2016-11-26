@@ -1,5 +1,13 @@
 #include "SingleTextureObject.h"
 
+SingleTextureObject::SingleTextureObject(const char* directory, 
+										 const char* materialDirectory,
+										 const char* bumpMap) {
+	loadObject(directory);
+	loadMaterial(materialDirectory);
+	loadBumpMap(bumpMap);
+}
+
 void SingleTextureObject::loadObject(const char* directory) {
 
 	if (!model.import(directory)) {

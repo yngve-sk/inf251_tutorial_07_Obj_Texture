@@ -36,6 +36,8 @@ public:
 	void loadObject(const char*);
 	void loadMaterial(const char*);
 	void loadBumpMap(const char*);
+	
+	SingleTextureObject(const char*, const char*, const char*);
 
 private:
 };
