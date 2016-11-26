@@ -538,8 +538,6 @@ bool initMesh() {
 
 	cat = loadObject("Objects\\cat\\cat.obj", catVBO, catIBO);
 	//loadMaterials("Objects\\cat\\", cat, TexCatObj);
-	unsigned int width = 1024;
-	unsigned int height = 512;
 	loadMaterial("Objects\\cat\\cat_diff.png", TexCatObj);
 	loadMaterial("Objects\\cat\\cat_norm.png", normal_texture);
 	
