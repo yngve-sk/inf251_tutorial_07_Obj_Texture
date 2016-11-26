@@ -20,6 +20,7 @@ using namespace glm;
 class MultiTextureObject {
 
 public:
+	MultiTextureObject(const char*, const char*);
 	ModelOBJ model;
 
 	GLuint VBO = -1;
