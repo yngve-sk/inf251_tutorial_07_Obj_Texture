@@ -43,7 +43,7 @@ mat4 GLMCamera::computeCameraTransform() {
 
 	mat4 lookAt = glm::lookAt(position, target, up);
 
-	return  prj * camZoom * (useLookAt ? lookAt : (camR * camT));
+	return  prj * camZoom * (camR * camT);
 }
 
 mat4 GLMCamera::getWorldToViewMatrix() {

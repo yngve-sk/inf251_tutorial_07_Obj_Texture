@@ -2,11 +2,10 @@
 #include <fstream>
 
 SingleTextureTerrain::SingleTextureTerrain(const char* directory,
-	const char* materialDirectory,
-	const char* bumpMap) {
+	const char* materialDirectory) {
 	loadObject(directory);
 	loadTerrain(materialDirectory);
-	loadBumpMap(bumpMap);
+	//loadBumpMap(bumpMap);
 }
 
 void SingleTextureTerrain::loadObject(const char* directory) {
@@ -164,7 +163,7 @@ int SingleTextureTerrain::rc2index(int row, int col) {
 	return col * rowsNum + row;
 }
 
-void SingleTextureTerrain::loadBumpMap(const char* textureDirectory) {
+/*void SingleTextureTerrain::loadBumpMap(const char* textureDirectory) {
 
 	unsigned char* TextureData = nullptr;
 	unsigned int TextureWidth = 0;
@@ -211,7 +210,7 @@ void SingleTextureTerrain::loadBumpMap(const char* textureDirectory) {
 	// Configure texture parameter
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-}
+}*/
 
 void SingleTextureTerrain::drawObject(VertexGLLocs vertexGLLocs, MaterialGLLocs materialGLLocs) {
 

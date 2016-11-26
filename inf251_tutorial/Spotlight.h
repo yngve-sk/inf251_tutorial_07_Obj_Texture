@@ -12,6 +12,8 @@ private:
 		  fConeCosine, 
 		  fLinearAtt;
 public:
+	Spotlight();
+
 	glm::vec3 vColor,
 		      vPosition,
 		      vDirection;

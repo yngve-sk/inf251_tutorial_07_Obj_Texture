@@ -21,7 +21,6 @@ AnimatedTextureSquare::AnimatedTextureSquare(vec3 position,
 
 void AnimatedTextureSquare::loadSquare() {
 
-
 	square[0].position[0] = position.x;
 	square[0].position[1] = position.y;
 	square[0].position[2] = position.z;

@@ -42,9 +42,9 @@ public:
 	void drawObject(VertexGLLocs, MaterialGLLocs);
 	void loadObject(const char*);
 	void loadTerrain(const char*);
-	void loadBumpMap(const char*);
+	//void loadBumpMap(const char*);
 
-	SingleTextureTerrain(const char*, const char*, const char*);
+	SingleTextureTerrain(const char*, const char*);
 
 private:
 	void createVertices();

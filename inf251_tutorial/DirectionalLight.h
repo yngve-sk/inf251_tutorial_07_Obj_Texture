@@ -12,6 +12,8 @@ private:
 
 	int bOn;
 public:
+	DirectionalLight();
+
 	glm::vec3 aColor, dColor, sColor;
 	
 	void loadToUniformsInShader(GLuint shaderProgram, std::string uniformName);

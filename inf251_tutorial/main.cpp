@@ -22,6 +22,8 @@
 #include "SingleTextureTerrain.h"
 #include "GLLocStructs.h"
 
+#define PI 3.14159265
+
 // --- OpenGL callbacks ---------------------------------------------------------------------------
 void display();
 void idle();
@@ -34,15 +36,32 @@ GLMCamera _cam;
 Spotlight _spotlight;
 DirectionalLight _directionalLight;
 
-SingleTextureTerrain _terrain;
+SingleTextureTerrain _terrain = *(new SingleTextureTerrain("terrain\\bergen_1024x918.bin",
+	"terrain\\bergen_terrain_texture.png"));
 
-SingleTextureObject _cat;
-SingleTextureObject _house;
-AnimatedTextureSquare _canvas;
+SingleTextureObject _cat = *(new SingleTextureObject("Objects\\cat\\cat.obj",
+	"Objects\\cat\\cat_diff.png",
+	"Objects\\cat\\cat_norm.png"));
+
+SingleTextureObject _house = *(new SingleTextureObject("Objects\\House-Model\\House.obj",
+	"Objects\\House-Model\\House\\basic_realistic.png",
+	"Objects\\cat\\cat_norm.png"));
+
+AnimatedTextureSquare _canvas = *(new AnimatedTextureSquare(vec3(0, 50, 10),
+	36.f*2.f,
+	18.5f*2.f,
+	173,
+	10,
+	10,
+	"Animated-textures\\"));
 
 // TODO MOVE THIS
+bool initShaders();
 bool initObjects();
 bool initLights();
+void drawText(string, double, double, double);
+string readTextFile(const string&);
+void loadUniformLocation(GLuint&, GLint&, char*);
 
 // --- GL Shader location ----------------------------------------------
 GLuint ShaderProgram = -1;
@@ -53,11 +72,6 @@ WorldToProjectionMatrixLoc = -1;
 
 MaterialGLLocs MaterialLocs;
 
-GLint MaterialAColorLoc = -1, 
-	  MaterialDColorLoc = -1,
-	  MaterialSColorLoc = -1,
-	  MaterialShineLoc = -1;
-
 GLint SamplerLoc = -1;
 
 GLint CameraPositionLoc = -1;
@@ -67,14 +81,13 @@ GLint NormalTextureLoc = -1;
 GLint ColorByHeightLoc = -1;
 
 // --- GL attrib locations --------/------------------------------------
-GLint PosLoc = 0,
-	  NormalLoc = 1,
-	  TexCoordsLoc = 2; 
+VertexGLLocs VertexLocs = {0, 1, 2};
 
 // --- MICS-----------------------------
 // Non-transformation matrix
 mat4 NonTransformation = mat4();
 
+bool HeadlightInt = true;
 
 // --- main() -------------------------------------------------------------------------------------
 /// The entry point of the application
@@ -121,7 +134,7 @@ int main(int argc, char **argv) {
 	glEnable(GL_LIGHT1);
 
 	// Transformation
-	Cam = *(new GLMCamera());
+	_cam = *(new GLMCamera());
 
 
 	// Shaders & mesh
@@ -143,6 +156,9 @@ void display() {
 		height = glutGet(GLUT_WINDOW_HEIGHT);
 	glViewport(0, 0, width, height);
 
+	glEnableVertexAttribArray(VertexLocs.posLoc);
+	glEnableVertexAttribArray(VertexLocs.texLoc);
+	glEnableVertexAttribArray(VertexLocs.normalLoc);
 
 	// Enable the shader program
 	assert(ShaderProgram != 0);
@@ -164,35 +180,22 @@ void display() {
 	_house.transformation.loadToUniformLoc(ModelToWorldMatrixLoc);
 	//glUniformMatrix4fv(ModelToWorldMatrixLoc, 1, GL_FALSE, &_house.transformation.[0][0]);
 	_house.usingBumpMapping = false;
-	_house.drawObject();
+	_house.drawObject(VertexLocs,MaterialLocs);
 
-	// Set material parameters for grass
-	glUniform3f(MaterialAColorLoc, 0.9f, 1.0f, 0.9f);
-	glUniform3f(MaterialDColorLoc, 0.3f, 1.0f, 0.3f);
-	glUniform3f(MaterialSColorLoc, 0.1f, 0.1f, 0.1f);
-	glUniform1f(MaterialShineLoc, 10.0f);
+	_canvas.transformation.loadToUniformLoc(ModelToWorldMatrixLoc);
+	_canvas.usingBumpMapping = false;
+	_canvas.drawObject(VertexLocs, MaterialLocs);
 
-	glUniform1i(BumpMapping, 1);
-	// Draw the grass
-	//drawObject(3 * GRASS_TRIS_NUM, TexGrassObj, GrassVBO, GrassIBO, posLoc, texLoc, -1);
-	drawObject(3 * GRASS_TRIS_NUM, TexGrassObj, normal_texture, GrassVBO, GrassIBO, posLoc, texLoc, normalLoc);
+	_cat.transformation.rotate((float)(180 * PI / 180.0), vec3(1, 0, 0));
+	_cat.transformation.translate(vec3(5, -0.5, 8));
+	_cat.transformation.setScale(5);
+	_cat.transformation.loadToUniformLoc(ModelToWorldMatrixLoc);
+	_cat.usingBumpMapping = true;
+	_cat.drawObject(VertexLocs, MaterialLocs);
 
-
-	glUniform1i(BumpMapping, 0);
-	// Draw the canvas
-	drawObject(3 * CANVAS_TRIS_NUM, ActiveTexCanvas, CanvasVBO, CanvasIBO, posLoc, texLoc, -1);
-
-	catTransformation = glm::rotate((float)(180 * PI / 180.0), vec3(1, 0, 0)) * glm::translate(vec3(5, -0.5, 8)) * glm::scale(vec3(5, 5, 5));
-	// Draw the cat
-	glUniform1i(BumpMapping, 1);
-	glUniformMatrix4fv(LocalTrLoc, 1, GL_FALSE, &catTransformation[0][0]);
-	drawObject(cat.getNumberOfIndices(), TexCatObj, normal_texture_cat, catVBO, catIBO, posLoc, texLoc, -1);
-	//drawObject(cat.getNumberOfIndices(), TexCatObj, normal_texture, catVBO, catIBO, posLoc, texLoc, -1);
-
-	glUniform1i(BumpMapping, 0);
 	// Draw projection text
 	string projection;
-	if (Cam.isProjectionPerspective()) {
+	if (_cam.isProjectionPerspective()) {
 		projection = "You are using perspective projection. Press 'p' for change.";
 	}
 	else {
@@ -201,19 +204,19 @@ void display() {
 	drawText(projection, -0.9, 0.9, 0);
 
 	// Draw camera position text
-	vec3 CamPosition = Cam.getPosition();
+	vec3 camPosition = _cam.getPosition();
 	string position = "Camera position x: ";
-	position.append(to_string(CamPosition[0]) + ", y: ");
-	position.append(to_string(CamPosition[1])) + ", z: ";
-	position.append(to_string(CamPosition[2]));
+	position.append(to_string(camPosition[0]) + ", y: ");
+	position.append(to_string(camPosition[1])) + ", z: ";
+	position.append(to_string(camPosition[2]));
 
 	drawText(position, -0.7, 0.7, 0);
 
 
 	// Disable the "position" vertex attribute (not necessary but recommended)
-	glDisableVertexAttribArray(posLoc);
-	glDisableVertexAttribArray(texLoc);
-	glDisableVertexAttribArray(normalLoc);
+	glDisableVertexAttribArray(VertexLocs.posLoc);
+	glDisableVertexAttribArray(VertexLocs.texLoc);
+	glDisableVertexAttribArray(VertexLocs.normalLoc);
 
 	// Disable the shader program (not necessary but recommended)
 	glUseProgram(0);
@@ -319,7 +322,7 @@ bool initShader(GLuint& program, string vShaderPath, string fShaderPath) {
 }
 
 bool initObjects() {
-	_terrain = *(new SingleTextureTerrain("terrain\\bergen_1024x918.bin", 
+	/*_terrain = *(new SingleTextureTerrain("terrain\\bergen_1024x918.bin", 
 										"terrain\\bergen_terrain_texture.png", 
 										nullptr));
 
@@ -338,7 +341,7 @@ bool initObjects() {
 										173,
 										10,
 										10,
-										"Animated-textures\\"));		
+										"Animated-textures\\"));	*/	
 	return true;
 }
 
@@ -408,4 +411,127 @@ void loadAttribPointersFromShader(GLuint& shaderProgram) {
 void loadUniformLocation(GLuint& ShaderProgram, GLint& loc, char* name) {
 	loc = glGetUniformLocation(ShaderProgram, name);
 	assert(loc!= -1);
+}
+
+/// Draw string in specific position on window
+void drawText(string s, double x, double y, double z) {
+	glRasterPos3f(x, y, z);
+	for (char& c : s) {
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
+	}
+}
+
+float deltaDefault = 10;
+/// Called whenever a keyboard button is pressed (only ASCII characters)
+void keyboard(unsigned char key, int x, int y) {
+	switch (tolower(key)) {
+	case 'q':  // terminate the application
+		exit(0);
+		break;
+	case 'r':
+		_idle_disable_house_rotation = !_idle_disable_house_rotation;
+		break;
+	case 'w':
+		std::cout << "forkwards" << std::endl;
+		_cam.moveForward();
+		glutPostRedisplay();
+		break;
+	case 'a':
+		_cam.strafeLeft();
+		glutPostRedisplay();
+		break;
+	case 's':
+		std::cout << "backwards" << std::endl;
+		_cam.moveBackwards();
+		glutPostRedisplay();
+		break;
+	case 'd':
+		_cam.strafeRight();
+		glutPostRedisplay();
+		break;
+	case 'c':
+		_cam.moveDown();
+		glutPostRedisplay();
+		break;
+	case ' ':
+		_cam.moveUp();
+		glutPostRedisplay();
+		break;
+	case '+':
+		_cam.adjustFov(deltaDefault);
+		glutPostRedisplay();
+		break;
+	case '-':
+		_cam.adjustFov(-deltaDefault);
+		glutPostRedisplay();
+		break;
+	case 'f':
+		_cam.adjustZFar(deltaDefault);
+		glutPostRedisplay();
+		break;
+	case 'g':
+		_cam.adjustZFar(-deltaDefault);
+		glutPostRedisplay();
+		break;
+	case 'n':
+		_cam.adjustZNear(deltaDefault);
+		glutPostRedisplay();
+		break;
+	case 'm':
+		_cam.adjustZNear(-deltaDefault);
+		glutPostRedisplay();
+		break;
+	case 'p':
+		_cam.switchPerspective();
+		glutPostRedisplay();
+		break;
+	case 'l':
+		HeadlightInt = !HeadlightInt;
+		glutPostRedisplay();
+		break;
+	case '9':
+		_cam.flip();
+		glutPostRedisplay();
+		break;
+	case 'b':
+		//colorByHeightOnOff *= -1;
+		//glUniform1i(ColorByHeightLoc, colorByHeightOnOff);
+		break;
+	}
+}
+
+int MouseX, MouseY;		///< The last position of the mouse
+int MouseButton;		///< The last mouse button pressed or released
+
+/// Called whenever a mouse event occur (press or release)
+void mouse(int button, int state, int x, int y) {
+	// Store the current mouse status
+	MouseButton = button;
+	MouseX = x;
+	MouseY = y;
+}
+
+inline void updateMousePosition(int newX, int newY) {
+	MouseX = newX;
+	MouseY = newY;
+}
+/// Called whenever the mouse is moving while a button is pressed
+void motion(int x, int y) {
+	if (MouseButton == GLUT_RIGHT_BUTTON) {
+		_cam.translate(vec2(MouseX, MouseY), vec2(x, y));
+
+		updateMousePosition(x, y);
+	}
+	if (MouseButton == GLUT_MIDDLE_BUTTON) {
+		_cam.adjustZoom(vec2(MouseX, MouseY), vec2(x, y));
+
+		updateMousePosition(x, y);
+	}
+	if (MouseButton == GLUT_LEFT_BUTTON) {
+		_cam.rotate(vec2(MouseX, MouseY), glm::vec2(x, y));
+
+		updateMousePosition(x, y);
+	}
+
+	glutPostRedisplay(); // Specify that the scene needs to be updated
 }
