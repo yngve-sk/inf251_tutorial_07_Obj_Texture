@@ -17,4 +17,5 @@ public:
 		      vDirection;
 
 	void loadToUniformAt(GLuint shaderProgram, std::string uniformName);
+	void toggleOnOff();
 };

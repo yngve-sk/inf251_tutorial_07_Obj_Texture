@@ -4,6 +4,9 @@ Spotlight::Spotlight() :
 	bOn(1), fConeAngle(0), fConeCosine(0), fLinearAtt(0)
 					{}
 
+void Spotlight::toggleOnOff() {
+	bOn = (bOn == 1 ? 0 : 1);
+}
 
 void Spotlight::loadToUniformAt(GLuint shaderProgram, std::string uniformName) {
 	std::string vDirLoc = uniformName + ".direction",
