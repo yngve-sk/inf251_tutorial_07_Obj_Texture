@@ -1,5 +1,11 @@
 #include "MultiTextureObject.h"
 
+MultiTextureObject::MultiTextureObject( const char* directory,
+										const char* materialDirectory) {
+	loadObject(directory);
+	loadMaterials(materialDirectory);
+}
+
 void MultiTextureObject::loadObject(const char* directory) {
 
 	if (!model.import(directory)) {
