@@ -19,6 +19,7 @@
 #include "SingleTextureObject.h"
 #include "MultiTextureObject.h"
 #include "AnimatedTextureSquare.h"
+#include "SingleTextureTerrain.h"
 
 // --- OpenGL callbacks ---------------------------------------------------------------------------
 void display();
@@ -32,7 +33,7 @@ GLMCamera _cam;
 Spotlight _spotlight;
 DirectionalLight _directionalLight;
 
-SingleTextureObject* _terrain;
+SingleTextureTerrain* _terrain;
 
 SingleTextureObject* _cat;
 SingleTextureObject* _house;
@@ -125,6 +126,15 @@ int main(int argc, char **argv) {
 	return 0;
 }
 
+void idle() {
+	// rotate around Y-axis
+	//LocalRotationY = disable_house_rotation ? LocalRotationY : LocalRotationY * glm::rotate(0.005f, vec3(0, 1, 0));
+
+	(*_canvas).stepAnimation();
+	
+	glutPostRedisplay();
+}
+
 bool initShader(GLuint& program, string vShaderPath, string fShaderPath) {
 	if (program != 0)
 		glDeleteProgram(program);
@@ -211,13 +221,26 @@ bool initShader(GLuint& program, string vShaderPath, string fShaderPath) {
 }
 
 void initObjects() {
-	
-	//Terrain = new SingleTextureObject();
-	//Terrain.loadObject("Objects\\cat\\cat.obj");
+	_terrain = new SingleTextureTerrain("terrain\\bergen_1024x918.bin", 
+										"terrain\\bergen_terrain_texture.png", 
+										nullptr);
 
 	_cat = new SingleTextureObject("Objects\\cat\\cat.obj", 
 								  "Objects\\cat\\cat_diff.png",
 								  "Objects\\cat\\cat_norm.png");
+
+	_house = new SingleTextureObject("Objects\\House-Model\\House.obj",
+									 "Objects\\House-Model\\House\\basic_realistic.png",
+									 "Objects\\cat\\cat_norm.png");
+
+	float canvasScale = 2.f;
+	_canvas = new AnimatedTextureSquare(vec3(0, 50, 10),
+										36.f*canvasScale, 
+										18.5f*canvasScale,
+										173,
+										10,
+										10,
+										"Animated-textures\\");										
 }
 
 /// Read the specified file and return its content
