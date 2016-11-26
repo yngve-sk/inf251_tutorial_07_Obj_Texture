@@ -8,9 +8,9 @@ uniform mat4 modelToWorldMatrix;
 // vertex position	
 layout (location = 0) in vec3 position; 
 layout (location = 1) in vec3 normal;
+layout (location = 2) in vec2 tex_coords;
 
 // vertex texture coordinates
-layout (location = 2) in vec2 tex_coords;
 
 // pass the texture coordinates to the fragment shader
 out vec3 fragVert;

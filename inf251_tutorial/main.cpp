@@ -20,6 +20,7 @@
 #include "MultiTextureObject.h"
 #include "AnimatedTextureSquare.h"
 #include "SingleTextureTerrain.h"
+#include "GLLocStructs.h"
 
 // --- OpenGL callbacks ---------------------------------------------------------------------------
 void display();
@@ -49,6 +50,8 @@ GLuint ShaderProgram = -1;
 // --- GL uniform locations --------------------------------------------
 GLint ModelToWorldMatrixLoc = -1,
 WorldToProjectionMatrixLoc = -1;
+
+MaterialGLLocs MaterialLocs;
 
 GLint MaterialAColorLoc = -1, 
 	  MaterialDColorLoc = -1,
@@ -386,10 +389,10 @@ void loadUniformLocationsFromShader(GLuint& shaderProgram) {
 	loadUniformLocation(shaderProgram, WorldToProjectionMatrixLoc, "worldToProjectionMatrix");
 	loadUniformLocation(shaderProgram, ModelToWorldMatrixLoc, "modelToWorldMatrix");
 
-	loadUniformLocation(shaderProgram, MaterialAColorLoc, "material.aColor");
-	loadUniformLocation(shaderProgram, MaterialDColorLoc, "material.dColor");
-	loadUniformLocation(shaderProgram, MaterialSColorLoc, "material.sColor");
-	loadUniformLocation(shaderProgram, MaterialShineLoc, "material.shininess");
+	loadUniformLocation(shaderProgram, MaterialLocs.aColorLoc, "material.aColor");
+	loadUniformLocation(shaderProgram, MaterialLocs.dColorLoc, "material.dColor");
+	loadUniformLocation(shaderProgram, MaterialLocs.sColorLoc, "material.sColor");
+	loadUniformLocation(shaderProgram, MaterialLocs.shineLoc, "material.shininess");
 
 	loadUniformLocation(shaderProgram, SamplerLoc, "sampler");
 
