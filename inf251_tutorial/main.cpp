@@ -17,6 +17,10 @@
 #include "FunctionDeclarations.h"
 #include "GLLocStructs.h"
 
+#include "SingleTextureObject.h"
+#include "MultiTextureObject.h"
+#include "AnimatedTextureSquare.h"
+
 // --- OpenGL callbacks ---------------------------------------------------------------------------
 void display();
 void idle();
@@ -28,6 +32,13 @@ void motion(int, int);
 GLMCamera Cam;
 Spotlight theSpotlight;
 DirectionalLight theDirectionalLight;
+
+SingleTextureObject terrain;
+
+SingleTextureObject cat;
+SingleTextureObject house;
+AnimatedTextureSquare canvas;
+
 
 // --- GL Shader location ----------------------------------------------
 GLuint ShaderProgram = -1;
@@ -101,7 +112,7 @@ int main(int argc, char **argv) {
 
 
 	// Shaders & mesh
-	if (!initShaders() || !initMesh()) {
+	if (!initShaders() || !initObjects()) {
 		cerr << "An error occurred, press Enter to quit ..." << endl;
 		getchar();
 		return -1;
@@ -195,6 +206,14 @@ bool initShader(GLuint& program, string vShaderPath, string fShaderPath) {
 	glDeleteShader(fragShader);
 
 	return true;
+}
+
+void initObjects() {
+	
+	terrain = new SingleTextureObject();
+	terrain.loadObject("Objects\\cat\\cat.obj");
+
+	cat = new SingleTextureObject();
 }
 
 //void bindUniformLocs(GLint shader) {

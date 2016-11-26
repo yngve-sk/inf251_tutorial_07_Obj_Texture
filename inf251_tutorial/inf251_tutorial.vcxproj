@@ -137,6 +137,7 @@
     <Image Include="Objects\cat\normalMap1.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="SingleTextureTerrain.cpp" />
     <ClCompile Include="TexturedAnimatedRectangle.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="main.cpp" />
@@ -148,6 +149,7 @@
     <ClCompile Include="Transformation.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="SingleTextureTerrain.h" />
     <ClInclude Include="TexturedAnimatedRectangle.h" />
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="Drawing.h" />
