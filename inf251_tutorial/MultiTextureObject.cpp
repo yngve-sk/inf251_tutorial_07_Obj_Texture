@@ -1,4 +1,5 @@
 #include "MultiTextureObject.h"
+#include "lodepng.h"
 
 MultiTextureObject::MultiTextureObject( const char* directory,
 										const char* materialDirectory) {

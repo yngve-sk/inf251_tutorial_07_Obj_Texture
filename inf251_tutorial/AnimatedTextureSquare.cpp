@@ -125,7 +125,7 @@ void AnimatedTextureSquare::loadTexture(const char* texturePath, GLuint& texture
 }
 
 
-void AnimatedTextureSquare::loadBumpMap(const char* textureDirectory) {
+/*void AnimatedTextureSquare::loadBumpMap(const char* textureDirectory) {
 
 	unsigned char* TextureData = nullptr;
 	unsigned int TextureWidth = 0;
@@ -172,7 +172,7 @@ void AnimatedTextureSquare::loadBumpMap(const char* textureDirectory) {
 	// Configure texture parameter
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-}
+}*/
 
 void AnimatedTextureSquare::drawObject(VertexGLLocs vertexGLLocs, MaterialGLLocs materialGLLocs) {
 

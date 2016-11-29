@@ -54,8 +54,7 @@ public:
 	void drawObject(VertexGLLocs, MaterialGLLocs);
 	void loadSquare();
 	void loadTextures();
-	void loadTexture(const char*, GLuint&);
-	void loadBumpMap(const char*);
+	//void loadBumpMap(const char*);
 	void toogleAnimate();
 	void stepAnimation();
 
@@ -68,5 +67,5 @@ public:
 		const char* textureDirectory);
 
 private:
-	void loadTexture(GLuint*, const char*);
+	void loadTexture(const char*, GLuint&);
 };

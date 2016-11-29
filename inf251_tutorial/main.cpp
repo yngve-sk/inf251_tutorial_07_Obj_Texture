@@ -48,8 +48,8 @@ SingleTextureObject _house = *(new SingleTextureObject("Objects\\House-Model\\Ho
 	"Objects\\cat\\cat_norm.png"));
 
 AnimatedTextureSquare _canvas = *(new AnimatedTextureSquare(vec3(0, 50, 10),
-	36.f*2.f,
-	18.5f*2.f,
+	(float)36.f*2.f,
+	(float)18.5f*2.f,
 	173,
 	10,
 	10,
@@ -84,9 +84,7 @@ GLint ColorByHeightLoc = -1;
 VertexGLLocs VertexLocs = {0, 1, 2};
 
 // --- MICS-----------------------------
-// Non-transformation matrix
 mat4 NonTransformation = mat4();
-
 bool HeadlightInt = true;
 
 // --- main() -------------------------------------------------------------------------------------
@@ -180,7 +178,7 @@ void display() {
 	_house.transformation.loadToUniformLoc(ModelToWorldMatrixLoc);
 	//glUniformMatrix4fv(ModelToWorldMatrixLoc, 1, GL_FALSE, &_house.transformation.[0][0]);
 	_house.usingBumpMapping = false;
-	_house.drawObject(VertexLocs,MaterialLocs);
+	_house.drawObject(VertexLocs, MaterialLocs);
 
 	_canvas.transformation.loadToUniformLoc(ModelToWorldMatrixLoc);
 	_canvas.usingBumpMapping = false;
