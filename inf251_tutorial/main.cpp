@@ -36,24 +36,13 @@ GLMCamera _cam;
 Spotlight _spotlight;
 DirectionalLight _directionalLight;
 
-SingleTextureTerrain _terrain = *(new SingleTextureTerrain("terrain\\bergen_1024x918.bin",
-	"terrain\\bergen_terrain_texture.png"));
+SingleTextureTerrain _terrain;
 
-SingleTextureObject _cat = *(new SingleTextureObject("Objects\\cat\\cat.obj",
-	"Objects\\cat\\cat_diff.png",
-	"Objects\\cat\\cat_norm.png"));
+SingleTextureObject _cat;
 
-SingleTextureObject _house = *(new SingleTextureObject("Objects\\House-Model\\House.obj",
-	"Objects\\House-Model\\House\\basic_realistic.png",
-	"Objects\\cat\\cat_norm.png"));
+SingleTextureObject _house;
 
-AnimatedTextureSquare _canvas = *(new AnimatedTextureSquare(vec3(0, 50, 10),
-	(float)36.f*2.f,
-	(float)18.5f*2.f,
-	173,
-	10,
-	10,
-	"Animated-textures\\"));
+AnimatedTextureSquare _canvas;
 
 // TODO MOVE THIS
 bool initShaders();

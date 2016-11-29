@@ -14,7 +14,7 @@ struct DirectionalLight {
 
 	int bOn; // on/off switch
 };
-vec3 generateLightColor(DirectionalLight light);
+vec3 generateLightColor(DirectionalLight light,vec3);
 
 struct Spotlight {
 	vec3 vDirection;
@@ -25,8 +25,9 @@ struct Spotlight {
 
 	float fConeAngle, fConeCosine;
 	float fLinearAtt;
-}
-vec3 generateSpotlightColor(Spotlight spotlight);
+};
+
+vec3 generateSpotlightColor(Spotlight spotlight, vec3);
 
 struct Material {
 	vec3 aColor;
@@ -63,6 +64,7 @@ in vec3 fragVert;
 // Normal texture for bump mapping
 uniform sampler2D normalTexture;
 uniform int bumpMapping;
+vec3 normalBump;
 
 // color by height on/off
 uniform int colorByHeight;
@@ -95,17 +97,17 @@ void main() {
 	}
 
 	//create the spotlight
-	SpotLight sl;
-	sl.vColor = vec3(122, 122, 122); // White Color
-	//sl.vPosition = vec3(cameraPosition[0]-10, cameraPosition[1]-10, cameraPosition[2]-5);
-	sl.vPosition = vec3(0,0,0);
-	sl.bOn = 1;
-	sl.fConeCosine = 0.86602540378;
-	sl.fLinearAtt = 1.0;
-	sl.vDirection = vec3(0,0,1);
+	//SpotLight sl;
+	//sl.vColor = vec3(122, 122, 122); // White Color
+	////sl.vPosition = vec3(cameraPosition[0]-10, cameraPosition[1]-10, cameraPosition[2]-5);
+	//sl.vPosition = vec3(0,0,0);
+	//sl.bOn = 1;
+	//sl.fConeCosine = 0.86602540378;
+	//sl.fLinearAtt = 1.0;
+	//sl.vDirection = vec3(0,0,1);
 
 	vec4 fWorldPosition = worldToProjectionMatrix * vec4(fragVert, 1.);
-	vec4 spotLighting = GetSpotLightColor(splotlight, vec3(fWorldPosition));
+	vec4 spotLighting = generateSpotlightColor(spotlight, vec3(fWorldPosition));
 
 	vec4 fLighting;
 	if (headlight == 1){
@@ -133,7 +135,7 @@ void main() {
     
 }
 
-vec4 GetSpotLightColor(const Spotlight spotlight, vec3 vWorldPos) 
+vec4 generateSpotlightColor(const Spotlight spotlight, vec3 vWorldPos) 
 { 
   if(spotLight.bOn == 0)return vec4(0.0, 0.0, 0.0, 0.0); 
 
@@ -152,7 +154,7 @@ vec4 GetSpotLightColor(const Spotlight spotlight, vec3 vWorldPos)
   return vec4(0.0, 0.0, 0.0, 0.0); 
 }
 
-vec3 generateLightColor(DirectionalLight dLight, Material mtl, vec3 normal) {
+vec3 generateLightColor(DirectionalLight dLight, vec3 normal) {
 	//From Sergej
 	vec4 fWorldPosition = worldToProjectionMatrix * vec4(fragVert, 1.);	   //WorldPosition
 	//vec3 normal_nn = normalize((worldToProjectionMatrix * vec4(normal,0.0)).xyz);	//The normal must be transformed in World coordinates as well
@@ -188,14 +190,14 @@ vec3 generateLightColor(DirectionalLight dLight, Material mtl, vec3 normal) {
 
 	vec3 color;
 	vec3 ambient_color = clamp(
-		mtl.aColor * dLight.aColor * dLight.aIntensity, 
+		material.aColor * dLight.aColor * dLight.aIntensity, 
 		0.0, 1.0);
 	vec3 diff_color = clamp(
-		mtl.dColor * dot_d_light_normal * dLight.dIntensity,
+		material.dColor * dot_d_light_normal * dLight.dIntensity,
 		0.0,1.0);
 	vec3 spec_color = clamp(
-		mtl.sColor * 
-		pow(dot(d_reflected_dir_nn, viewDirNN), mtl.shininess),
+		material.sColor * 
+		pow(dot(d_reflected_dir_nn, viewDirNN), material.shininess),
 		0.0,1.0);
 	color = distanceMultiplier*(ambient_color + diff_color + spec_color); // NOT JUST ONE CHANNEL
 
