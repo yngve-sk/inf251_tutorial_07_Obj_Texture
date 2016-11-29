@@ -61,6 +61,8 @@ in vec2 fragTexCoord;
 in vec3 fragNormal;
 in vec3 fragVert;
 
+out vec4 FragColor;
+
 // Normal texture for bump mapping
 uniform sampler2D normalTexture;
 uniform int bumpMapping;
@@ -110,7 +112,7 @@ void main() {
 	vec4 spotLighting = generateSpotlightColor(spotlight, vec3(fWorldPosition));
 
 	vec4 fLighting;
-	if (headlight == 1){
+	if (spotlight.bOn == 1){
 		//Add headlight to camera
 		fLighting = clamp(spotLighting + vec4(color, 1.0), 0, 255);
 	} else {
@@ -137,7 +139,7 @@ void main() {
 
 vec4 generateSpotlightColor(const Spotlight spotlight, vec3 vWorldPos) 
 { 
-  if(spotLight.bOn == 0)return vec4(0.0, 0.0, 0.0, 0.0); 
+  if(spotlight.bOn == 0)return vec4(0.0, 0.0, 0.0, 0.0); 
 
   float fDistance = distance(vWorldPos, spotlight.vPosition); 
 
