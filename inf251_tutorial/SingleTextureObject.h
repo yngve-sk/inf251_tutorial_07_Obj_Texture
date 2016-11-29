@@ -38,6 +38,10 @@ public:
 	void loadBumpMap(const char*);
 	
 	SingleTextureObject(const char*, const char*, const char*);
+	SingleTextureObject();
 
+	void init(const char* directory,
+		const char* materialDirectory,
+		const char* bumpMap);
 private:
 };
