@@ -65,8 +65,8 @@ void SingleTextureTerrain::loadTerrain(const char* directory) {
 	heights = new float[numberOfPoints];
 	for (int i = 0; i < numberOfPoints; i++)
 		heights[i] = bufferX.fVals[i];
-
-
+	
+	/*
 	vertices = new vec3[numberOfPoints];
 	createVertices();
 	numberOfTriangles = 2 * (rowsNum - 1) * (colsNum - 1);
@@ -98,7 +98,7 @@ void SingleTextureTerrain::loadTerrain(const char* directory) {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
 		numberOfTriangles * 3 * sizeof(unsigned int),
 		trIndices,
-		GL_STATIC_DRAW);
+		GL_STATIC_DRAW);*/
 
 	// close the file
 	fileIn.close();
@@ -106,7 +106,7 @@ void SingleTextureTerrain::loadTerrain(const char* directory) {
 
 // compute the vertices from the heights array
 void SingleTextureTerrain::createVertices() {
-	for (int i = 0; i < numberOfPoints; i++) {
+	/*for (int i = 0; i < numberOfPoints; i++) {
 		vertices[i].x = (i % rowsNum) * cellSize + xLowLeft;
 		if (heights[i] < 0) {
 			vertices[i].y = 0;
@@ -115,6 +115,20 @@ void SingleTextureTerrain::createVertices() {
 			vertices[i].y = heights[i];
 		}
 		vertices[i].z = (i / rowsNum) * cellSize + yLowLeft;
+	}*/
+	vertices = new vec3[numberOfPoints];
+
+	for (int r = 0; r < rowsNum - 1; r++) {
+		for (int c = 0; c < colsNum - 1; c++) {
+			int i = rc2index(r, c);
+			float x = (i % rowsNum) * cellSize;
+			float y = heights[i];
+			float z = -floor(float(i / rowsNum))*cellSize;
+
+			vertices[i].x = x;
+			vertices[i].y = y;
+			vertices[i].z = z;
+		}
 	}
 }
 
@@ -187,45 +201,22 @@ int SingleTextureTerrain::rc2index(int row, int col) {
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }*/
 
-void SingleTextureTerrain::drawObject(VertexGLLocs vertexGLLocs, MaterialGLLocs materialGLLocs) {
-
-	ModelOBJ::Material material = model.getMaterial(0);
-
-	// Set material parameters for house
-	glUniform3f(materialGLLocs.aColorLoc, material.ambient[0], material.ambient[1], material.ambient[2]);
-	glUniform3f(materialGLLocs.dColorLoc, material.diffuse[0], material.diffuse[1], material.diffuse[2]);
-	glUniform3f(materialGLLocs.sColorLoc, material.specular[0], material.specular[1], material.specular[2]);
-	glUniform1f(materialGLLocs.shineLoc, material.shininess);
-
-	glActiveTexture(GL_TEXTURE0);
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, textureObject);
-
-	glActiveTexture(GL_TEXTURE1);
-	glEnable(GL_TEXTURE_2D);
-	//int normal_location = glGetUniformLocation(ShaderProgram, "normal_texture");
-	//glUniform1i(normal_location, 1);
-	glBindTexture(GL_TEXTURE_2D, bumpMapObject);
-
+void SingleTextureTerrain::drawObject() {
+	//Added from Sergej
+	glDisable(GL_CULL_FACE);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-	glVertexAttribPointer(vertexGLLocs.posLoc, 3, GL_FLOAT, GL_FALSE,
-		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(0));
-	glVertexAttribPointer(vertexGLLocs.texLoc, 2, GL_FLOAT, GL_FALSE,
-		sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(3 * sizeof(float)));
-	if (vertexGLLocs.normalLoc != -1) {
-		glVertexAttribPointer(vertexGLLocs.normalLoc, 3, GL_FLOAT, GL_FALSE,
-			sizeof(ModelOBJ::Vertex), reinterpret_cast<const GLvoid*>(5 * sizeof(float)));
-	}
-	glDrawElements(GL_TRIANGLES, model.getNumberOfIndices(), GL_UNSIGNED_INT, 0);
+	glBindTexture(GL_TEXTURE_2D, textureObject);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(TerrainVertex), reinterpret_cast<const GLvoid*>(0));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(TerrainVertex), reinterpret_cast<const GLvoid*>(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(TerrainVertex), reinterpret_cast<const GLvoid*>(5 * sizeof(float)));
 
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glDisable(GL_TEXTURE_2D);
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glDisable(GL_TEXTURE_2D);
+	// Draw the elements on the GPU
+	glDrawElements(
+		GL_TRIANGLES,
+		3 * numberOfTriangles,
+		GL_UNSIGNED_INT,
+		0);
 }
 
 

@@ -181,6 +181,8 @@ void display() {
 	_cat.usingBumpMapping = true;
 	_cat.drawObject(VertexLocs, MaterialLocs);
 
+	_terrain.drawObject();
+
 	// Draw projection text
 	string projection;
 	if (_cam.isProjectionPerspective()) {

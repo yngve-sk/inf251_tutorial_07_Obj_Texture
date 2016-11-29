@@ -45,7 +45,7 @@ public:
 	vec3 *vertices;
 	unsigned int *trIndices;
 
-	void drawObject(VertexGLLocs, MaterialGLLocs);
+	void drawObject();
 	void loadTerrain(const char*);
 	//void loadBumpMap(const char*);
 
