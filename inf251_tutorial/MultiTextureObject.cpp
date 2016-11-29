@@ -3,6 +3,8 @@
 
 /*MultiTextureObject::MultiTextureObject( const char* directory,
 										const char* materialDirectory) {
+	
+	
 	loadObject(directory);
 	loadMaterials(materialDirectory);
 }*/
