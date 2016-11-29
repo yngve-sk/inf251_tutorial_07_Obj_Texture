@@ -27,7 +27,7 @@ struct Spotlight {
 	float fLinearAtt;
 };
 
-vec3 generateSpotlightColor(Spotlight spotlight, vec3);
+vec4 generateSpotlightColor(Spotlight spotlight, vec3);
 
 struct Material {
 	vec3 aColor;
@@ -137,8 +137,10 @@ void main() {
     
 }
 
-vec4 generateSpotlightColor(const Spotlight spotlight, vec3 vWorldPos) 
+vec4 generateSpotlightColor(Spotlight spotlight, vec3 vWorldPos) 
 { 
+	if(1==1) return vec4(0.0, 0.0, 0.0, 0.0);
+
   if(spotlight.bOn == 0)return vec4(0.0, 0.0, 0.0, 0.0); 
 
   float fDistance = distance(vWorldPos, spotlight.vPosition); 
