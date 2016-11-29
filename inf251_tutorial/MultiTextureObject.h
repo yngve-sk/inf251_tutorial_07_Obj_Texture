@@ -20,7 +20,7 @@ using namespace glm;
 class MultiTextureObject {
 
 public:
-	//MultiTextureObject(const char*, const char*);
+	void init(const char*, const char*);
 	MultiTextureObject();
 	ModelOBJ model;
 

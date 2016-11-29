@@ -44,7 +44,7 @@ public:
 	void loadTerrain(const char*);
 	//void loadBumpMap(const char*);
 
-	//SingleTextureTerrain(const char*, const char*);
+	void init(const char*, const char*);
 	SingleTextureTerrain();
 
 private:

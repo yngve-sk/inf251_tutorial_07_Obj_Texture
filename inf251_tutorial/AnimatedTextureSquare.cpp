@@ -1,23 +1,23 @@
 #include "AnimatedTextureSquare.h"
 
-/*AnimatedTextureSquare::AnimatedTextureSquare(vec3 position,
-											float width, 
-											float height, 
-											int numberOfFrames, 
-											int numberOfSteps, 
-											int frameWait, 
-											const char* textureDirectory) :
-	position(position),
-	width(width),
-	height(height),
-	numberOfFrames(numberOfFrames),
-	numberOfSteps(numberOfSteps),
-	frameWait(frameWait),
-	textureDirectory(textureDirectory){
+void AnimatedTextureSquare::init(vec3 position,
+								float width,
+								float height,
+								int numberOfFrames,
+								int numberOfSteps,
+								int frameWait,
+								const char* textureDirectory) {
 
+	this->position = position;
+	this->width = width;
+	this->height = height;
+	this->numberOfFrames = numberOfFrames;
+	this->frameWait = frameWait;
+	this->textureDirectory = textureDirectory;
+	this->numberOfSteps = numberOfSteps;
 	loadSquare();
 	loadTextures();
-}*/
+}
 
 AnimatedTextureSquare::AnimatedTextureSquare() {
 }

@@ -4,12 +4,12 @@
 SingleTextureTerrain::SingleTextureTerrain() {
 }
 
-/*SingleTextureTerrain::SingleTextureTerrain(const char* directory,
+void SingleTextureTerrain::init(const char* directory,
 	const char* materialDirectory) {
 	loadObject(directory);
 	loadTerrain(materialDirectory);
 	//loadBumpMap(bumpMap);
-}*/
+}
 
 void SingleTextureTerrain::loadObject(const char* directory) {
 
