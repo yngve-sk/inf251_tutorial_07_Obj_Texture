@@ -23,7 +23,7 @@ void SingleTextureObject::loadObject(const char* directory) {
 		return;
 	}
 
-	cout << "Imported model..." << endl;
+	cout << "Imported model: " << directory << endl;
 
 	// VBO
 	glGenBuffers(1, &VBO);

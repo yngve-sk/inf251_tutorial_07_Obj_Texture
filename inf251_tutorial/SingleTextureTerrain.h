@@ -20,7 +20,13 @@ using namespace glm;
 class SingleTextureTerrain {
 
 public:
-	ModelOBJ model;
+
+	//From Sergej
+	struct TerrainVertex {
+		vec3 position;
+		float tex_coords[2];
+		vec3 normals;
+	};
 
 	GLuint VBO = -1;
 	GLuint IBO = -1;
@@ -40,7 +46,6 @@ public:
 	unsigned int *trIndices;
 
 	void drawObject(VertexGLLocs, MaterialGLLocs);
-	void loadObject(const char*);
 	void loadTerrain(const char*);
 	//void loadBumpMap(const char*);
 

@@ -11,16 +11,18 @@ void SingleTextureTerrain::init(const char* directory,
 	//loadBumpMap(bumpMap);
 }
 
-void SingleTextureTerrain::loadTerrain(const char* textureDirectory) {
+void SingleTextureTerrain::loadTerrain(const char* directory) {
 
 	// open the file
-	fstream fileIn(textureDirectory, ifstream::in | ifstream::binary);
+	fstream fileIn(directory, ifstream::in | ifstream::binary);
 
 	//check if the file has been opened
 	if (!fileIn.good()) {
-		cout << "Error opening the file." << endl;
+		cout << "Error opening the file." << directory << endl;
 		return;
 	}
+
+	cout << "Imported model: " << directory << endl;
 
 	// struct to read values from the file
 	union {

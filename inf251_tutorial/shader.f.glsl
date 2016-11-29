@@ -36,9 +36,6 @@ struct Material {
 	float shininess;
 };
 
-
-
-
 // model-view transformation
 uniform mat4 worldToProjectionMatrix;
 uniform mat4 modelToWorldMatrix;

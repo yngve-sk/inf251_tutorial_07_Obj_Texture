@@ -14,11 +14,11 @@ MultiTextureObject::MultiTextureObject() {
 void MultiTextureObject::loadObject(const char* directory) {
 
 	if (!model.import(directory)) {
-		cerr << "Error: cannot load model." << endl;
+		cerr << "Error: cannot load model:" << directory << endl;
 		return;
 	}
 
-	cout << "Imported model..." << endl;
+	cout << "Imported model:" << directory << endl;
 
 	// VBO
 	glGenBuffers(1, &VBO);

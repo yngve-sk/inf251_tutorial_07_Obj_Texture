@@ -51,6 +51,7 @@ bool initLights();
 void drawText(string, double, double, double);
 string readTextFile(const string&);
 void loadUniformLocation(GLuint&, GLint&, char*);
+void loadUniformLocationsFromShader(GLuint&);
 
 // --- GL Shader location ----------------------------------------------
 GLuint ShaderProgram = -1;
@@ -300,6 +301,8 @@ bool initShader(GLuint& program, string vShaderPath, string fShaderPath) {
 		cerr << "Error: cannot validate shader program.\nError log:\n" << errorLog << endl;
 		return false;
 	}
+
+	loadUniformLocationsFromShader(ShaderProgram);
 
 	// Shaders can be deleted now
 	glDeleteShader(vertShader);
