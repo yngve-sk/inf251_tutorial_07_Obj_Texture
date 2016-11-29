@@ -3,9 +3,17 @@
 SingleTextureObject::SingleTextureObject(const char* directory, 
 										 const char* materialDirectory,
 										 const char* bumpMap) {
-	loadObject(directory);
-	loadMaterial(materialDirectory);
-	loadBumpMap(bumpMap);
+	init(directory, materialDirectory, bumpMap);
+}
+
+SingleTextureObject::SingleTextureObject(){}
+
+void SingleTextureObject::init(const char* directory,
+		  const char* materialDirectory,
+		  const char* bumpMap) {
+		  loadObject(directory);
+		  loadMaterial(materialDirectory);
+		  loadBumpMap(bumpMap);
 }
 
 void SingleTextureObject::loadObject(const char* directory) {

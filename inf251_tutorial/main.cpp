@@ -31,7 +31,7 @@ void keyboard(unsigned char, int, int);
 void mouse(int, int, int, int);
 void motion(int, int);
 
-// --- Scene objects ---------------------------------------------------------------------------
+//--- Scene objects ---------------------------------------------------------------------------
 GLMCamera _cam;
 Spotlight _spotlight;
 DirectionalLight _directionalLight;
