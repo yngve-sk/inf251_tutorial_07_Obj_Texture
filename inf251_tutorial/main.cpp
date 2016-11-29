@@ -322,26 +322,24 @@ bool initShader(GLuint& program, string vShaderPath, string fShaderPath) {
 }
 
 bool initObjects() {
-	/*_terrain = *(new SingleTextureTerrain("terrain\\bergen_1024x918.bin", 
-										"terrain\\bergen_terrain_texture.png", 
-										nullptr));
+	_terrain.init("terrain\\bergen_1024x918.bin",
+		"terrain\\bergen_terrain_texture.png");
 
-	_cat = *(new SingleTextureObject("Objects\\cat\\cat.obj", 
-								  "Objects\\cat\\cat_diff.png",
-								  "Objects\\cat\\cat_norm.png"));
+	_cat.init("Objects\\cat\\cat.obj",
+		"Objects\\cat\\cat_diff.png",
+		"Objects\\cat\\cat_norm.png");
 
-	_house = *(new SingleTextureObject("Objects\\House-Model\\House.obj",
-									 "Objects\\House-Model\\House\\basic_realistic.png",
-									 "Objects\\cat\\cat_norm.png"));
+	_house.init("Objects\\House-Model\\House.obj",
+		"Objects\\House-Model\\House\\basic_realistic.png",
+		"Objects\\cat\\cat_norm.png");
 
-	float canvasScale = 2.f;
-	_canvas = *(new AnimatedTextureSquare(vec3(0, 50, 10),
-										36.f*canvasScale, 
-										18.5f*canvasScale,
-										173,
-										10,
-										10,
-										"Animated-textures\\"));	*/	
+	_canvas.init(vec3(0, 50, 10),
+		(float)36.f*2.f,
+		(float)18.5f*2.f,
+		173,
+		10,
+		10,
+		"Animated-textures\\");
 	return true;
 }
 
