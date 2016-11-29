@@ -90,6 +90,8 @@ bool HeadlightInt = true;
 // --- main() -------------------------------------------------------------------------------------
 /// The entry point of the application
 int main(int argc, char **argv) {
+	
+	cout << "1" << endl;
 
 	// Initialize glut and create a simple window
 	glutInit(&argc, argv);

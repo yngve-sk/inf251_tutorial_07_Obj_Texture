@@ -1,12 +1,15 @@
 #include "SingleTextureTerrain.h"
 #include <fstream>
 
-SingleTextureTerrain::SingleTextureTerrain(const char* directory,
+SingleTextureTerrain::SingleTextureTerrain() {
+}
+
+/*SingleTextureTerrain::SingleTextureTerrain(const char* directory,
 	const char* materialDirectory) {
 	loadObject(directory);
 	loadTerrain(materialDirectory);
 	//loadBumpMap(bumpMap);
-}
+}*/
 
 void SingleTextureTerrain::loadObject(const char* directory) {
 

@@ -58,13 +58,15 @@ public:
 	void toogleAnimate();
 	void stepAnimation();
 
-	AnimatedTextureSquare(vec3 position,
+	/*AnimatedTextureSquare(vec3 position,
 		float width,
 		float height,
 		int numberOfFrames,
 		int numberOfSteps,
 		int frameWait,
-		const char* textureDirectory);
+		const char* textureDirectory);*/
+
+	AnimatedTextureSquare();
 
 private:
 	void loadTexture(const char*, GLuint&);

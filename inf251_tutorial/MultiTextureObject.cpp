@@ -1,10 +1,13 @@
 #include "MultiTextureObject.h"
 #include "lodepng.h"
 
-MultiTextureObject::MultiTextureObject( const char* directory,
+/*MultiTextureObject::MultiTextureObject( const char* directory,
 										const char* materialDirectory) {
 	loadObject(directory);
 	loadMaterials(materialDirectory);
+}*/
+
+MultiTextureObject::MultiTextureObject() {
 }
 
 void MultiTextureObject::loadObject(const char* directory) {

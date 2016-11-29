@@ -1,6 +1,6 @@
 #include "AnimatedTextureSquare.h"
 
-AnimatedTextureSquare::AnimatedTextureSquare(vec3 position,
+/*AnimatedTextureSquare::AnimatedTextureSquare(vec3 position,
 											float width, 
 											float height, 
 											int numberOfFrames, 
@@ -17,6 +17,9 @@ AnimatedTextureSquare::AnimatedTextureSquare(vec3 position,
 
 	loadSquare();
 	loadTextures();
+}*/
+
+AnimatedTextureSquare::AnimatedTextureSquare() {
 }
 
 void AnimatedTextureSquare::loadSquare() {
