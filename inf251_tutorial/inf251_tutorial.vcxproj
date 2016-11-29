@@ -130,13 +130,19 @@
     <None Include="Objects\cat\cat.mtl" />
     <None Include="shader.f.glsl" />
     <None Include="shader.v.glsl" />
+    <None Include="terrain\bergen_1024x918.bin" />
+    <None Include="terrain\bergen_2048x1836.bin" />
+    <None Include="terrain\bergen_3072x2754.bin" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Objects\cat\cat_diff.png" />
     <Image Include="Objects\cat\cat_norm.png" />
     <Image Include="Objects\cat\normalMap1.png" />
+    <Image Include="terrain\bergen_terrain_texture.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AnimatedTextureSquare.cpp" />
+    <ClCompile Include="lodepng.cpp" />
     <ClCompile Include="SingleTextureTerrain.cpp" />
     <ClCompile Include="TexturedAnimatedRectangle.cpp" />
     <ClCompile Include="camera.cpp" />
@@ -149,6 +155,8 @@
     <ClCompile Include="Transformation.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AnimatedTextureSquare.h" />
+    <ClInclude Include="lodepng.h" />
     <ClInclude Include="SingleTextureTerrain.h" />
     <ClInclude Include="TexturedAnimatedRectangle.h" />
     <ClInclude Include="DirectionalLight.h" />
