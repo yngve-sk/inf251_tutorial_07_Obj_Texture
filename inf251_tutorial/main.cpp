@@ -79,8 +79,6 @@ bool HeadlightInt = true;
 // --- main() -------------------------------------------------------------------------------------
 /// The entry point of the application
 int main(int argc, char **argv) {
-	
-	cout << "1" << endl;
 
 	// Initialize glut and create a simple window
 	glutInit(&argc, argv);
@@ -318,8 +316,8 @@ bool initObjects() {
 		"Objects\\cat\\cat_diff.png",
 		"Objects\\cat\\cat_norm.png");
 
-	_house.init("Objects\\House-Model\\House.obj",
-		"Objects\\House-Model\\House\\basic_realistic.png",
+	_house.init("House-Model\\House.obj",
+		"House-Model\\House\\basic_realistic.png",
 		"Objects\\cat\\cat_norm.png");
 
 	_canvas.init(vec3(0, 50, 10),

@@ -6,39 +6,9 @@ SingleTextureTerrain::SingleTextureTerrain() {
 
 void SingleTextureTerrain::init(const char* directory,
 	const char* materialDirectory) {
-	loadObject(directory);
-	loadTerrain(materialDirectory);
+	loadTerrain(directory);
+	//loadTerrain(materialDirectory);
 	//loadBumpMap(bumpMap);
-}
-
-void SingleTextureTerrain::loadObject(const char* directory) {
-
-	if (!model.import(directory)) {
-		cerr << "Error: cannot load model." << endl;
-		return;
-	}
-
-	cout << "Imported model..." << endl;
-
-	// VBO
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER,
-		model.getNumberOfVertices() * sizeof(ModelOBJ::Vertex),
-		model.getVertexBuffer(),
-		GL_STATIC_DRAW);
-
-	// IBO
-	glGenBuffers(1, &IBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-		model.getNumberOfIndices() * sizeof(unsigned int),
-		model.getIndexBuffer(),
-		GL_STATIC_DRAW);
-
-	model.normalize();
-
-	return;
 }
 
 void SingleTextureTerrain::loadTerrain(const char* textureDirectory) {

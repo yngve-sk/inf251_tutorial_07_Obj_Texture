@@ -19,7 +19,7 @@ void SingleTextureObject::init(const char* directory,
 void SingleTextureObject::loadObject(const char* directory) {
 
 	if (!model.import(directory)) {
-		cerr << "Error: cannot load model." << endl;
+		cerr << "Error: cannot load model: " << directory << endl;
 		return;
 	}
 
