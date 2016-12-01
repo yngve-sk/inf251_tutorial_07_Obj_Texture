@@ -37,9 +37,9 @@ void DirectionalLight::loadToUniformsInShader(GLuint shaderProgram, std::string 
 		bOnSLoc = glGetUniformLocation(shaderProgram, &bOnLoc[0]);
 
 	glUniform3fv(dirSLoc, 1, &direction[0]);
-	glUniform3fv(aColorSLoc, 1, &direction[0]);
-	glUniform3fv(dColorSLoc, 1, &direction[0]);
-	glUniform3fv(sColorSLoc, 1, &direction[0]);
+	glUniform3fv(aColorSLoc, 1, &aColor[0]);
+	glUniform3fv(dColorSLoc, 1, &dColor[0]);
+	glUniform3fv(sColorSLoc, 1, &sColor[0]);
 
 	glUniform1f(aIntensitySLoc, aIntensity);
 	glUniform1f(dIntensitySLoc, dIntensity);

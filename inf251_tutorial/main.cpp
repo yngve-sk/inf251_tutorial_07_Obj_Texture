@@ -338,7 +338,10 @@ bool initObjects() {
 bool initLights() {
 
 	_directionalLight = *(new DirectionalLight());
+	_directionalLight.loadToUniformsInShader(ShaderProgram, "dLight");
+
 	_spotlight = *(new Spotlight());
+	_spotlight.loadToUniformsInShader(ShaderProgram, "spotlight");
 
 	return true;
 }

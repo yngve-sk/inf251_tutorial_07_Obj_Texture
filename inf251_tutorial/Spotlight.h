@@ -18,6 +18,6 @@ public:
 		      vPosition,
 		      vDirection;
 
-	void loadToUniformAt(GLuint shaderProgram, std::string uniformName);
+	void loadToUniformsInShader(GLuint shaderProgram, std::string uniformName);
 	void toggleOnOff();
 };

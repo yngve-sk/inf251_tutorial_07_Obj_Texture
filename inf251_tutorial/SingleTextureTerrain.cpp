@@ -208,8 +208,8 @@ void SingleTextureTerrain::drawObject() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
 	glBindTexture(GL_TEXTURE_2D, textureObject);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(TerrainVertex), reinterpret_cast<const GLvoid*>(0));
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(TerrainVertex), reinterpret_cast<const GLvoid*>(3 * sizeof(float)));
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(TerrainVertex), reinterpret_cast<const GLvoid*>(5 * sizeof(float)));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(TerrainVertex), reinterpret_cast<const GLvoid*>(3 * sizeof(float)));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(TerrainVertex), reinterpret_cast<const GLvoid*>(5 * sizeof(float)));
 
 	// Draw the elements on the GPU
 	glDrawElements(
