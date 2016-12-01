@@ -23,7 +23,7 @@ public:
 
 	const int numberOfVertices = 4;
 	const int numberOfTriangles = 2;
-	const int numberOfIndeces = 6;
+	const int numberOfIndices = 6;
 
 	ModelOBJ::Vertex square[4];
 

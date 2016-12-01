@@ -121,7 +121,7 @@ void main() {
     // 1. The angle of incidence: brightness
     // 2. The color/intensities of the light: light.intensities
     // 3. The texture and texture coord: texture(sampler, fragTexCoord)
-    vec4 surfaceColor = fLighting * texture2D(sampler, fragTexCoord);
+    vec4 surfaceColor = texture2D(sampler, fragTexCoord);
 
 	if(colorByHeight == 1){
 		float fy = fragVert.y + 0.;
@@ -131,6 +131,8 @@ void main() {
 	else {
 		FragColor = vec4(brightness * vec3(dLight.aIntensity, dLight.dIntensity, dLight.sIntensity) * surfaceColor.rgb, surfaceColor.a);
 	}
+
+	FragColor = surfaceColor * brightness;
     
 }
 
