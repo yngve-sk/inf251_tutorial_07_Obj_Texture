@@ -8,11 +8,11 @@ void Spotlight::toggleOnOff() {
 	bOn = (bOn == 1 ? 0 : 1);
 }
 
-void Spotlight::loadToUniformAt(GLuint shaderProgram, std::string uniformName) {
-	std::string vDirLoc = uniformName + ".direction",
+void Spotlight::loadToUniformsInShader(GLuint shaderProgram, std::string uniformName) {
+	std::string vDirLoc = uniformName + ".vDirection",
 
-		vPositionLoc = uniformName + ".dColor",
-		vColorLoc = uniformName + ".aColor",
+		vPositionLoc = uniformName + ".vPosition",
+		vColorLoc = uniformName + ".vColor",
 
 		bOnLoc = uniformName + ".bOn",
 

@@ -13,7 +13,6 @@
 #include "lodepng.h"
 #include "GLLocStructs.h"
 #include "Transformation.h"
-#include "vector3.h"
 
 using namespace std;
 using namespace glm;
@@ -24,9 +23,9 @@ public:
 
 	//From Sergej
 	struct TerrainVertex {
-		Vector3f position;
+		vec3 position;
 		float tex_coords[2];
-		Vector3f normals;
+		vec3 normals;
 	};
 
 	GLuint VBO = -1;
@@ -43,17 +42,11 @@ public:
 	int colsNum, rowsNum, NO_DATA, numberOfPoints, numberOfTriangles;
 	double xLowLeft, yLowLeft, cellSize;
 	float *heights;
-	Vector3f *vertices;
+	vec3 *vertices;
 	unsigned int *trIndices;
 
-	TerrainVertex *terrainVertices;
-	float *texture_coords;
-	Vector3f *vertexNormals;
-
-	void drawObject(VertexGLLocs, MaterialGLLocs);
+	void drawObject();
 	void loadTerrain(const char*);
-	void generateTerrainBuffers();
-	void initTriangles();
 	//void loadBumpMap(const char*);
 
 	void init(const char*, const char*);

@@ -121,9 +121,10 @@ void main() {
     // 1. The angle of incidence: brightness
     // 2. The color/intensities of the light: light.intensities
     // 3. The texture and texture coord: texture(sampler, fragTexCoord)
-    vec4 surfaceColor = texture2D(sampler, fragTexCoord);
+    vec4 surfaceColor = fLighting * texture2D(sampler, fragTexCoord);
+	
 
-	if(colorByHeight == 1){
+	if(colorByHeight == 0){
 		float fy = fragVert.y + 0.;
 		//brightness = fy/41.;
 		FragColor = vec4(brightness * vec3(dLight.aIntensity, dLight.dIntensity, dLight.sIntensity) * surfaceColor.rgb, surfaceColor.a);
@@ -131,15 +132,11 @@ void main() {
 	else {
 		FragColor = vec4(brightness * vec3(dLight.aIntensity, dLight.dIntensity, dLight.sIntensity) * surfaceColor.rgb, surfaceColor.a);
 	}
-
-	FragColor = surfaceColor * brightness;
     
 }
 
 vec4 generateSpotlightColor(Spotlight spotlight, vec3 vWorldPos) 
 { 
-	if(1==1) return vec4(0.0, 0.0, 0.0, 0.0);
-
   if(spotlight.bOn == 0)return vec4(0.0, 0.0, 0.0, 0.0); 
 
   float fDistance = distance(vWorldPos, spotlight.vPosition); 
@@ -205,5 +202,7 @@ vec3 generateLightColor(DirectionalLight dLight, vec3 normal) {
 	color = distanceMultiplier*(ambient_color + diff_color + spec_color); // NOT JUST ONE CHANNEL
 
 	return(color);
+
+	// we can add sergejs 
 }
 

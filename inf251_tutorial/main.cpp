@@ -165,20 +165,23 @@ void display() {
 
 	glActiveTexture(GL_TEXTURE0);
 
-	//_house.transformation.loadToUniformLoc(ModelToWorldMatrixLoc);
-	//_house.usingBumpMapping = false;
-	//_house.drawObject(VertexLocs, MaterialLocs);
+	_house.transformation.loadToUniformLoc(ModelToWorldMatrixLoc);
+	//glUniformMatrix4fv(ModelToWorldMatrixLoc, 1, GL_FALSE, &_house.transformation.[0][0]);
+	_house.usingBumpMapping = false;
+	_house.drawObject(VertexLocs, MaterialLocs);
 
 	_canvas.transformation.loadToUniformLoc(ModelToWorldMatrixLoc);
 	_canvas.usingBumpMapping = false;
 	_canvas.drawObject(VertexLocs, MaterialLocs);
 
+	_cat.transformation.rotate((float)(180 * PI / 180.0), vec3(1, 0, 0));
+	_cat.transformation.translate(vec3(5, -0.5, 8));
+	_cat.transformation.setScale(5);
 	_cat.transformation.loadToUniformLoc(ModelToWorldMatrixLoc);
 	_cat.usingBumpMapping = true;
 	_cat.drawObject(VertexLocs, MaterialLocs);
 
-	_terrain.transformation.loadToUniformLoc(ModelToWorldMatrixLoc);
-	_terrain.drawObject(VertexLocs, MaterialLocs);
+	_terrain.drawObject();
 
 	// Draw projection text
 	string projection;
@@ -315,14 +318,12 @@ bool initObjects() {
 		"terrain\\bergen_terrain_texture.png");
 
 	_cat.init("Objects\\cat\\cat.obj",
-		"Objects\\cat\\cat_diff.png");
-		//"Objects\\cat\\cat_norm.png");
-	//_cat.transformation.rotate((float)(180 * PI / 180.0), vec3(1, 0, 0));
-	//_cat.transformation.translate(vec3(5, -0.5, 8));
-	//_cat.transformation.setScale(5);
+		"Objects\\cat\\cat_diff.png",
+		"Objects\\cat\\cat_norm.png");
 
 	_house.init("House-Model\\House.obj",
-		"House-Model\\House\\basic_realistic.png");
+		"House-Model\\House\\basic_realistic.png",
+		"Objects\\cat\\cat_norm.png");
 
 	_canvas.init(vec3(0, 50, 10),
 		(float)36.f*2.f,
@@ -337,7 +338,10 @@ bool initObjects() {
 bool initLights() {
 
 	_directionalLight = *(new DirectionalLight());
+	_directionalLight.loadToUniformsInShader(ShaderProgram, "dLight");
+
 	_spotlight = *(new Spotlight());
+	_spotlight.loadToUniformsInShader(ShaderProgram, "spotlight");
 
 	return true;
 }
