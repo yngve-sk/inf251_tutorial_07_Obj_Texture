@@ -289,6 +289,7 @@ int SingleTextureTerrain::rc2index(int row, int col) {
 
 void SingleTextureTerrain::drawObject(VertexGLLocs vertexGLLocs, MaterialGLLocs materialGLLocs) {
 	//Added from Sergej
+	glEnable(GL_TEXTURE_2D);
 	glDisable(GL_CULL_FACE);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
@@ -303,5 +304,9 @@ void SingleTextureTerrain::drawObject(VertexGLLocs vertexGLLocs, MaterialGLLocs 
 		3 * numberOfTriangles,
 		GL_UNSIGNED_INT,
 		0);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glDisable(GL_TEXTURE_2D);
+
 }
 

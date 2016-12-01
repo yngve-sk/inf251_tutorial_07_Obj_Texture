@@ -115,6 +115,8 @@ void main() {
 	} else {
 		fLighting = vec4(color, 1.0);
 	}
+
+	fLighting = vec4(1,1,1,1);
 	
 
     //calculate final color of the pixel, based on:
@@ -132,6 +134,7 @@ void main() {
 		FragColor = vec4(brightness * vec3(dLight.aIntensity, dLight.dIntensity, dLight.sIntensity) * surfaceColor.rgb, surfaceColor.a);
 	}
     
+	FragColor = vec4(surfaceColor.rgb,surfaceColor.a);
 }
 
 vec4 generateSpotlightColor(Spotlight spotlight, vec3 vWorldPos) 

@@ -144,6 +144,8 @@ void display() {
 		height = glutGet(GLUT_WINDOW_HEIGHT);
 	glViewport(0, 0, width, height);
 
+	//glUniform1i(SamplerLoc, 0);
+
 	glEnableVertexAttribArray(VertexLocs.posLoc);
 	glEnableVertexAttribArray(VertexLocs.texLoc);
 	glEnableVertexAttribArray(VertexLocs.normalLoc);
@@ -174,7 +176,7 @@ void display() {
 	_canvas.drawObject(VertexLocs, MaterialLocs);
 
 	_cat.transformation.loadToUniformLoc(ModelToWorldMatrixLoc);
-	_cat.usingBumpMapping = true;
+	_cat.usingBumpMapping = false;
 	_cat.drawObject(VertexLocs, MaterialLocs);
 
 	_terrain.drawObject(VertexLocs, MaterialLocs);
@@ -317,10 +319,10 @@ bool initObjects() {
 		"Objects\\cat\\cat_diff.png",
 		"Objects\\cat\\cat_norm.png");
 
-	_house.init("House-Model\\House.obj",
-		"House-Model\\House\\basic_realistic.png",
-		"Objects\\cat\\cat_norm.png");
-
+	//_house.init("House-Model\\House.obj",
+	//	"House-Model\\House\\basic_realistic.png",
+	//	"Objects\\cat\\cat_norm.png");
+	//
 	_canvas.init(vec3(0, 50, 10),
 		(float)36.f*2.f,
 		(float)18.5f*2.f,

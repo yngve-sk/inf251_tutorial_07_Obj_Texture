@@ -70,12 +70,14 @@ void SingleTextureObject::loadMaterial(const char* textureDirectory) {
 	}
 
 	// Create the texture object
-	if (textureObject != 0)
+	if (textureObject != 0){
 		glDeleteTextures(1, &textureObject);
+		cout << "glDeletetextures " << &textureObject << endl;
+	}
 	glGenTextures(1, &textureObject);
 
 	// Bind it as a 2D texture (note that other types of textures are supported as well)
-	glBindTexture(GL_TEXTURE_2D_ARRAY, textureObject);
+	glBindTexture(GL_TEXTURE_2D, textureObject);
 
 	// Set the texture data
 	glTexImage2D(
@@ -124,7 +126,7 @@ void SingleTextureObject::loadBumpMap(const char* textureDirectory) {
 	glGenTextures(1, &bumpMapObject);
 
 	// Bind it as a 2D texture (note that other types of textures are supported as well)
-	glBindTexture(GL_TEXTURE_2D_ARRAY, bumpMapObject);
+	glBindTexture(GL_TEXTURE_2D, bumpMapObject);
 
 	// Set the texture data
 	glTexImage2D(
@@ -154,8 +156,8 @@ void SingleTextureObject::drawObject(VertexGLLocs vertexGLLocs, MaterialGLLocs m
 	glUniform3f(materialGLLocs.sColorLoc, material.specular[0], material.specular[1], material.specular[2]);
 	glUniform1f(materialGLLocs.shineLoc, material.shininess);
 
-	glActiveTexture(GL_TEXTURE0);
 	glEnable(GL_TEXTURE_2D);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, textureObject);
 
 	glActiveTexture(GL_TEXTURE1);
@@ -179,7 +181,7 @@ void SingleTextureObject::drawObject(VertexGLLocs vertexGLLocs, MaterialGLLocs m
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisable(GL_TEXTURE_2D);
-
+	
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisable(GL_TEXTURE_2D);

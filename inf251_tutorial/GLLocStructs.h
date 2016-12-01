@@ -12,7 +12,7 @@ struct MaterialGLLocs {
 
 struct VertexGLLocs {
 	GLint posLoc, 
-		  texLoc, 
+		  texLoc,
 		  normalLoc;
 };
 
