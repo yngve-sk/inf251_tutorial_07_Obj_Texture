@@ -7,7 +7,7 @@ Camera::Camera() :
 	UP(0.0f, 1.0f, 0.0f), fov(30.0f),
 	ar(1.f),
 	zNear(0.1f),
-	zFar(4000.f),
+	zFar(10000.f),
 	zoom(1.f) {
 }
 

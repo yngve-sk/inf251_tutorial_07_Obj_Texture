@@ -322,19 +322,19 @@ bool initObjects() {
 	_terrain.init("terrain\\bergen_1024x918.bin",
 		"terrain\\bergen_terrain_texture.png");
 	_terrain.transformation.rotate(180, vec3(1, 0, 0));
-	_terrain.transformation.translate(vec3(-1000, 0, 4000));
+	_terrain.transformation.translate(vec3(-2613, -1, 2010));
 
 	_cat.init("Objects\\cat\\cat.obj",
 		"Objects\\cat\\cat_diff.png",
 		"Objects\\cat\\cat_norm.png");
 	_cat.transformation.rotate(180, vec3(1, 0, 0));
-	_cat.transformation.translate(vec3(0, -2.5, 5));
+	_cat.transformation.translate(vec3(0, 0, 5));
 	_cat.transformation.setScale(2.5);
 
 	//_house.init("House-Model\\House.obj",
 	//	"House-Model\\House\\basic_realistic.png",
 	//	"Objects\\cat\\cat_norm.png");
-	//
+	
 	_canvas.init(vec3(0, 50, 10),
 		(float)36.f*2.f,
 		(float)18.5f*2.f,
