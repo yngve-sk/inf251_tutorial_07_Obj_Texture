@@ -5,7 +5,7 @@
 class Camera {
 	float fov, ar, zNear, zFar, zoom;
 
-	float MOVEMENT_SPEED = 0.15f,
+	float MOVEMENT_SPEED = 10.95f,
 		ROTATIONAL_SPEED = 0.015f,
 		ZOOM_SPEED = 0.05f;
 	bool perspectiveProjection = true;

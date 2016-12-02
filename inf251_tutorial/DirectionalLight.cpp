@@ -3,12 +3,12 @@
 using namespace glm;
 DirectionalLight::DirectionalLight() : 
 				direction(vec3(1,1,1)),
-				aColor(vec3(0.5, 0.5, 0.5)),
-				dColor(vec3(0.5, 0.5, 0.5)),
-				sColor(vec3(0.5, 0.5, 0.5)),
-				aIntensity(0.5),
-				dIntensity(0.5),
-				sIntensity(0.5),
+				aColor(vec3(0.3, 0.3, 0.3)),
+				dColor(vec3(0.1, 0.1, 0.5)),
+				sColor(vec3(0.4, 0.4, 0.4)),
+				aIntensity(0.03),
+				dIntensity(0.03),
+				sIntensity(0.03),
 				bOn(1) {}
 
 void DirectionalLight::loadToUniformAt(GLuint shaderProgram, std::string uniformName) {

@@ -321,8 +321,8 @@ bool initShader(GLuint& program, string vShaderPath, string fShaderPath) {
 bool initObjects() {
 	_terrain.init("terrain\\bergen_1024x918.bin",
 		"terrain\\bergen_terrain_texture.png");
-	_terrain.transformation.flip(vec3(0, 0, 1));
-	_terrain.transformation.translate(vec3(-800, 1000, 4000));
+	_terrain.transformation.rotate(180, vec3(1, 0, 0));
+	_terrain.transformation.translate(vec3(-1000, 0, 4000));
 
 	_cat.init("Objects\\cat\\cat.obj",
 		"Objects\\cat\\cat_diff.png",

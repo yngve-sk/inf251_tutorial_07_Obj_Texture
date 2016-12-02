@@ -2,7 +2,7 @@
 
 Spotlight::Spotlight() : 
 	bOn(1), fConeAngle(0), fConeCosine(0), fLinearAtt(0),
-	vColor(0.5f, 0.1f, 0.2f),
+	vColor(0.0f, 0.0f, 0.2f),
 	vDirection(0, 0, -1),
 	vPosition(0,0,0)
 					{}
