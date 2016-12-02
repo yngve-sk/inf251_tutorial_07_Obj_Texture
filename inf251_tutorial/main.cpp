@@ -164,7 +164,6 @@ void display() {
 	//_cam.setAspectRatio(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
 	
 	mat4 VMatrix = _cam.getWorldToViewMatrix();
-	//mat4 PMatrix = _cam.getCameraZoom() * _cam.getViewToProjectionMatrix();
 	mat4 PMatrix = _cam.getViewToProjectionMatrix();
 
 	glUniformMatrix4fv(ViewMatrixLoc, 1, GL_FALSE, &VMatrix[0][0]);
@@ -174,17 +173,17 @@ void display() {
 	//loadMatricesToUniform(_house.transformation.getTransformationMatrix(), VMatrix, PMatrix);
 	//_house.drawObject(VertexLocs, MaterialLocs);
 
+	_terrain.usingBumpMapping = false;
+	loadMatricesToUniform(_terrain.transformation.getTransformationMatrix(), VMatrix, PMatrix);
+	_terrain.drawObject(VertexLocs, MaterialLocs);
+
 	_canvas.usingBumpMapping = false;
 	loadMatricesToUniform(_canvas.transformation.getTransformationMatrix(), VMatrix, PMatrix);
-	_canvas.drawObject(VertexLocs, MaterialLocs);
+	//_canvas.drawObject(VertexLocs, MaterialLocs);
 
 	_cat.usingBumpMapping = false;
 	loadMatricesToUniform(_cat.transformation.getTransformationMatrix(), VMatrix, PMatrix);
 	_cat.drawObject(VertexLocs, MaterialLocs);
-
-	_terrain.usingBumpMapping = false;
-	loadMatricesToUniform(_terrain.transformation.getTransformationMatrix(), VMatrix, PMatrix);
-	_terrain.drawObject(VertexLocs, MaterialLocs);
 
 	// Draw projection text
 	string projection;
@@ -319,24 +318,27 @@ bool initShader(GLuint& program, string vShaderPath, string fShaderPath) {
 bool initObjects() {
 	_terrain.init("terrain\\bergen_1024x918.bin",
 		"terrain\\bergen_terrain_texture.png");
-	//_terrain.transformation.flip(vec3(0.0, 0.0, 1.0));
+	_terrain.transformation.flip(vec3(0, 0, 1));
+	_terrain.transformation.translate(vec3(-1000, 0, 4000));
 
 	_cat.init("Objects\\cat\\cat.obj",
 		"Objects\\cat\\cat_diff.png",
 		"Objects\\cat\\cat_norm.png");
-	//_cat.transformation.flip(vec3(0.0, 0.0, 1.0));
+	_cat.transformation.rotate(180, vec3(1, 0, 0));
+	_cat.transformation.translate(vec3(0, -2.5, 5));
+	_cat.transformation.setScale(2.5);
 
 	//_house.init("House-Model\\House.obj",
 	//	"House-Model\\House\\basic_realistic.png",
 	//	"Objects\\cat\\cat_norm.png");
 	//
-	_canvas.init(vec3(0, 50, 10),
+	/*_canvas.init(vec3(0, 50, 10),
 		(float)36.f*2.f,
 		(float)18.5f*2.f,
 		173,
 		10,
 		10,
-		"Animated-textures\\");
+		"Animated-textures\\");*/
 	//_canvas.transformation.flip(vec3(0.0, 0.0, 1.0));
 
 	return true;
@@ -389,7 +391,6 @@ void loadUniformLocationsFromShader(GLuint& shaderProgram) {
 	//loadUniformLocation(shaderProgram, WorldToProjectionMatrixLoc, "worldToProjectionMatrix");
 	//loadUniformLocation(shaderProgram, ModelToWorldMatrixLoc, "modelToWorldMatrix");
 
-	loadUniformLocation(ShaderProgram, MMatrixLoc, "MMatrix");
 	loadUniformLocation(ShaderProgram, ViewMatrixLoc, "ViewMatrix");
 	loadUniformLocation(ShaderProgram, MVMatrixLoc, "MVMatrix");
 	loadUniformLocation(ShaderProgram, MVPMatrixLoc, "MVPMatrix");

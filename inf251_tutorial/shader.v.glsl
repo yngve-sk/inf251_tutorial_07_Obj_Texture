@@ -8,7 +8,6 @@ layout (location = 2) in vec3 normal;
 // Constant Inputs from Client
 uniform mat4 MVPMatrix;         // MVP = Projection x View x Model matrix
 uniform mat4 MVMatrix;          // MV = View x Model matrix
-uniform mat4 MMatrix;           // M  = model matrix
 uniform mat4 ViewMatrix;        // Just the view matrix (position of camera in the world, looking at some point, usually 0,0,0)
 
 // pass the texture coordinates to the fragment shader

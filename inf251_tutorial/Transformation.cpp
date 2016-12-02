@@ -22,7 +22,7 @@ void Transformation::rotate(float angle, glm::vec3 aroundAxis) {
 }
 
 mat4 Transformation::getTransformationMatrix() {
-	return scaleMatrix * rotationMatrix * translationMatrix;
+	return rotationMatrix * translationMatrix * scaleMatrix;
 }
 
 void Transformation::loadToUniformLoc(GLuint loc) {
