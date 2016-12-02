@@ -7,7 +7,7 @@ GLMCamera::GLMCamera() :
 	fov(30.0f),
 	ar(1.f),
 	zNear(0.1f),
-	zFar(4000.f),
+	zFar(100000.f),
 	zoom(1.f) {};
 
 void GLMCamera::setAspectRatio(int width, int height) {
