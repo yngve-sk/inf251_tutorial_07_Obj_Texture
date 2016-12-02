@@ -34,12 +34,11 @@ public:
 	GLMCamera();
 	void setAspectRatio(int width, int height);
 
-	/* Compute world to projection matrix */
-	mat4 computeCameraTransform();
-
 	mat4 getWorldToViewMatrix();
 
 	mat4 getViewToProjectionMatrix();
+
+	mat4 getCameraZoom();
 
 	vec3 getPosition();
 

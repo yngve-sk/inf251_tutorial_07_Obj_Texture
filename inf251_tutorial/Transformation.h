@@ -7,6 +7,9 @@
 #include <gl/GL.h>
 
 using namespace glm;
+
+#define PI 3.14159265
+
 class Transformation {
 private:
 	mat4 rotationMatrix = mat4(), translationMatrix = mat4();
@@ -19,4 +22,5 @@ public:
 	void rotate(float, glm::vec3);
 	mat4 getTransformationMatrix();
 	void loadToUniformLoc(GLuint);
+	void flip(vec3);
 };

@@ -52,19 +52,21 @@ void drawText(string, double, double, double);
 string readTextFile(const string&);
 void loadUniformLocation(GLuint&, GLint&, char*);
 void loadUniformLocationsFromShader(GLuint&);
+void loadMatricesToUniform(mat4, mat4, mat4);
 
 // --- GL Shader location ----------------------------------------------
 GLuint ShaderProgram = -1;
 
 // --- GL uniform locations --------------------------------------------
-GLint ModelToWorldMatrixLoc = -1,
-WorldToProjectionMatrixLoc = -1;
+GLint  MVPMatrixLoc = -1;
+GLint  MVMatrixLoc = -1;
+GLint  MMatrixLoc = -1;
+GLint  ViewMatrixLoc = -1;
+
 
 MaterialGLLocs MaterialLocs;
 
 GLint SamplerLoc = -1;
-
-GLint CameraPositionLoc = -1;
 
 GLint NormalTextureLoc = -1;
 
@@ -158,27 +160,29 @@ void display() {
 	glUniform1i(ColorByHeightLoc, 1);
 
 
+	// Camera 
 	_cam.setAspectRatio(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
-	mat4 worldToProjection = _cam.computeCameraTransform();
+	
+	mat4 VMatrix = _cam.getWorldToViewMatrix();
+	mat4 PMatrix = _cam.getCameraZoom() * _cam.getViewToProjectionMatrix();
 
-	glUniform3fv(CameraPositionLoc, 1, &(_cam.getPosition())[0]);
-	glUniformMatrix4fv(WorldToProjectionMatrixLoc, 1, GL_FALSE, &worldToProjection[0][0]);
-	glUniformMatrix4fv(ModelToWorldMatrixLoc, 1, GL_FALSE, &NonTransformation[0][0]);
+	glUniformMatrix4fv(ViewMatrixLoc, 1, GL_FALSE, &VMatrix[0][0]);
 
-	glActiveTexture(GL_TEXTURE0);
-
-	//_house.transformation.loadToUniformLoc(ModelToWorldMatrixLoc);
+	//Models
 	//_house.usingBumpMapping = false;
+	//loadMatricesToUniform(_house.transformation.getTransformationMatrix(), VMatrix, PMatrix);
 	//_house.drawObject(VertexLocs, MaterialLocs);
 
-	_canvas.transformation.loadToUniformLoc(ModelToWorldMatrixLoc);
 	_canvas.usingBumpMapping = false;
+	loadMatricesToUniform(_canvas.transformation.getTransformationMatrix(), VMatrix, PMatrix);
 	_canvas.drawObject(VertexLocs, MaterialLocs);
 
-	_cat.transformation.loadToUniformLoc(ModelToWorldMatrixLoc);
 	_cat.usingBumpMapping = false;
+	loadMatricesToUniform(_cat.transformation.getTransformationMatrix(), VMatrix, PMatrix);
 	_cat.drawObject(VertexLocs, MaterialLocs);
 
+	_terrain.usingBumpMapping = false;
+	loadMatricesToUniform(_terrain.transformation.getTransformationMatrix(), VMatrix, PMatrix);
 	_terrain.drawObject(VertexLocs, MaterialLocs);
 
 	// Draw projection text
@@ -314,10 +318,12 @@ bool initShader(GLuint& program, string vShaderPath, string fShaderPath) {
 bool initObjects() {
 	_terrain.init("terrain\\bergen_1024x918.bin",
 		"terrain\\bergen_terrain_texture.png");
+	_terrain.transformation.flip(vec3(0.0, 0.0, 1.0));
 
 	_cat.init("Objects\\cat\\cat.obj",
 		"Objects\\cat\\cat_diff.png",
 		"Objects\\cat\\cat_norm.png");
+	_cat.transformation.flip(vec3(0.0, 0.0, 1.0));
 
 	//_house.init("House-Model\\House.obj",
 	//	"House-Model\\House\\basic_realistic.png",
@@ -330,6 +336,8 @@ bool initObjects() {
 		10,
 		10,
 		"Animated-textures\\");
+	_canvas.transformation.flip(vec3(0.0, 0.0, 1.0));
+
 	return true;
 }
 
@@ -377,8 +385,13 @@ bool initShaders() {
 }
 
 void loadUniformLocationsFromShader(GLuint& shaderProgram) {
-	loadUniformLocation(shaderProgram, WorldToProjectionMatrixLoc, "worldToProjectionMatrix");
-	loadUniformLocation(shaderProgram, ModelToWorldMatrixLoc, "modelToWorldMatrix");
+	//loadUniformLocation(shaderProgram, WorldToProjectionMatrixLoc, "worldToProjectionMatrix");
+	//loadUniformLocation(shaderProgram, ModelToWorldMatrixLoc, "modelToWorldMatrix");
+
+	loadUniformLocation(ShaderProgram, MMatrixLoc, "MMatrix");
+	loadUniformLocation(ShaderProgram, ViewMatrixLoc, "ViewMatrix");
+	loadUniformLocation(ShaderProgram, MVMatrixLoc, "MVMatrix");
+	loadUniformLocation(ShaderProgram, MVPMatrixLoc, "MVPMatrix");
 
 	loadUniformLocation(shaderProgram, MaterialLocs.aColorLoc, "material.aColor");
 	loadUniformLocation(shaderProgram, MaterialLocs.dColorLoc, "material.dColor");
@@ -387,7 +400,7 @@ void loadUniformLocationsFromShader(GLuint& shaderProgram) {
 
 	loadUniformLocation(shaderProgram, SamplerLoc, "sampler");
 
-	loadUniformLocation(shaderProgram, CameraPositionLoc, "cameraPosition");
+	//loadUniformLocation(shaderProgram, CameraPositionLoc, "cameraPosition");
 	loadUniformLocation(shaderProgram, NormalTextureLoc, "normalTexture");
 	loadUniformLocation(shaderProgram, ColorByHeightLoc, "colorByHeight");
 }
@@ -398,7 +411,7 @@ void loadAttribPointersFromShader(GLuint& shaderProgram) {
 
 void loadUniformLocation(GLuint& ShaderProgram, GLint& loc, char* name) {
 	loc = glGetUniformLocation(ShaderProgram, name);
-	assert(loc!= -1);
+	assert(name, loc!= -1);
 }
 
 /// Draw string in specific position on window
@@ -522,4 +535,14 @@ void motion(int x, int y) {
 	}
 
 	glutPostRedisplay(); // Specify that the scene needs to be updated
+}
+
+void loadMatricesToUniform(mat4 MMatrix, mat4 VMatrix, mat4 PMatrix) {
+
+	mat4 MVMatrix = VMatrix * MMatrix;
+	mat4 MVPMatrix = PMatrix * MVMatrix;
+
+	glUniformMatrix4fv(MMatrixLoc, 1, GL_FALSE, &MMatrix[0][0]);
+	glUniformMatrix4fv(MVMatrixLoc, 1, GL_FALSE, &MVMatrix[0][0]);
+	glUniformMatrix4fv(MVPMatrixLoc, 1, GL_FALSE, &MVPMatrix[0][0]);
 }

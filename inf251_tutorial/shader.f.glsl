@@ -54,9 +54,9 @@ uniform sampler2D sampler;
 uniform Material material;
 
 // Per fragment texture coordinates
-in vec2 fragTexCoord;
-in vec3 fragNormal;
-in vec3 fragVert;
+in vec2 texCoord;	
+in vec3 viewNormal;
+in vec3 viewPosition;
 
 out vec4 FragColor;
 
@@ -70,71 +70,75 @@ uniform int colorByHeight;
 
 void main() { 
 
-	//calculate normal in world coordinates
-    mat3 normalMatrix = transpose(inverse(mat3(worldToProjectionMatrix)));
-    vec3 normal = normalize(normalMatrix * fragNormal);
 
-	//calculate the location of this fragment (pixel) in world coordinates
-    vec3 fragPosition = vec3(worldToProjectionMatrix * vec4(fragVert, 1));
+	FragColor = vec4(1.0, 1.0, 1.0, 1.0);
 
-	//calculate the vector from this pixels surface to the light source
-    vec3 surfaceToLight = dLight.direction - fragPosition;
 
-	//calculate the cosine of the angle of incidence
-    float brightness = dot(normal, surfaceToLight) / (length(surfaceToLight) * length(normal));
-    brightness = 1;//clamp(brightness, 0, 1);
-
-	// calculate, nomalize normals from bump mapping
-	normalBump = normalize(texture2D(normalTexture, fragTexCoord).rgb * 2.0 - 1.0);  
-
-	vec3 color;
-	//calculate light color
-	if (bumpMapping == 0){
-		color = generateLightColor(dLight, normal);
-	} else if (bumpMapping == 1){
-		color = generateLightColor(dLight, normalize(vec3(vec4(normalBump,1.)*modelToWorldMatrix)));
-	}
-
-	//create the spotlight
-	//SpotLight sl;
-	//sl.vColor = vec3(122, 122, 122); // White Color
-	////sl.vPosition = vec3(cameraPosition[0]-10, cameraPosition[1]-10, cameraPosition[2]-5);
-	//sl.vPosition = vec3(0,0,0);
-	//sl.bOn = 1;
-	//sl.fConeCosine = 0.86602540378;
-	//sl.fLinearAtt = 1.0;
-	//sl.vDirection = vec3(0,0,1);
-
-	vec4 fWorldPosition = worldToProjectionMatrix * vec4(fragVert, 1.);
-	vec4 spotLighting = generateSpotlightColor(spotlight, vec3(fWorldPosition));
-
-	vec4 fLighting;
-	if (spotlight.bOn == 1){
-		//Add headlight to camera
-		fLighting = clamp(spotLighting + vec4(color, 1.0), 0, 255);
-	} else {
-		fLighting = vec4(color, 1.0);
-	}
-
-	fLighting = vec4(1,1,1,1);
-	
-
-    //calculate final color of the pixel, based on:
-    // 1. The angle of incidence: brightness
-    // 2. The color/intensities of the light: light.intensities
-    // 3. The texture and texture coord: texture(sampler, fragTexCoord)
-    vec4 surfaceColor = fLighting * texture2D(sampler, fragTexCoord);
-
-	if(colorByHeight == 1){
-		float fy = fragVert.y + 0.;
-		//brightness = fy/41.;
-		FragColor = vec4(brightness * vec3(dLight.aIntensity, dLight.dIntensity, dLight.sIntensity) * surfaceColor.rgb, surfaceColor.a);
-	}
-	else {
-		FragColor = vec4(brightness * vec3(dLight.aIntensity, dLight.dIntensity, dLight.sIntensity) * surfaceColor.rgb, surfaceColor.a);
-	}
-    
-	FragColor = vec4(surfaceColor.rgb,surfaceColor.a);
+	////calculate normal in world coordinates
+    //mat3 normalMatrix = transpose(inverse(mat3(worldToProjectionMatrix)));
+    //vec3 normal = normalize(normalMatrix * viewNormal);
+	//
+	////calculate the location of this fragment (pixel) in world coordinates
+    //vec3 fragPosition = vec3(worldToProjectionMatrix * vec4(viewPosition], 1));
+	//
+	////calculate the vector from this pixels surface to the light source
+    //vec3 surfaceToLight = dLight.direction - fragPosition;
+	//
+	////calculate the cosine of the angle of incidence
+    //float brightness = dot(normal, surfaceToLight) / (length(surfaceToLight) * length(normal));
+    //brightness = 1;//clamp(brightness, 0, 1);
+	//
+	//// calculate, nomalize normals from bump mapping
+	//normalBump = normalize(texture2D(normalTexture, texCoord).rgb * 2.0 - 1.0);  
+	//
+	//vec3 color;
+	////calculate light color
+	//if (bumpMapping == 0){
+	//	color = generateLightColor(dLight, normal);
+	//} else if (bumpMapping == 1){
+	//	color = generateLightColor(dLight, normalize(vec3(vec4(normalBump,1.)*modelToWorldMatrix)));
+	//}
+	//
+	////create the spotlight
+	////SpotLight sl;
+	////sl.vColor = vec3(122, 122, 122); // White Color
+	//////sl.vPosition = vec3(cameraPosition[0]-10, cameraPosition[1]-10, cameraPosition[2]-5);
+	////sl.vPosition = vec3(0,0,0);
+	////sl.bOn = 1;
+	////sl.fConeCosine = 0.86602540378;
+	////sl.fLinearAtt = 1.0;
+	////sl.vDirection = vec3(0,0,1);
+	//
+	//vec4 fWorldPosition = worldToProjectionMatrix * vec4(viewPosition, 1.);
+	//vec4 spotLighting = generateSpotlightColor(spotlight, vec3(fWorldPosition));
+	//
+	//vec4 fLighting;
+	//if (spotlight.bOn == 1){
+	//	//Add headlight to camera
+	//	fLighting = clamp(spotLighting + vec4(color, 1.0), 0, 255);
+	//} else {
+	//	fLighting = vec4(color, 1.0);
+	//}
+	//
+	//fLighting = vec4(1,1,1,1);
+	//
+	//
+    ////calculate final color of the pixel, based on:
+    //// 1. The angle of incidence: brightness
+    //// 2. The color/intensities of the light: light.intensities
+    //// 3. The texture and texture coord: texture(sampler, texCoord)
+    //vec4 surfaceColor = fLighting * texture2D(sampler, texCoord);
+	//
+	//if(colorByHeight == 1){
+	//	float fy = viewPosition.y + 0.;
+	//	//brightness = fy/41.;
+	//	FragColor = vec4(brightness * vec3(dLight.aIntensity, dLight.dIntensity, dLight.sIntensity) * surfaceColor.rgb, surfaceColor.a);
+	//}
+	//else {
+	//	FragColor = vec4(brightness * vec3(dLight.aIntensity, dLight.dIntensity, dLight.sIntensity) * surfaceColor.rgb, surfaceColor.a);
+	//}
+    //
+	//FragColor = vec4(surfaceColor.rgb,surfaceColor.a);
 }
 
 vec4 generateSpotlightColor(Spotlight spotlight, vec3 vWorldPos) 
@@ -160,7 +164,7 @@ vec4 generateSpotlightColor(Spotlight spotlight, vec3 vWorldPos)
 
 vec3 generateLightColor(DirectionalLight dLight, vec3 normal) {
 	//From Sergej
-	vec4 fWorldPosition = worldToProjectionMatrix * vec4(fragVert, 1.);	   //WorldPosition
+	vec4 fWorldPosition = worldToProjectionMatrix * vec4(viewPosition, 1.);	   //WorldPosition
 	//vec3 normal_nn = normalize((worldToProjectionMatrix * vec4(normal,0.0)).xyz);	//The normal must be transformed in World coordinates as well
 	
 	vec3 normal_nn = normalize(normal);	
@@ -183,7 +187,7 @@ vec3 generateLightColor(DirectionalLight dLight, vec3 normal) {
 		distanceMultiplier = 1;
 	}
 
-	vec3 camLightDirection = cameraPosition - fragVert;
+	vec3 camLightDirection = cameraPosition - viewPosition;
 
 	vec3 dLightDirNN = normalize(dLight.direction);
 	vec3 viewDirNN = normalize(cameraPosition - fWorldPosition.xyz /*position*/ );		//Transform into world position (Sergej)

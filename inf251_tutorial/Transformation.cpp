@@ -18,7 +18,7 @@ void Transformation::resetScale() {
 }
 
 void Transformation::rotate(float angle, glm::vec3 aroundAxis) {
-	rotationMatrix = glm::rotate(rotationMatrix, angle, aroundAxis);
+	rotationMatrix = glm::rotate(rotationMatrix, (float)(angle * PI / 180.0), aroundAxis);
 }
 
 mat4 Transformation::getTransformationMatrix() {
@@ -28,4 +28,8 @@ mat4 Transformation::getTransformationMatrix() {
 void Transformation::loadToUniformLoc(GLuint loc) {
 	mat4 transformation = getTransformationMatrix();
 	glUniformMatrix4fv(loc, 1, GL_FALSE, &transformation[0][0]);
+}
+
+void Transformation::flip(vec3 aroundAxis) {
+	rotate((float)(180 * PI / 180.0), aroundAxis);
 }
