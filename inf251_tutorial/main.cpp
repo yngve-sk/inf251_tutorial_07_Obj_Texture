@@ -181,7 +181,7 @@ void display() {
 
 	_canvas.usingBumpMapping = false;
 	loadMatricesToUniform(_canvas.transformation.getTransformationMatrix(), VMatrix, PMatrix);
-	//_canvas.drawObject(VertexLocs, MaterialLocs);
+	_canvas.drawObject(VertexLocs, MaterialLocs);
 
 	_cat.usingBumpMapping = false;
 	loadMatricesToUniform(_cat.transformation.getTransformationMatrix(), VMatrix, PMatrix);
@@ -335,14 +335,14 @@ bool initObjects() {
 	//	"House-Model\\House\\basic_realistic.png",
 	//	"Objects\\cat\\cat_norm.png");
 	//
-	/*_canvas.init(vec3(0, 50, 10),
+	_canvas.init(vec3(0, 50, 10),
 		(float)36.f*2.f,
 		(float)18.5f*2.f,
 		173,
 		10,
 		10,
-		"Animated-textures\\");*/
-	//_canvas.transformation.flip(vec3(0.0, 0.0, 1.0));
+		"Animated-textures\\");
+	_canvas.transformation.translate(vec3(0, -90, -60));
 
 	initLights();
 
