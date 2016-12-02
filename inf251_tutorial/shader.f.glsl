@@ -70,6 +70,8 @@ uniform int colorByHeight;
 
 void main() { 
 
+	vec4 texture = texture(sampler, texCoord);
+
 	vec3 fcolor = vec3(0.0,0.0,0.0);
 	float transparency = 1.0;
 
@@ -79,7 +81,7 @@ void main() {
 
 	// Phong shading
 
-	vec3 surfaceColor = 6*material.dColor;
+	vec3 surfaceColor = material.dColor;
 
 	/**/
 	float angleX = dot(dLight.direction, newViewNormal);
@@ -92,13 +94,13 @@ void main() {
 
 	vec3 rgbI = vec3(1.,1.,1.);
 
-	vec3 ambientRes = material.aColor;
+	vec3 ambientRes = 0.05 * material.aColor;
 	vec3 diffuseRes = diffuse * material.dColor;
 	vec3 specularRes = specular * material.sColor;
 
 	vec3 fColor = ambientRes + diffuseRes + specularRes;
 
-	FragColor = vec4(fColor,1.);
+	FragColor = texture + vec4(fColor,1.);
 //	FragColor = vec4(spotlight.vColor, 1.);
 //	FragColor = vec4(spotlight.vColor.xyz, 1.);
 	//FragColor = vec4(.5,.1,.2, 1.);
