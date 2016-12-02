@@ -24,6 +24,7 @@ void main() {
     
 	viewPosition = vec3(MVMatrix * vec4(position, 1.0));
 	viewNormal = normalize(vec3(MVMatrix * vec4(normal, 0.0)));
+		
 	texCoord = tex_coords;
 
     // Apply all matrix transformations to vert

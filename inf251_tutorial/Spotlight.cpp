@@ -1,7 +1,10 @@
 #include "Spotlight.h"
 
 Spotlight::Spotlight() : 
-	bOn(1), fConeAngle(0), fConeCosine(0), fLinearAtt(0)
+	bOn(1), fConeAngle(0), fConeCosine(0), fLinearAtt(0),
+	vColor(0.5f, 0.1f, 0.2f),
+	vDirection(0, 0, -1),
+	vPosition(0,0,0)
 					{}
 
 void Spotlight::toggleOnOff() {
@@ -9,10 +12,9 @@ void Spotlight::toggleOnOff() {
 }
 
 void Spotlight::loadToUniformAt(GLuint shaderProgram, std::string uniformName) {
-	std::string vDirLoc = uniformName + ".direction",
-
-		vPositionLoc = uniformName + ".dColor",
-		vColorLoc = uniformName + ".aColor",
+	std::string vDirLoc = uniformName + ".vDirection",
+		vPositionLoc = uniformName + ".vPosition",
+		vColorLoc = uniformName + ".vColor",
 
 		bOnLoc = uniformName + ".bOn",
 
@@ -34,7 +36,7 @@ void Spotlight::loadToUniformAt(GLuint shaderProgram, std::string uniformName) {
 		   glUniform3fv(vDirSLoc, 1, &vDirection[0]);
 		   glUniform3fv(vPositionSLoc, 1, &vPosition[0]);
 		   glUniform3fv(vColorSLoc, 1, &vColor[0]);
-		   
+
 		   glUniform1f(fConeAngleSLoc, fConeAngle);
 		   glUniform1f(fConeCosineSLoc, fConeCosine);
 		   glUniform1f(fLinearAttSLoc, fLinearAtt);

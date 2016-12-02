@@ -11,7 +11,7 @@ DirectionalLight::DirectionalLight() :
 				sIntensity(0.5),
 				bOn(1) {}
 
-void DirectionalLight::loadToUniformsInShader(GLuint shaderProgram, std::string uniformName) {
+void DirectionalLight::loadToUniformAt(GLuint shaderProgram, std::string uniformName) {
 	std::string dirLoc = uniformName + ".direction",
 
 		aColorLoc = uniformName + ".aColor",

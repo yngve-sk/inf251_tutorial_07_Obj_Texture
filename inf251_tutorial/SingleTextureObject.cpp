@@ -160,11 +160,13 @@ void SingleTextureObject::drawObject(VertexGLLocs vertexGLLocs, MaterialGLLocs m
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, textureObject);
 
-	glActiveTexture(GL_TEXTURE1);
-	glEnable(GL_TEXTURE_2D);
-	//int normal_location = glGetUniformLocation(ShaderProgram, "normal_texture");
-	//glUniform1i(normal_location, 1);
-	glBindTexture(GL_TEXTURE_2D, bumpMapObject);
+	if (usingBumpMapping == 1) {
+		glActiveTexture(GL_TEXTURE1);
+		glEnable(GL_TEXTURE_2D);
+		//int normal_location = glGetUniformLocation(ShaderProgram, "normal_texture");
+		//glUniform1i(normal_location, 1);
+		glBindTexture(GL_TEXTURE_2D, bumpMapObject);
+	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
@@ -178,9 +180,11 @@ void SingleTextureObject::drawObject(VertexGLLocs vertexGLLocs, MaterialGLLocs m
 	}
 	glDrawElements(GL_TRIANGLES, model.getNumberOfIndices(), GL_UNSIGNED_INT, 0);
 
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glDisable(GL_TEXTURE_2D);
+	if (usingBumpMapping == 1) {
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glDisable(GL_TEXTURE_2D);
+	}
 	
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, 0);

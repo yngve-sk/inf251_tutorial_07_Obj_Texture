@@ -147,6 +147,8 @@ void display() {
 	glViewport(0, 0, width, height);
 
 	//glUniform1i(SamplerLoc, 0);
+	_directionalLight.loadToUniformAt(ShaderProgram, "dLight");
+	_spotlight.loadToUniformAt(ShaderProgram, "spotlight");
 
 	glEnableVertexAttribArray(VertexLocs.posLoc);
 	glEnableVertexAttribArray(VertexLocs.texLoc);
@@ -306,6 +308,7 @@ bool initShader(GLuint& program, string vShaderPath, string fShaderPath) {
 		cerr << "Error: cannot validate shader program.\nError log:\n" << errorLog << endl;
 		return false;
 	}
+	glUseProgram(ShaderProgram);
 
 	loadUniformLocationsFromShader(ShaderProgram);
 
@@ -339,6 +342,8 @@ bool initObjects() {
 		"Animated-textures\\");
 	//_canvas.transformation.flip(vec3(0.0, 0.0, 1.0));
 
+	initLights();
+
 	return true;
 }
 
@@ -346,6 +351,9 @@ bool initLights() {
 
 	_directionalLight = *(new DirectionalLight());
 	_spotlight = *(new Spotlight());
+
+	_directionalLight.loadToUniformAt(ShaderProgram, "dLight");
+	_spotlight.loadToUniformAt(ShaderProgram, "spotlight");
 
 	return true;
 }
