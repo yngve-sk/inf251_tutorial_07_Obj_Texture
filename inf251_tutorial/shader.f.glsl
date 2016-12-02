@@ -70,9 +70,39 @@ uniform int colorByHeight;
 
 void main() { 
 
+	vec3 fcolor = vec3(0.0,0.0,0.0);
+	float transparency = 1.0;
 
-	FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+	vec3 newViewNormal = normalize(viewNormal);
 
+	vec3 viewDirection = normalize(-viewPosition);
+
+	// Phong shading
+
+	vec3 surfaceColor = 6*material.dColor;
+
+	/**/
+	float angleX = dot(dLight.direction, newViewNormal);
+	vec3 dirR = -dLight.direction + 2.0*angleX + newViewNormal;
+
+	float RV = dot(dirR, viewDirection);
+	float specular = clamp(pow(RV, material.shininess), 0.0, 1.0);
+
+	float diffuse = clamp(angleX, 0.0, 1.0);
+
+	vec3 rgbI = vec3(1.,1.,1.);
+
+	vec3 ambientRes = material.aColor;
+	vec3 diffuseRes = diffuse * material.dColor;
+	vec3 specularRes = specular * material.sColor;
+
+	vec3 fColor = ambientRes + diffuseRes + specularRes;
+
+	FragColor = vec4(fColor,1.);
+//	FragColor = vec4(spotlight.vColor, 1.);
+//	FragColor = vec4(spotlight.vColor.xyz, 1.);
+	//FragColor = vec4(.5,.1,.2, 1.);
+	//FragColor = vec4(dLight.dColor, 1.);
 
 	////calculate normal in world coordinates
     //mat3 normalMatrix = transpose(inverse(mat3(worldToProjectionMatrix)));
