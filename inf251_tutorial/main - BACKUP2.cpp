@@ -10,7 +10,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/extend.hpp>
 
-#include "CameraV2.h"
+#include "glm_camera.h"
 #include "DirectionalLight.h"
 #include "Spotlight.h"
 
@@ -32,7 +32,7 @@ void mouse(int, int, int, int);
 void motion(int, int);
 
 //--- Scene objects ---------------------------------------------------------------------------
-Camera _cam;
+GLMCamera _cam;
 Spotlight _spotlight;
 DirectionalLight _directionalLight;
 
@@ -124,7 +124,7 @@ int main(int argc, char **argv) {
 	glEnable(GL_LIGHT1);
 
 	// Transformation
-	//_cam = *(new GLMCamera());
+	_cam = *(new GLMCamera());
 
 
 	// Shaders & mesh
@@ -161,11 +161,10 @@ void display() {
 
 
 	// Camera 
-	//_cam.setAspectRatio(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+	_cam.setAspectRatio(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
 	
 	mat4 VMatrix = _cam.getWorldToViewMatrix();
-	//mat4 PMatrix = _cam.getCameraZoom() * _cam.getViewToProjectionMatrix();
-	mat4 PMatrix = _cam.getViewToProjectionMatrix();
+	mat4 PMatrix = _cam.getCameraZoom() * _cam.getViewToProjectionMatrix();
 
 	glUniformMatrix4fv(ViewMatrixLoc, 1, GL_FALSE, &VMatrix[0][0]);
 
@@ -319,12 +318,12 @@ bool initShader(GLuint& program, string vShaderPath, string fShaderPath) {
 bool initObjects() {
 	_terrain.init("terrain\\bergen_1024x918.bin",
 		"terrain\\bergen_terrain_texture.png");
-	//_terrain.transformation.flip(vec3(0.0, 0.0, 1.0));
+	_terrain.transformation.flip(vec3(0.0, 0.0, 1.0));
 
 	_cat.init("Objects\\cat\\cat.obj",
 		"Objects\\cat\\cat_diff.png",
 		"Objects\\cat\\cat_norm.png");
-	//_cat.transformation.flip(vec3(0.0, 0.0, 1.0));
+	_cat.transformation.flip(vec3(0.0, 0.0, 1.0));
 
 	//_house.init("House-Model\\House.obj",
 	//	"House-Model\\House\\basic_realistic.png",
@@ -337,7 +336,7 @@ bool initObjects() {
 		10,
 		10,
 		"Animated-textures\\");
-	//_canvas.transformation.flip(vec3(0.0, 0.0, 1.0));
+	_canvas.transformation.flip(vec3(0.0, 0.0, 1.0));
 
 	return true;
 }
@@ -444,7 +443,7 @@ void keyboard(unsigned char key, int x, int y) {
 		break;
 	case 's':
 		std::cout << "backwards" << std::endl;
-		_cam.moveBackward();
+		_cam.moveBackwards();
 		glutPostRedisplay();
 		break;
 	case 'd':
@@ -460,27 +459,27 @@ void keyboard(unsigned char key, int x, int y) {
 		glutPostRedisplay();
 		break;
 	case '+':
-		//_cam.adjustFov(deltaDefault);
+		_cam.adjustFov(deltaDefault);
 		glutPostRedisplay();
 		break;
 	case '-':
-		//_cam.adjustFov(-deltaDefault);
+		_cam.adjustFov(-deltaDefault);
 		glutPostRedisplay();
 		break;
 	case 'f':
-		//_cam.adjustZFar(deltaDefault);
+		_cam.adjustZFar(deltaDefault);
 		glutPostRedisplay();
 		break;
 	case 'g':
-		//_cam.adjustZFar(-deltaDefault);
+		_cam.adjustZFar(-deltaDefault);
 		glutPostRedisplay();
 		break;
 	case 'n':
-		//_cam.adjustZNear(deltaDefault);
+		_cam.adjustZNear(deltaDefault);
 		glutPostRedisplay();
 		break;
 	case 'm':
-		//_cam.adjustZNear(-deltaDefault);
+		_cam.adjustZNear(-deltaDefault);
 		glutPostRedisplay();
 		break;
 	case 'p':
@@ -492,7 +491,7 @@ void keyboard(unsigned char key, int x, int y) {
 		glutPostRedisplay();
 		break;
 	case '9':
-		//_cam.flip();
+		_cam.flip();
 		glutPostRedisplay();
 		break;
 	case 'b':
@@ -520,17 +519,17 @@ inline void updateMousePosition(int newX, int newY) {
 /// Called whenever the mouse is moving while a button is pressed
 void motion(int x, int y) {
 	if (MouseButton == GLUT_RIGHT_BUTTON) {
-		_cam.mouseUpdate(vec2(x, y));
+		_cam.translate(vec2(MouseX, MouseY), vec2(x, y));
 
 		updateMousePosition(x, y);
 	}
 	if (MouseButton == GLUT_MIDDLE_BUTTON) {
-		//_cam.adjustZoom(vec2(MouseX, MouseY), vec2(x, y));
+		_cam.adjustZoom(vec2(MouseX, MouseY), vec2(x, y));
 
 		updateMousePosition(x, y);
 	}
 	if (MouseButton == GLUT_LEFT_BUTTON) {
-		_cam.mouseUpdate(vec2(x, y));
+		_cam.rotate(vec2(MouseX, MouseY), glm::vec2(x, y));
 
 		updateMousePosition(x, y);
 	}

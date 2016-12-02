@@ -142,6 +142,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AnimatedTextureSquare.cpp" />
+    <ClCompile Include="cameraV2.cpp" />
     <ClCompile Include="lodepng.cpp" />
     <ClCompile Include="SingleTextureTerrain.cpp" />
     <ClCompile Include="TexturedAnimatedRectangle.cpp" />
@@ -156,13 +157,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimatedTextureSquare.h" />
+    <ClInclude Include="CameraV2.h" />
     <ClInclude Include="lodepng.h" />
     <ClInclude Include="SingleTextureTerrain.h" />
     <ClInclude Include="TexturedAnimatedRectangle.h" />
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="Drawing.h" />
     <ClInclude Include="FunctionDeclarations.h" />
-    <ClInclude Include="glm_camera.h" />
     <ClInclude Include="GLLocStructs.h" />
     <ClInclude Include="Initializing.h" />
     <ClInclude Include="Loading.h" />
