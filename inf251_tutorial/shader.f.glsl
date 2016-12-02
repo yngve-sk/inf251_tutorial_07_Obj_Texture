@@ -94,9 +94,9 @@ void main() {
 
 	vec3 rgbI = vec3(1.,1.,1.);
 
-	vec3 ambientRes = 0.05 * material.aColor;
-	vec3 diffuseRes = diffuse * material.dColor;
-	vec3 specularRes = specular * material.sColor;
+	vec3 ambientRes = dLight.aIntensity * material.aColor;
+	vec3 diffuseRes = dLight.dIntensity * diffuse * material.dColor;
+	vec3 specularRes = dLight.sIntensity * specular * material.sColor;
 
 	vec3 fColor = ambientRes + diffuseRes + specularRes;
 
