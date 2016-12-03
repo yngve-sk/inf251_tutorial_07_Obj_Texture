@@ -59,6 +59,7 @@ uniform Material material;
 in vec2 texCoord;	
 in vec3 viewNormal;
 in vec3 viewPosition;
+in float belowSeaLevel;
 
 out vec4 FragColor;
 
@@ -82,15 +83,14 @@ void main() {
 
 	vec3 newViewNormal;
 
+	vec3 viewDirection = normalize(-viewPosition); // from camera at (0,0,0)
+
 	if (bumpMapping == 0){
 		newViewNormal = normalize(viewNormal);
-	} else if ((bumpMapping == 1)){
+	} else if ((bumpMapping == 1) && (belowSeaLevel == 0)){
 		normalBump = normalize(texture2D(normalTexture, texCoord).rgb * 2.0 - 1.0); 
 		newViewNormal = normalize(vec3(MVMatrix * vec4(normalBump, 0.0)));
 	}
-	
-
-	vec3 viewDirection = normalize(-viewPosition); // from camera at (0,0,0)
 	
 	//------------------------------------------------------------------------//
 	//--------------------------DIRECTIONAL LIGHTS----------------------------//

@@ -105,7 +105,7 @@ void AnimatedTextureSquare::loadTexture(const char* texturePath, GLuint& texture
 		texturePath, LCT_RGB, 8);
 
 	if (fail != 0) {
-		cerr << "Error: cant load the texture at loc " << textureDirectory << endl;
+		cerr << "Error: cant load the texture at loc " << texturePath << endl;
 	}
 
 	if (textureObject != 0)
@@ -229,7 +229,7 @@ void AnimatedTextureSquare::toogleAnimate() {
 void AnimatedTextureSquare::stepAnimation() {
 
 	if (--numberOfSteps == 0) {
-		canvasFrame = (++canvasFrame) % 173;
+		canvasFrame = (++canvasFrame) % numberOfFrames;
 		numberOfSteps = frameWait;
 	}
 	activeTextureObject = textureObjects[canvasFrame];

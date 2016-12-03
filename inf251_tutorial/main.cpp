@@ -44,8 +44,6 @@ SingleTextureObject _house;
 
 AnimatedTextureSquare _canvas;
 
-//AnimatedTextureSquare _waves;
-
 // TODO MOVE THIS
 bool initShaders();
 bool initObjects();
@@ -203,7 +201,6 @@ void display() {
 
 	drawText(position, -0.7, 0.7, 0);
 
-
 	// Disable the "position" vertex attribute (not necessary but recommended)
 	glDisableVertexAttribArray(VertexLocs.posLoc);
 	glDisableVertexAttribArray(VertexLocs.texLoc);
@@ -308,9 +305,6 @@ bool initShader(GLuint& program, string vShaderPath, string fShaderPath) {
 
 	loadUniformLocationsFromShader(ShaderProgram);
 
-	_directionalLight.loadToUniformAt(ShaderProgram, "dLight");
-	_spotlight.loadToUniformAt(ShaderProgram, "spotlight");
-
 	// Shaders can be deleted now
 	glDeleteShader(vertShader);
 	glDeleteShader(fragShader);
@@ -320,8 +314,10 @@ bool initShader(GLuint& program, string vShaderPath, string fShaderPath) {
 
 bool initObjects() {
 	_terrain.init("terrain\\bergen_1024x918.bin",
-		"terrain\\bergen_terrain_texture.png",
-		"terrain\\vawes.png");
+		"terrain\\bergen_terrain_texture.png");
+	_terrain.loadBumpMaps(5,
+		2,
+		"Animated-waves\\");
 	_terrain.transformation.rotate(180, vec3(1, 0, 0));
 	_terrain.transformation.translate(vec3(-2613, -1, 2010));
 
@@ -335,7 +331,7 @@ bool initObjects() {
 	//_house.init("House-Model\\House.obj",
 	//	"House-Model\\House\\basic_realistic.png",
 	//	"Objects\\cat\\cat_norm.png");
-	
+
 	_canvas.init(vec3(0, 50, 10),
 		(float)36.f*2.f,
 		(float)18.5f*2.f,
@@ -400,6 +396,7 @@ void loadUniformLocationsFromShader(GLuint& shaderProgram) {
 	//loadUniformLocation(shaderProgram, WorldToProjectionMatrixLoc, "worldToProjectionMatrix");
 	//loadUniformLocation(shaderProgram, ModelToWorldMatrixLoc, "modelToWorldMatrix");
 
+	loadUniformLocation(ShaderProgram, MMatrixLoc, "MMatrix");
 	loadUniformLocation(ShaderProgram, ViewMatrixLoc, "ViewMatrix");
 	loadUniformLocation(ShaderProgram, MVMatrixLoc, "MVMatrix");
 	loadUniformLocation(ShaderProgram, MVPMatrixLoc, "MVPMatrix");
@@ -509,6 +506,9 @@ void keyboard(unsigned char key, int x, int y) {
 	case 'b':
 		//colorByHeightOnOff *= -1;
 		//glUniform1i(ColorByHeightLoc, colorByHeightOnOff);
+		break;
+	case '1':
+		_terrain.stepAnimation();
 		break;
 	}
 }

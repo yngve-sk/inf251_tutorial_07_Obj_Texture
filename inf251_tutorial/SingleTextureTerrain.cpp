@@ -11,16 +11,6 @@ void SingleTextureTerrain::init(const char* directory,
 	initTriangles();
 	generateTerrainBuffers();
 	//loadTerrain(materialDirectory);
-	//loadBumpMap(bumpMap);
-}
-void SingleTextureTerrain::init(const char* directory,
-	const char* materialDirectory, const char* bumpMapDirectory) {
-	loadTerrain(directory);
-	createVertices();
-	initTriangles();
-	generateTerrainBuffers();
-	//loadTerrain(materialDirectory);
-	loadBumpMap(bumpMapDirectory);
 }
 
 void SingleTextureTerrain::loadTerrain(const char* directory) {
@@ -76,7 +66,7 @@ void SingleTextureTerrain::loadTerrain(const char* directory) {
 	// copy the height values in the global array
 	heights = new float[numberOfPoints];
 	for (int i = 0; i < numberOfPoints; i++)
-		heights[i] = bufferX.fVals[i];
+		heights[i] = bufferX.fVals[i] < 0 ? 0 : bufferX.fVals[i];
 
 	// close the file
 	fileIn.close();
@@ -347,6 +337,63 @@ void SingleTextureTerrain::loadBumpMap(const char* textureDirectory) {
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }
 
+void SingleTextureTerrain::loadBumpMaps(int numberOfFrames,
+										int frameWait,
+										const char* textureDirectory) {
+
+	this->numberOfFrames = numberOfFrames;
+	this->frameWait = frameWait;
+	this->numberOfSteps = frameWait;
+
+	int step = sizeof(GLuint);
+
+	for (int i = 1; i < numberOfFrames + 1; i++) {
+		string path = textureDirectory + std::to_string(i) + ".png";
+		loadActiveBumpMap(&path[0], bumpMapObjects[i - 1]);
+		//cout << "loading texture " << i << " filepath: " << path << endl;
+	}
+
+	//print array
+	for (int i = 0; i < numberOfFrames; i++) {
+		//cout << "arr[" << std::to_string(i) << "] = " << start[i] << endl;
+	}
+}
+
+void SingleTextureTerrain::loadActiveBumpMap(const char* texturePath, GLuint& textureObject) {
+
+	unsigned char* TextureData = nullptr;
+	unsigned int TextureWidth = 0,
+		TextureHeight = 0;
+
+	if (TextureData != nullptr)
+		free(TextureData);
+	unsigned int fail = lodepng_decode_file(&TextureData, &TextureWidth, &TextureHeight,
+		texturePath, LCT_RGB, 8);
+
+	if (fail != 0) {
+		cerr << "Error: cant load the texture at loc " << texturePath << endl;
+	}
+
+	if (textureObject != 0)
+		glDeleteTextures(1, &textureObject);
+	glGenTextures(1, &textureObject);
+
+	// Bind it as a 2D texture (note that other types of textures are supported as well)
+	glBindTexture(GL_TEXTURE_2D, textureObject);
+
+	// Set the texture data
+	glTexImage2D(GL_TEXTURE_2D, 0,
+		GL_RGB,		// remember to check this
+		TextureWidth, TextureHeight, 0,
+		GL_RGB,		// remember to check this
+		GL_UNSIGNED_BYTE, TextureData);
+
+	// Configure texture parameter
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+}
+
+
 void SingleTextureTerrain::drawObject(VertexGLLocs vertexGLLocs, MaterialGLLocs materialGLLocs, GLint bumpMappingLoc, GLint normalTextureLoc) {
 	
 	// Set material parameters for grass
@@ -368,7 +415,7 @@ void SingleTextureTerrain::drawObject(VertexGLLocs vertexGLLocs, MaterialGLLocs 
 		glEnable(GL_TEXTURE_2D);
 		glUniform1i(bumpMappingLoc, 1);
 		glUniform1i(normalTextureLoc, 1);
-		glBindTexture(GL_TEXTURE_2D, bumpMapObject);
+		glBindTexture(GL_TEXTURE_2D, activeBumpMapObject);
 	}
 
 	glVertexAttribPointer(vertexGLLocs.posLoc, 3, GL_FLOAT, GL_FALSE, sizeof(TerrainVertex), reinterpret_cast<const GLvoid*>(0));
@@ -391,5 +438,18 @@ void SingleTextureTerrain::drawObject(VertexGLLocs vertexGLLocs, MaterialGLLocs 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisable(GL_TEXTURE_2D);
 
+}
+
+void SingleTextureTerrain::toogleAnimate() {
+	animate = !animate;
+}
+
+void SingleTextureTerrain::stepAnimation() {
+
+	if (--numberOfSteps == 0) {
+		terrainFrame = (++terrainFrame) % numberOfFrames;
+		numberOfSteps = frameWait;
+	}
+	activeBumpMapObject = bumpMapObjects[terrainFrame];
 }
 
