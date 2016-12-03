@@ -25,7 +25,9 @@ struct Spotlight {
 
 	float fConeAngle, fConeCosine;
 	float fLinearAtt;
-};
+	float range;
+}; // chao chao dobhre ahoooy
+//^cau cau dobre ahoj
 
 vec4 generateSpotlightColor(Spotlight spotlight, vec3);
 
@@ -68,6 +70,8 @@ vec3 normalBump;
 // color by height on/off
 uniform int colorByHeight;
 
+uniform mat4 ViewMatrix;        // Just the view matrix (position of camera in the world, looking at some point, usually 0,0,0)
+
 void main() { 
 
 	vec4 texture = texture(sampler, texCoord);
@@ -77,13 +81,12 @@ void main() {
 
 	vec3 newViewNormal = normalize(viewNormal);
 
-	vec3 viewDirection = normalize(-viewPosition);
-
-	// Phong shading
-
-	vec3 surfaceColor = material.dColor;
-
-	/**/
+	vec3 viewDirection = normalize(-viewPosition); // from camera at (0,0,0)
+	
+	//------------------------------------------------------------------------//
+	//--------------------------DIRECTIONAL LIGHTS----------------------------//
+	//------------------------------------------------------------------------//
+	
 	float angleX = dot(dLight.direction, newViewNormal);
 	vec3 dirR = -dLight.direction + 2.0*angleX + newViewNormal;
 
@@ -97,8 +100,30 @@ void main() {
 	vec3 ambientRes = dLight.aIntensity * material.aColor;
 	vec3 diffuseRes = dLight.dIntensity * diffuse * material.dColor;
 	vec3 specularRes = dLight.sIntensity * specular * material.sColor;
+	
+	//------------------------------------------------------------------------//
+	//----------------------DIRECTIONAL LIGHTS END----------------------------//
+	//------------------------------------------------------------------------//
+	
+	vec3 fColor = ambientRes + diffuseRes + specularRes; // add dLight to fragment color
 
-	vec3 fColor = ambientRes + diffuseRes + specularRes;
+	//------------------------------------------------------------------------//
+	//-----------------------------SPOTLIGHTS---------------------------------//
+	//------------------------------------------------------------------------//
+
+	vec3 SpotlightViewPosition = vec3(ViewMatrix * vec4(spotlight.vPosition,1.));
+	vec3 vLight = normalize(spotlight.vDirection);
+	vec3 vLightToFragment = normalize(spotlight.vPosition - viewPosition);
+
+	float cosTheta = dot(vLight, vLightToFragment);
+	if(cosTheta  < spotlight.fConeCosine) {
+		float radialAttentuation = pow(1.05*cosTheta, 18);
+		fColor += (radialAttentuation * spotlight.vColor);
+	}
+
+	//------------------------------------------------------------------------//
+	//----------------------------SPOTLIGHTS END------------------------------//
+	//------------------------------------------------------------------------//
 
 	FragColor = texture + vec4(fColor,1.);
 //	FragColor = vec4(spotlight.vColor, 1.);

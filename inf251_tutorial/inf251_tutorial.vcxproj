@@ -144,6 +144,7 @@
     <ClCompile Include="AnimatedTextureSquare.cpp" />
     <ClCompile Include="cameraV2.cpp" />
     <ClCompile Include="lodepng.cpp" />
+    <ClCompile Include="Path.cpp" />
     <ClCompile Include="SingleTextureTerrain.cpp" />
     <ClCompile Include="TexturedAnimatedRectangle.cpp" />
     <ClCompile Include="camera.cpp" />
@@ -159,6 +160,7 @@
     <ClInclude Include="AnimatedTextureSquare.h" />
     <ClInclude Include="CameraV2.h" />
     <ClInclude Include="lodepng.h" />
+    <ClInclude Include="Path.h" />
     <ClInclude Include="SingleTextureTerrain.h" />
     <ClInclude Include="TexturedAnimatedRectangle.h" />
     <ClInclude Include="DirectionalLight.h" />
