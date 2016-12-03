@@ -34,6 +34,8 @@ public:
 
 	GLuint textureObject;
 	GLuint bumpMapObject;
+	GLuint bumpMapObjects[10];
+	GLuint activeBumpMapObject;
 
 	Transformation transformation;
 
@@ -46,18 +48,32 @@ public:
 	Vector3f *vertices;
 	unsigned int *trIndices;
 
+	// Animated Texture
+	int vertexNumber = 4;
+	int numberOfFrames = 173;
+	int terrainFrame = 0;
+	int numberOfSteps = 10;
+	int frameWait = 10;
+
 	TerrainVertex *terrainVertices;
 	float *texture_coords;
 	Vector3f *vertexNormals;
 
-	void drawObject(VertexGLLocs, MaterialGLLocs);
+	bool animate;
+
+	void drawObject(VertexGLLocs, MaterialGLLocs, GLint, GLint);
 	void loadTerrain(const char*);
 	void generateTerrainBuffers();
 	void initTriangles();
-	//void loadBumpMap(const char*);
+	void loadBumpMap(const char*);
+	void loadBumpMaps(int numberOfFrames, int frameWait, const char* textureDirectory);
+	void loadActiveBumpMap(const char* texturePath, GLuint& textureObject);
 
 	void init(const char*, const char*);
 	SingleTextureTerrain();
+
+	void toogleAnimate();
+	void stepAnimation();
 
 private:
 	void createVertices();

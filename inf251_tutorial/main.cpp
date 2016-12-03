@@ -66,12 +66,12 @@ GLint  MVMatrixLoc = -1;
 GLint  MMatrixLoc = -1;
 GLint  ViewMatrixLoc = -1;
 
-
 MaterialGLLocs MaterialLocs;
 
 GLint SamplerLoc = -1;
 
 GLint NormalTextureLoc = -1;
+GLint BumpMappingLoc = -1;
 
 GLint ColorByHeightLoc = -1;
 
@@ -79,7 +79,6 @@ GLint ColorByHeightLoc = -1;
 VertexGLLocs VertexLocs = {0, 1, 2};
 
 // --- MICS-----------------------------
-mat4 NonTransformation = mat4();
 bool HeadlightInt = true;
 
 // --- main() -------------------------------------------------------------------------------------
@@ -149,10 +148,6 @@ void display() {
 		height = glutGet(GLUT_WINDOW_HEIGHT);
 	glViewport(0, 0, width, height);
 
-	//glUniform1i(SamplerLoc, 0);
-	_directionalLight.loadToUniformAt(ShaderProgram, "dLight");
-	_spotlight.loadToUniformAt(ShaderProgram, "spotlight");
-
 	glEnableVertexAttribArray(VertexLocs.posLoc);
 	glEnableVertexAttribArray(VertexLocs.texLoc);
 	glEnableVertexAttribArray(VertexLocs.normalLoc);
@@ -178,9 +173,9 @@ void display() {
 	//loadMatricesToUniform(_house.transformation.getTransformationMatrix(), VMatrix, PMatrix);
 	//_house.drawObject(VertexLocs, MaterialLocs);
 
-	_terrain.usingBumpMapping = false;
+	_terrain.usingBumpMapping = true;
 	loadMatricesToUniform(_terrain.transformation.getTransformationMatrix(), VMatrix, PMatrix);
-	_terrain.drawObject(VertexLocs, MaterialLocs);
+	_terrain.drawObject(VertexLocs, MaterialLocs, BumpMappingLoc, NormalTextureLoc);
 
 	_canvas.usingBumpMapping = false;
 	loadMatricesToUniform(_canvas.transformation.getTransformationMatrix(), VMatrix, PMatrix);
@@ -208,7 +203,6 @@ void display() {
 	position.append(to_string(camPosition[2]));
 
 	drawText(position, -0.7, 0.7, 0);
-
 
 	// Disable the "position" vertex attribute (not necessary but recommended)
 	glDisableVertexAttribArray(VertexLocs.posLoc);
@@ -348,6 +342,9 @@ bool initObjects() {
 
 	_terrain.init("terrain\\bergen_1024x918.bin",
 		"terrain\\bergen_terrain_texture.png");
+	_terrain.loadBumpMaps(5,
+		2,
+		"Animated-waves\\");
 	_terrain.transformation.rotate(180, vec3(1, 0, 0));
 	_terrain.transformation.translate(vec3(-2613, -1, 2010));
 
@@ -361,7 +358,7 @@ bool initObjects() {
 	//_house.init("House-Model\\House.obj",
 	//	"House-Model\\House\\basic_realistic.png",
 	//	"Objects\\cat\\cat_norm.png");
-	
+
 	_canvas.init(vec3(0, 50, 10),
 		(float)36.f*2.f,
 		(float)18.5f*2.f,
@@ -428,6 +425,7 @@ void loadUniformLocationsFromShader(GLuint& shaderProgram) {
 	//loadUniformLocation(shaderProgram, WorldToProjectionMatrixLoc, "worldToProjectionMatrix");
 	//loadUniformLocation(shaderProgram, ModelToWorldMatrixLoc, "modelToWorldMatrix");
 
+	loadUniformLocation(ShaderProgram, MMatrixLoc, "MMatrix");
 	loadUniformLocation(ShaderProgram, ViewMatrixLoc, "ViewMatrix");
 	loadUniformLocation(ShaderProgram, MVMatrixLoc, "MVMatrix");
 	loadUniformLocation(ShaderProgram, MVPMatrixLoc, "MVPMatrix");
@@ -441,6 +439,7 @@ void loadUniformLocationsFromShader(GLuint& shaderProgram) {
 
 	//loadUniformLocation(shaderProgram, CameraPositionLoc, "cameraPosition");
 	loadUniformLocation(shaderProgram, NormalTextureLoc, "normalTexture");
+	loadUniformLocation(shaderProgram, BumpMappingLoc, "bumpMapping");
 	loadUniformLocation(shaderProgram, ColorByHeightLoc, "colorByHeight");
 }
 
@@ -536,6 +535,9 @@ void keyboard(unsigned char key, int x, int y) {
 	case 'b':
 		//colorByHeightOnOff *= -1;
 		//glUniform1i(ColorByHeightLoc, colorByHeightOnOff);
+		break;
+	case '1':
+		_terrain.stepAnimation();
 		break;
 	case 'h':
 		_idle_traverse_camera_movement_path = !_idle_traverse_camera_movement_path;

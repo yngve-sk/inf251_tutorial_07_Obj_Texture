@@ -59,6 +59,7 @@ uniform Material material;
 in vec2 texCoord;	
 in vec3 viewNormal;
 in vec3 viewPosition;
+in float belowSeaLevel;
 
 out vec4 FragColor;
 
@@ -66,6 +67,7 @@ out vec4 FragColor;
 uniform sampler2D normalTexture;
 uniform int bumpMapping;
 vec3 normalBump;
+uniform mat4 MVMatrix;          // MV = View x Model matrix
 
 // color by height on/off
 uniform int colorByHeight;
@@ -76,18 +78,25 @@ void main() {
 
 	vec4 texture = texture(sampler, texCoord);
 
-	vec3 fcolor = vec3(0.0,0.0,0.0);
+	//vec3 fcolor = vec3(0.0,0.0,0.0);
 	float transparency = 1.0;
 
-	vec3 newViewNormal = normalize(viewNormal);
+	vec3 newViewNormal;
 
 	vec3 viewDirection = normalize(-viewPosition); // from camera at (0,0,0)
+
+	if (bumpMapping == 0){
+		newViewNormal = normalize(viewNormal);
+	} else if ((bumpMapping == 1) && (belowSeaLevel == 0)){
+		normalBump = normalize(texture2D(normalTexture, texCoord).rgb * 2.0 - 1.0); 
+		newViewNormal = normalize(vec3(MVMatrix * vec4(normalBump, 0.0)));
+	}
 	
 	//------------------------------------------------------------------------//
 	//--------------------------DIRECTIONAL LIGHTS----------------------------//
 	//------------------------------------------------------------------------//
 	
-	float angleX = dot(dLight.direction, newViewNormal);
+	float angleX = dot(-dLight.direction, newViewNormal);
 	vec3 dirR = -dLight.direction + 2.0*angleX + newViewNormal;
 
 	float RV = dot(dirR, viewDirection);
