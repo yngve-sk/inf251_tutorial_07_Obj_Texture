@@ -4,7 +4,7 @@
 using namespace glm;
 class Path {
 private:
-	int* Coefficients; // Binomial coefficients
+	int* Coefficients = nullptr; // Binomial coefficients
 	
 	vec3* bezierPoints; // points of curve is stored here
 	int currentPointIndex = 0;
@@ -23,8 +23,7 @@ public:
 	void computeBezierPoint(float u, 
 						    vec3& bezierPoint, 
 						    int numControlPoints, 
-						    vec3* controlPoints, 
-						    int* Coefficients);
+						    vec3* controlPoints);
 
 	void reverseDirection();
 	vec3 getNextCurvePoint();

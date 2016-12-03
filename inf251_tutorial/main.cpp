@@ -324,14 +324,20 @@ bool initShader(GLuint& program, string vShaderPath, string fShaderPath) {
 
 bool initObjects() {
 	// init bezier path
-	vec3 controlpts[4];
-	controlpts[0] = vec3(1, -100, 3000);
-	controlpts[1] = vec3(1, -250, 2500);
-	controlpts[2] = vec3(1, -100, 2000);
-	controlpts[3] = vec3(1, -250, 1500);
-	
-	_cameraPath.bezier(controlpts, 4, 200);
+	vec3 controlpts[10];
+	controlpts[0] = vec3(1500, -100, 3000);
+	controlpts[1] = vec3(500, -250, 2500);
+	controlpts[2] = vec3(1500, -900, 2000);
+	controlpts[3] = vec3(3500, -350, 1500);
+	controlpts[4] = vec3(1, -350, 1300);
+	controlpts[5] = vec3(4000, -3500, 200);
+	controlpts[6] = vec3(1, -350, 2500);
+	controlpts[7] = vec3(1, -3500, -1500);
+	controlpts[8] = vec3(1, 2550, 500);
+	controlpts[9] = vec3(1500, -100, 3000);
 
+	_cameraPath.bezier(controlpts, 10, 200);
+	
 	for (int i = 0; i < 200; i++) {
 		vec3 nextPoint = _cameraPath.getNextCurvePoint();
 		cout << std::to_string(nextPoint.z) << endl;

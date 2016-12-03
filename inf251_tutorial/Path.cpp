@@ -17,20 +17,21 @@ void Path::bezier(vec3* controlPoints, int numControlPoints,
 	numCurvePoints = numBezierPoints;
 
 	if (Coefficients) {
-		free(Coefficients);
+		delete[] Coefficients;
 	}
+
 	Coefficients = new int[numControlPoints];
 
 	computeBinomialCoeffs(numControlPoints-1);
-	for (k = 0; k <= numBezierPoints; k++) {
-		u = k / numBezierPoints;
+	for (k = 0; k < numBezierPoints; k++) {
+		u = (float) k / numBezierPoints;
 		// store all points in an array
-		computeBezierPoint(u, bezierPoints[k], numControlPoints, controlPoints, Coefficients);
-		int b = 1;
+		computeBezierPoint(u, bezierPoints[k], numControlPoints, controlPoints);
 	}
+
 	int a = 2;
 
-	delete Coefficients;
+	delete[] Coefficients;
 }
 
 void Path::computeBinomialCoeffs(int n) {
@@ -46,14 +47,14 @@ void Path::computeBinomialCoeffs(int n) {
 
 		//std::cout << std::to_string(val) << std::endl;
 		Coefficients[k] = val;
+		std::cout << "Coefficients[" << k << "] = " << Coefficients[k] << std::endl;
 	}
 }
 
 void Path::computeBezierPoint(float u,
 						vec3& bezierPoint, 
 						int numControlPoints, 
-						vec3* controlPoints, 
-						int* Coefficients) {
+						vec3* controlPoints) {
 	int k, n = numControlPoints - 1;
 	float bezierBlendFunction;
 
@@ -61,10 +62,11 @@ void Path::computeBezierPoint(float u,
 	
 	for (k = 0; k < numControlPoints; k++) {
 		bezierBlendFunction = Coefficients[k] * pow(u, k) * pow(1 - u, n - k);
-		x += controlPoints[k].x + bezierBlendFunction;
-		y += controlPoints[k].y + bezierBlendFunction;
-		z += controlPoints[k].z + bezierBlendFunction;
+		x += controlPoints[k].x * bezierBlendFunction;
+		y += controlPoints[k].y * bezierBlendFunction;
+		z += controlPoints[k].z * bezierBlendFunction;
 	}
+	//std::cout << "p = ( " << x << ", " << y << ", " << z << "), blend = " << bezierBlendFunction << " coeff[k] = " << Coefficients[k] << std::endl;;
 
 	bezierPoint = vec3(x, y, z);
 }
@@ -74,13 +76,18 @@ void Path::reverseDirection() {
 }
 
 vec3 Path::getNextCurvePoint() {
+	vec3 p = bezierPoints[currentPointIndex];
+	//std::cout << currentPointIndex << " = ( " << p.x << ", " << p.y << ", " << p.z << ")" << std::endl;;
 	if (currentPointIndex == 0) {
 		isReversed = false;
 		return bezierPoints[++currentPointIndex];
 	}
 	else if (currentPointIndex == numCurvePoints - 1) {
-		isReversed = true; // reverse and start going back
-		return bezierPoints[--currentPointIndex];
+		//isReversed = true; // reverse and start going back
+		//return bezierPoints[--currentPointIndex];
+		isReversed = false;
+		currentPointIndex = 0;
+		return bezierPoints[0];
 	}
 	else {
 		return isReversed ?
