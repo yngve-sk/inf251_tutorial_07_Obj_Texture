@@ -22,6 +22,8 @@
 #include "SingleTextureTerrain.h"
 #include "GLLocStructs.h"
 
+#include "Path.h"
+
 #define PI 3.14159265
 
 // --- OpenGL callbacks ---------------------------------------------------------------------------
@@ -39,10 +41,11 @@ DirectionalLight _directionalLight;
 SingleTextureTerrain _terrain;
 
 SingleTextureObject _cat;
-
 SingleTextureObject _house;
 
 AnimatedTextureSquare _canvas;
+
+Path _cameraPath;
 
 // TODO MOVE THIS
 bool initShaders();
@@ -220,12 +223,19 @@ void display() {
 }
 
 bool _idle_disable_house_rotation = false;
+bool _idle_traverse_camera_movement_path = false;
+int _idle_traverse_camera_wait = 20;
+int _idle_traverse_camera_timeout = _idle_traverse_camera_wait;
 void idle() {
 	// rotate around Y-axis
 	//LocalRotationY = _idle_disable_house_rotation ? LocalRotationY : LocalRotationY * glm::rotate(0.005f, vec3(0, 1, 0));
 	_house.transformation.rotate(0.005f, vec3(0, 1, 0));
 
 	_canvas.stepAnimation();
+
+	if (_idle_traverse_camera_movement_path && (--_idle_traverse_camera_timeout%_idle_traverse_camera_wait)) {
+		_cam.setPosition(_cameraPath.getNextCurvePoint());
+	}
 	
 	glutPostRedisplay();
 }
@@ -319,6 +329,23 @@ bool initShader(GLuint& program, string vShaderPath, string fShaderPath) {
 }
 
 bool initObjects() {
+	// init bezier path
+	vec3 controlpts[4];
+	controlpts[0] = vec3(1, -100, 3000);
+	controlpts[1] = vec3(1, -250, 2500);
+	controlpts[2] = vec3(1, -100, 2000);
+	controlpts[3] = vec3(1, -250, 1500);
+	
+	_cameraPath.bezier(controlpts, 4, 200);
+
+	for (int i = 0; i < 200; i++) {
+		vec3 nextPoint = _cameraPath.getNextCurvePoint();
+		cout << std::to_string(nextPoint.z) << endl;
+		glBegin(GL_POINTS);
+		glVertex3f(nextPoint.x, nextPoint.y, nextPoint.z);
+		glEnd();
+	}
+
 	_terrain.init("terrain\\bergen_1024x918.bin",
 		"terrain\\bergen_terrain_texture.png");
 	_terrain.transformation.rotate(180, vec3(1, 0, 0));
@@ -346,6 +373,8 @@ bool initObjects() {
 
 	initLights();
 
+
+//
 	return true;
 }
 
@@ -507,6 +536,9 @@ void keyboard(unsigned char key, int x, int y) {
 	case 'b':
 		//colorByHeightOnOff *= -1;
 		//glUniform1i(ColorByHeightLoc, colorByHeightOnOff);
+		break;
+	case 'h':
+		_idle_traverse_camera_movement_path = !_idle_traverse_camera_movement_path;
 		break;
 	}
 }
