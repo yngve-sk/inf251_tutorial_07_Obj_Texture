@@ -44,6 +44,8 @@ SingleTextureObject _house;
 
 AnimatedTextureSquare _canvas;
 
+//AnimatedTextureSquare _waves;
+
 // TODO MOVE THIS
 bool initShaders();
 bool initObjects();
@@ -63,12 +65,12 @@ GLint  MVMatrixLoc = -1;
 GLint  MMatrixLoc = -1;
 GLint  ViewMatrixLoc = -1;
 
-
 MaterialGLLocs MaterialLocs;
 
 GLint SamplerLoc = -1;
 
 GLint NormalTextureLoc = -1;
+GLint BumpMappingLoc = -1;
 
 GLint ColorByHeightLoc = -1;
 
@@ -76,7 +78,6 @@ GLint ColorByHeightLoc = -1;
 VertexGLLocs VertexLocs = {0, 1, 2};
 
 // --- MICS-----------------------------
-mat4 NonTransformation = mat4();
 bool HeadlightInt = true;
 
 // --- main() -------------------------------------------------------------------------------------
@@ -146,10 +147,6 @@ void display() {
 		height = glutGet(GLUT_WINDOW_HEIGHT);
 	glViewport(0, 0, width, height);
 
-	//glUniform1i(SamplerLoc, 0);
-	_directionalLight.loadToUniformAt(ShaderProgram, "dLight");
-	_spotlight.loadToUniformAt(ShaderProgram, "spotlight");
-
 	glEnableVertexAttribArray(VertexLocs.posLoc);
 	glEnableVertexAttribArray(VertexLocs.texLoc);
 	glEnableVertexAttribArray(VertexLocs.normalLoc);
@@ -175,9 +172,9 @@ void display() {
 	//loadMatricesToUniform(_house.transformation.getTransformationMatrix(), VMatrix, PMatrix);
 	//_house.drawObject(VertexLocs, MaterialLocs);
 
-	_terrain.usingBumpMapping = false;
+	_terrain.usingBumpMapping = true;
 	loadMatricesToUniform(_terrain.transformation.getTransformationMatrix(), VMatrix, PMatrix);
-	_terrain.drawObject(VertexLocs, MaterialLocs);
+	_terrain.drawObject(VertexLocs, MaterialLocs, BumpMappingLoc, NormalTextureLoc);
 
 	_canvas.usingBumpMapping = false;
 	loadMatricesToUniform(_canvas.transformation.getTransformationMatrix(), VMatrix, PMatrix);
@@ -311,6 +308,9 @@ bool initShader(GLuint& program, string vShaderPath, string fShaderPath) {
 
 	loadUniformLocationsFromShader(ShaderProgram);
 
+	_directionalLight.loadToUniformAt(ShaderProgram, "dLight");
+	_spotlight.loadToUniformAt(ShaderProgram, "spotlight");
+
 	// Shaders can be deleted now
 	glDeleteShader(vertShader);
 	glDeleteShader(fragShader);
@@ -320,7 +320,8 @@ bool initShader(GLuint& program, string vShaderPath, string fShaderPath) {
 
 bool initObjects() {
 	_terrain.init("terrain\\bergen_1024x918.bin",
-		"terrain\\bergen_terrain_texture.png");
+		"terrain\\bergen_terrain_texture.png",
+		"terrain\\vawes.png");
 	_terrain.transformation.rotate(180, vec3(1, 0, 0));
 	_terrain.transformation.translate(vec3(-2613, -1, 2010));
 
@@ -412,6 +413,7 @@ void loadUniformLocationsFromShader(GLuint& shaderProgram) {
 
 	//loadUniformLocation(shaderProgram, CameraPositionLoc, "cameraPosition");
 	loadUniformLocation(shaderProgram, NormalTextureLoc, "normalTexture");
+	loadUniformLocation(shaderProgram, BumpMappingLoc, "bumpMapping");
 	loadUniformLocation(shaderProgram, ColorByHeightLoc, "colorByHeight");
 }
 

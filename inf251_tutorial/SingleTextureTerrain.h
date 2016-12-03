@@ -50,13 +50,14 @@ public:
 	float *texture_coords;
 	Vector3f *vertexNormals;
 
-	void drawObject(VertexGLLocs, MaterialGLLocs);
+	void drawObject(VertexGLLocs, MaterialGLLocs, GLint, GLint);
 	void loadTerrain(const char*);
 	void generateTerrainBuffers();
 	void initTriangles();
-	//void loadBumpMap(const char*);
+	void loadBumpMap(const char*);
 
 	void init(const char*, const char*);
+	void init(const char*, const char*, const char*);
 	SingleTextureTerrain();
 
 private:

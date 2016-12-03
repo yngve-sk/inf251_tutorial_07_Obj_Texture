@@ -8,7 +8,7 @@ DirectionalLight::DirectionalLight() :
 				sColor(vec3(0.4, 0.4, 0.4)),
 				aIntensity(0.03),
 				dIntensity(0.03),
-				sIntensity(0.03),
+				sIntensity(0.5),
 				bOn(1) {}
 
 void DirectionalLight::loadToUniformAt(GLuint shaderProgram, std::string uniformName) {

@@ -8,6 +8,6 @@ private:
 	int numPoints = 0;
 public:
 	void setPoints(glm::vec3 start, int numPoints);
-	glm::vec3 getNextPoint();
+	//glm::vec3 getNextPoint();
 	void interpolate();
 };
