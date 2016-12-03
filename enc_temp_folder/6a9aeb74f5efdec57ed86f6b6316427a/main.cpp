@@ -22,8 +22,6 @@
 #include "SingleTextureTerrain.h"
 #include "GLLocStructs.h"
 
-#include "Path.h"
-
 #define PI 3.14159265
 
 // --- OpenGL callbacks ---------------------------------------------------------------------------
@@ -41,11 +39,10 @@ DirectionalLight _directionalLight;
 SingleTextureTerrain _terrain;
 
 SingleTextureObject _cat;
+
 SingleTextureObject _house;
 
 AnimatedTextureSquare _canvas;
-
-Path _cameraPath;
 
 // TODO MOVE THIS
 bool initShaders();
@@ -220,19 +217,13 @@ void display() {
 }
 
 bool _idle_disable_house_rotation = false;
-bool _idle_traverse_camera_movement_path = false;
-int _idle_traverse_camera_wait = 20;
-int _idle_traverse_camera_timeout = _idle_traverse_camera_wait;
 void idle() {
 	// rotate around Y-axis
 	//LocalRotationY = _idle_disable_house_rotation ? LocalRotationY : LocalRotationY * glm::rotate(0.005f, vec3(0, 1, 0));
 	_house.transformation.rotate(0.005f, vec3(0, 1, 0));
 
 	_canvas.stepAnimation();
-
-	if (_idle_traverse_camera_movement_path && (--_idle_traverse_camera_timeout%_idle_traverse_camera_wait)) {
-		_cam.setPosition(_cameraPath.getNextCurvePoint());
-	}
+	_terrain.stepAnimation();
 	
 	glutPostRedisplay();
 }
@@ -326,32 +317,9 @@ bool initShader(GLuint& program, string vShaderPath, string fShaderPath) {
 }
 
 bool initObjects() {
-	// init bezier path
-	vec3 controlpts[10];
-	controlpts[0] = vec3(1500, -100, 3000);
-	controlpts[1] = vec3(500, -250, 2500);
-	controlpts[2] = vec3(1500, -900, 2000);
-	controlpts[3] = vec3(3500, -350, 1500);
-	controlpts[4] = vec3(1, -350, 1300);
-	controlpts[5] = vec3(4000, -3500, 200);
-	controlpts[6] = vec3(1, -350, 2500);
-	controlpts[7] = vec3(1, -3500, -1500);
-	controlpts[8] = vec3(1, 2550, 500);
-	controlpts[9] = vec3(1500, -100, 3000);
-
-	_cameraPath.bezier(controlpts, 10, 200);
-	
-	for (int i = 0; i < 200; i++) {
-		vec3 nextPoint = _cameraPath.getNextCurvePoint();
-		cout << std::to_string(nextPoint.z) << endl;
-		glBegin(GL_POINTS);
-		glVertex3f(nextPoint.x, nextPoint.y, nextPoint.z);
-		glEnd();
-	}
-
 	_terrain.init("terrain\\bergen_1024x918.bin",
 		"terrain\\bergen_terrain_texture.png");
-	_terrain.loadBumpMaps(13,
+	_terrain.loadBumpMaps(11,
 		10,
 		"Animated-waves\\");
 	//_terrain.loadBumpMap("terrain\\waves.png");
@@ -380,8 +348,6 @@ bool initObjects() {
 
 	initLights();
 
-
-//
 	return true;
 }
 
@@ -546,12 +512,6 @@ void keyboard(unsigned char key, int x, int y) {
 	case 'b':
 		//colorByHeightOnOff *= -1;
 		//glUniform1i(ColorByHeightLoc, colorByHeightOnOff);
-		break;
-	case '1':
-		_terrain.stepAnimation();
-		break;
-	case 'h':
-		_idle_traverse_camera_movement_path = !_idle_traverse_camera_movement_path;
 		break;
 	}
 }
