@@ -33,7 +33,6 @@ public:
 	GLuint IBO = -1;
 
 	GLuint textureObject;
-	GLuint bumpMapObject;
 	GLuint bumpMapObjects[10];
 	GLuint activeBumpMapObject;
 

@@ -312,12 +312,12 @@ void SingleTextureTerrain::loadBumpMap(const char* textureDirectory) {
 	}
 
 	// Create the texture object
-	if (bumpMapObject != 0)
-		glDeleteTextures(1, &bumpMapObject);
-	glGenTextures(1, &bumpMapObject);
+	if (activeBumpMapObject != 0)
+		glDeleteTextures(1, &activeBumpMapObject);
+	glGenTextures(1, &activeBumpMapObject);
 
 	// Bind it as a 2D texture (note that other types of textures are supported as well)
-	glBindTexture(GL_TEXTURE_2D, bumpMapObject);
+	glBindTexture(GL_TEXTURE_2D, activeBumpMapObject);
 
 	// Set the texture data
 	glTexImage2D(

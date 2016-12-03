@@ -67,7 +67,11 @@ out vec4 FragColor;
 uniform sampler2D normalTexture;
 uniform int bumpMapping;
 vec3 normalBump;
-uniform mat4 MVMatrix;          // MV = View x Model matrix
+
+uniform mat4 MVMatrix;          
+
+// Animated bumpTexture
+uniform int displacement;
 
 // color by height on/off
 uniform int colorByHeight;
