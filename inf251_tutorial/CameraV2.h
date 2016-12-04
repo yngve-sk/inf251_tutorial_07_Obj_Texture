@@ -30,4 +30,7 @@ public:
 	glm::vec3 getPosition() const { return position; }
 	bool isProjectionPerspective();
 	void switchPerspective();
+	void setPosition(glm::vec3 newPos) {
+		position = newPos;
+	}
 };

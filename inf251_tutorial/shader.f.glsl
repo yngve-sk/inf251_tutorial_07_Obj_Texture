@@ -71,7 +71,7 @@ vec3 normalBump;
 uniform mat4 MVMatrix;          
 
 // Animated bumpTexture
-uniform int displacement;
+uniform vec2 displacement;
 
 // color by height on/off
 uniform int colorByHeight;
@@ -92,8 +92,36 @@ void main() {
 	if (bumpMapping == 0){
 		newViewNormal = normalize(viewNormal);
 	} else if ((bumpMapping == 1) && (belowSeaLevel == 0)){
-		normalBump = normalize(texture2D(normalTexture, texCoord).rgb * 2.0 - 1.0); 
+
+		// Normalize the texture coordinate 	
+	//	vec2 normalizedDisplacement = displacement / 2324;
+		vec2 displacedTexCoord = displacement + vec2(texCoord.x, texCoord.y)*2324;
+
+		displacedTexCoord.x = mod((displacedTexCoord.x), 2324) / 2324;
+		displacedTexCoord.y = mod((displacedTexCoord.y), 2324) / 2324;	
+
+		//normalBump = normalize(texture2D(normalTexture, texCoord).rgb * 2.0 - 1.0); 
+		normalBump = normalize(texture2D(normalTexture, displacedTexCoord).rgb * 2.0 - 1.0); 
 		newViewNormal = normalize(vec3(MVMatrix * vec4(normalBump, 0.0)));
+
+		float angleX = dot(-dLight.direction, newViewNormal);
+		vec3 dirR = -dLight.direction + 2.0*angleX + newViewNormal;
+
+		float RV = dot(dirR, viewDirection);
+		float specular = clamp(pow(RV, 0.2), 0.0, 1.0);
+
+		float diffuse = clamp(angleX, 0.0, 1.0);
+
+		vec3 rgbI = vec3(1.,1.,1.);
+
+		vec3 oceanColor = vec3(0.11,0.56,1);
+
+		vec3 ambientRes = dLight.aIntensity * oceanColor;
+		vec3 diffuseRes = dLight.dIntensity * diffuse * oceanColor;
+		vec3 specularRes = dLight.sIntensity * specular * oceanColor;
+
+		FragColor = vec4(ambientRes + diffuseRes + specularRes,1.);
+		return;
 	}
 	
 	//------------------------------------------------------------------------//

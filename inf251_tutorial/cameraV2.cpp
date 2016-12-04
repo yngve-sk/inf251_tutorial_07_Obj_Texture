@@ -1,6 +1,7 @@
 #include "CameraV2.h"
 #include <glm\gtx\transform.hpp>
 
+using namespace glm;
 Camera::Camera() :
 	viewDirection(0.f, 0.f, -1.f),
 	position(0.f, 0.f, 0.f),
@@ -11,33 +12,39 @@ Camera::Camera() :
 	zoom(1.f) {
 }
 
-void Camera::mouseUpdate(const glm::vec2& newMousePosition) {
-	glm::vec2 dxdy = newMousePosition - oldMousePosition;
-	if (glm::length(dxdy) > 50.0f)
+void Camera::mouseUpdate(const vec2& newMousePosition) {
+	vec2 dxdy = newMousePosition - oldMousePosition;
+	if (length(dxdy) > 50.0f)
 	{
 		oldMousePosition = newMousePosition;
 		return;
 	}
-	strafeDirection = glm::cross(viewDirection, UP);
-	glm::mat4 rotator = glm::rotate(-dxdy.x * ROTATIONAL_SPEED, UP) *
-		glm::rotate(-dxdy.y * ROTATIONAL_SPEED, strafeDirection);
+	strafeDirection = cross(viewDirection, UP);
 
-	viewDirection = glm::mat3(rotator) * viewDirection;
+	
+	mat4 rotateAroundUp = rotate(-dxdy.x * ROTATIONAL_SPEED, UP),
+		 rotateAroundStrafe = rotate(-dxdy.y * ROTATIONAL_SPEED, strafeDirection);
+
+	mat4 rotator = rotateAroundUp;
+	if(UP.y/glm::length(UP) > 0.1)
+		rotator = rotator * rotateAroundStrafe;
+
+	viewDirection = mat3(rotator) * viewDirection;
 
 	oldMousePosition = newMousePosition;
 }
 
-glm::mat4 Camera::getWorldToViewMatrix() const {
-	return glm::lookAt(position, position + viewDirection, UP);
+mat4 Camera::getWorldToViewMatrix() const {
+	return lookAt(position, position + viewDirection, UP);
 }
 
-glm::mat4 Camera::getViewToProjectionMatrix() const{
-	glm::mat4 prj;
+mat4 Camera::getViewToProjectionMatrix() const{
+	mat4 prj;
 	if (perspectiveProjection) {
-		prj = glm::perspective(fov, ar, zNear, zFar);
+		prj = perspective(fov, ar, zNear, zFar);
 	}
 	else {
-		prj = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, zNear, zFar);
+		prj = ortho(-1.0f, 1.0f, -1.0f, 1.0f, zNear, zFar);
 	}
 
 	return prj;

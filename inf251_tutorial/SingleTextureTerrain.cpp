@@ -445,6 +445,8 @@ void SingleTextureTerrain::toogleAnimate() {
 }
 
 void SingleTextureTerrain::stepAnimation() {
+	
+	if (1) return; // todo remove if necessary 
 
 	if (--numberOfSteps == 0) {
 		terrainFrame = (++terrainFrame) % numberOfFrames;
