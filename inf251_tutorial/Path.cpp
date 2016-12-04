@@ -47,7 +47,7 @@ void Path::computeBinomialCoeffs(int n) {
 
 		//std::cout << std::to_string(val) << std::endl;
 		Coefficients[k] = val;
-		std::cout << "Coefficients[" << k << "] = " << Coefficients[k] << std::endl;
+		//std::cout << "Coefficients[" << k << "] = " << Coefficients[k] << std::endl;
 	}
 }
 

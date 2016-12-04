@@ -66,7 +66,8 @@ void SingleTextureTerrain::loadTerrain(const char* directory) {
 	// copy the height values in the global array
 	heights = new float[numberOfPoints];
 	for (int i = 0; i < numberOfPoints; i++)
-		heights[i] = bufferX.fVals[i] < 0 ? 0 : bufferX.fVals[i];
+		//heights[i] = bufferX.fVals[i] < 0 ? 0 : bufferX.fVals[i];
+		heights[i] = bufferX.fVals[i];
 
 	// close the file
 	fileIn.close();
