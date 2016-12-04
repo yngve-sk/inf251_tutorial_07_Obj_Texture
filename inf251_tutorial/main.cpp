@@ -23,6 +23,7 @@
 #include "GLLocStructs.h"
 
 #include "Path.h"
+#include "CatMagic.h"
 
 #define PI 3.14159265
 
@@ -45,6 +46,8 @@ SingleTextureObject _cat;
 SingleTextureObject _house;
 
 AnimatedTextureSquare _canvas;
+
+CatMagic _catMagic;
 
 Path _cameraPath;
 Path _cameraLookAtPath;
@@ -188,10 +191,12 @@ void display() {
 
 	_canvas.usingBumpMapping = false;
 
-	vec3 oldIntensity = _directionalLight.setIntensity(vec3(0.3, 0.3, 0.3));
+	vec3 oldIntensity = _directionalLight.setIntensity(vec3(0.8, 0.8, 0.8));
+	_directionalLight.loadToUniformAt(ShaderProgram, "dLight");
 	loadMatricesToUniform(_canvas.transformation.getTransformationMatrix(), VMatrix, PMatrix);
 	_canvas.drawObject(VertexLocs, MaterialLocs);
 	_directionalLight.setIntensity(oldIntensity);
+	_directionalLight.loadToUniformAt(ShaderProgram, "dLight");
 
 	_cat.usingBumpMapping = false;
 	loadMatricesToUniform(_cat.transformation.getTransformationMatrix(), VMatrix, PMatrix);
@@ -216,6 +221,11 @@ void display() {
 
 	drawText(position, -0.7, 0.7, 0);
 
+	if (_idle_catm_enable) {
+		// DRAW CATS
+		_catMagic.drawAll(VertexLocs, MaterialLocs);
+	}
+
 	// Disable the "position" vertex attribute (not necessary but recommended)
 	glDisableVertexAttribArray(VertexLocs.posLoc);
 	glDisableVertexAttribArray(VertexLocs.texLoc);
@@ -238,6 +248,9 @@ bool _idle_traverse_camera_lookat_path = false;
 int _idle_traverse_camera_lookat_wait = 20;
 int _idle_traverse_camera_lookat_timeout = _idle_traverse_camera_lookat_wait;
 
+bool _idle_catm_enable = false;
+int _idle_catm_wait = 20;
+int _idle_catm_timeout = _idle_catm_wait;
 
 void idle() {
 	// rotate around Y-axis
@@ -253,6 +266,11 @@ void idle() {
 	if (_idle_traverse_camera_lookat_path && 
 		(--_idle_traverse_camera_lookat_timeout % _idle_traverse_camera_lookat_wait)) {
 		_cam.setLookAtPoint(_cameraLookAtPath.getNextCurvePoint());
+	}
+
+	if (_idle_catm_enable &&
+		(--_idle_catm_timeout % _idle_catm_wait)) {
+		_catMagic.step();
 	}
 
 	
@@ -592,6 +610,9 @@ void keyboard(unsigned char key, int x, int y) {
 	case 'y':
 		_cam.generateCircularBezierAroundCurrentPosition(_cameraLookAtPath, 40, -10);
 		glutPostRedisplay();
+		break;
+	case 'i':
+		_catMagic.init(_cam.getPosition(), 35, -3, 15);
 		break;
 	}
 }

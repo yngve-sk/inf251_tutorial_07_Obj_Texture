@@ -332,6 +332,7 @@
   <ItemGroup>
     <ClCompile Include="AnimatedTextureSquare.cpp" />
     <ClCompile Include="cameraV2.cpp" />
+    <ClCompile Include="CatMagic.cpp" />
     <ClCompile Include="lodepng.cpp" />
     <ClCompile Include="Path.cpp" />
     <ClCompile Include="SingleTextureTerrain.cpp" />
@@ -349,6 +350,7 @@
     <ClInclude Include="AnimatedTextureSquare.h" />
     <ClInclude Include="BoundingBox.h" />
     <ClInclude Include="CameraV2.h" />
+    <ClInclude Include="CatMagic.h" />
     <ClInclude Include="lodepng.h" />
     <ClInclude Include="Path.h" />
     <ClInclude Include="SingleTextureTerrain.h" />
