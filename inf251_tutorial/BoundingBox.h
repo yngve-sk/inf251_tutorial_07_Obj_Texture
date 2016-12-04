@@ -41,6 +41,15 @@ public:
 			   );
 	}
 
+	void setBoundingXZPlane(vec2 av, vec2 bv, vec2 cv, vec2 dv) {
+		a = av;
+		b = bv;
+		c = cv;
+		d = dv;
+
+		enableXZPlaneBounding = true;
+	}
+
 	BoundingBox() {}
 
 	void setYBounding(float minY, float maxY) {

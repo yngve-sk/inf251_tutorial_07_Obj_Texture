@@ -155,6 +155,14 @@ int main(int argc, char **argv) {
 	return 0;
 }
 
+
+// CAT MAGIC VARIABLES
+bool _idle_catm_enable = false;
+int _idle_catm_wait = 20;
+int _idle_catm_timeout = _idle_catm_wait;
+
+
+
 void display() {
 	// Clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -223,6 +231,7 @@ void display() {
 
 	drawText(position, -0.9, 0.7, 0);
 
+
 	// Draw Day/Night mode text
 	string lightMode;
 	if (1) {
@@ -243,7 +252,9 @@ void display() {
 
 	if (_idle_catm_enable) {
 		// DRAW CATS
-		_catMagic.drawAll(VertexLocs, MaterialLocs);
+		cout << "catmagic drawAll" << endl;
+		loadMatricesToUniform(_catMagic.cat.transformation.getTransformationMatrix(), VMatrix, PMatrix);
+		_catMagic.drawAll(VertexLocs, MaterialLocs, VMatrix, PMatrix, MMatrixLoc, MVMatrixLoc, MVPMatrixLoc);
 	}
 
 	// Disable the "position" vertex attribute (not necessary but recommended)
@@ -261,16 +272,13 @@ void display() {
 bool _idle_disable_house_rotation = false;
 bool _idle_traverse_camera_movement_path = false;
 
-int _idle_traverse_camera_wait = 20;
+int _idle_traverse_camera_wait = 30;
 int _idle_traverse_camera_timeout = _idle_traverse_camera_wait;
 
 bool _idle_traverse_camera_lookat_path = false;
 int _idle_traverse_camera_lookat_wait = 20;
 int _idle_traverse_camera_lookat_timeout = _idle_traverse_camera_lookat_wait;
 
-bool _idle_catm_enable = false;
-int _idle_catm_wait = 20;
-int _idle_catm_timeout = _idle_catm_wait;
 
 void idle() {
 	// rotate around Y-axis
@@ -407,18 +415,17 @@ void initCameraBoundingBox() {
 bool initObjects() {
 	// init bezier path
 	vec3 controlpts[10];
-	controlpts[0] = vec3(1500, -100, 3000);
-	controlpts[1] = vec3(500, -250, 2500);
-	controlpts[2] = vec3(1500, -900, 2000);
-	controlpts[3] = vec3(3500, -350, 1500);
-	controlpts[4] = vec3(1, -350, 1300);
-	controlpts[5] = vec3(4000, -3500, 200);
-	controlpts[6] = vec3(1, -350, 2500);
-	controlpts[7] = vec3(1, -3500, -1500);
-	controlpts[8] = vec3(1, 2550, 500);
-	controlpts[9] = vec3(1500, -100, 3000);
+	controlpts[0] = vec3(893,  -440, -1374);
+	controlpts[1] = vec3(2118, -791, -430);
+	controlpts[2] = vec3(4038, -1211, 1814);
+	controlpts[3] = vec3(6670, -877, 1833);
+	controlpts[4] = vec3(6678, -983, 3610);
+	controlpts[5] = vec3(5547, -1087, 6255);
+	controlpts[6] = vec3(60,   -1035, 4254);
+	controlpts[7] = vec3(-1439, -784, 3536);
+	controlpts[8] = vec3(-2279, -485, 2145);
 
-	_cameraPath.bezier(controlpts, 10, 200);
+	_cameraPath.bezier(controlpts, 9, 1000);
 	
 	initCameraBoundingBox();
 
@@ -454,6 +461,7 @@ bool initObjects() {
 
 	initLights();
 
+	_catMagic.load();
 
 //
 	return true;
@@ -645,7 +653,10 @@ void keyboard(unsigned char key, int x, int y) {
 		glutPostRedisplay();
 		break;
 	case 'i':
-		_catMagic.init(_cam.getPosition(), 35, -3, 15);
+		_catMagic.init(_cam.getPosition(), 12, -0.012, 15, _cam.getViewDirection(), _cam.getStrafeDirection());
+		break;
+	case 'u':
+		_idle_catm_enable = !_idle_catm_enable;
 		break;
 	case 'x':
 		CatView = !CatView;

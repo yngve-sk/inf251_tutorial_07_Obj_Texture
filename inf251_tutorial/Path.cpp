@@ -83,11 +83,11 @@ vec3 Path::getNextCurvePoint() {
 		return bezierPoints[++currentPointIndex];
 	}
 	else if (currentPointIndex == numCurvePoints - 1) {
-		//isReversed = true; // reverse and start going back
-		//return bezierPoints[--currentPointIndex];
-		isReversed = false;
-		currentPointIndex = 0;
-		return bezierPoints[0];
+		isReversed = true; // reverse and start going back
+		return bezierPoints[--currentPointIndex];
+		//isReversed = false;
+		//currentPointIndex = 0;
+		//return bezierPoints[0];
 	}
 	else {
 		return isReversed ?

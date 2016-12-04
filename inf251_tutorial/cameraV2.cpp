@@ -130,3 +130,11 @@ void Camera::generateCircularBezierAroundCurrentPosition(Path& curve, float hRad
 void Camera::setLookAtPoint(vec3 point) {
 	viewDirection = (point - position);
 }
+
+vec3 Camera::getViewDirection() {
+	return viewDirection;
+}
+
+vec3 Camera::getStrafeDirection() {
+	return cross(viewDirection, UP);
+}

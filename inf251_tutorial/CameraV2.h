@@ -51,4 +51,7 @@ public:
 
 	void generateCircularBezierAroundCurrentPosition(Path& writeTo, float hRadius, float dy);
 	void setLookAtPoint(vec3 point);
+
+	vec3 getViewDirection();
+	vec3 getStrafeDirection();
 };
