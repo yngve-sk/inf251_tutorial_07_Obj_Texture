@@ -13,6 +13,7 @@
 #include "lodepng.h"
 #include "GLLocStructs.h"
 #include "Transformation.h"
+#include "CameraV2.h"
 
 using namespace std;
 using namespace glm;
@@ -29,6 +30,8 @@ public:
 	GLuint bumpMapObject;
 
 	Transformation transformation;
+	Camera *cam;
+	bool isFixedToCamera = true;;
 
 	bool usingBumpMapping;
 
@@ -37,11 +40,14 @@ public:
 	void loadMaterial(const char*);
 	void loadBumpMap(const char*);
 	
-	SingleTextureObject(const char*, const char*, const char*);
 	SingleTextureObject();
 
 	void init(const char* directory,
 		const char* materialDirectory,
 		const char* bumpMap);
+
+	void syncWithCamera();
+	void setCamera(Camera*);
+	void setFixedToCamera(bool);
 private:
 };

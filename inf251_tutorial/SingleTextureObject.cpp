@@ -1,11 +1,5 @@
 #include "SingleTextureObject.h"
 
-SingleTextureObject::SingleTextureObject(const char* directory, 
-										 const char* materialDirectory,
-										 const char* bumpMap) {
-	init(directory, materialDirectory, bumpMap);
-}
-
 SingleTextureObject::SingleTextureObject(){}
 
 void SingleTextureObject::init(const char* directory,
@@ -14,6 +8,27 @@ void SingleTextureObject::init(const char* directory,
 		  loadObject(directory);
 		  loadMaterial(materialDirectory);
 		  loadBumpMap(bumpMap);
+		  
+}
+
+void SingleTextureObject::syncWithCamera() {
+	if (isFixedToCamera) {
+		transformation.setPosition(vec3((*cam).getPosition().x, -(*cam).getPosition().y - 2, -(*cam).getPosition().z - 1));
+	}
+}
+
+void SingleTextureObject::setCamera(Camera *camera) {
+	cam = camera;
+}
+
+void SingleTextureObject::setFixedToCamera(bool fixedToCamera) {
+	if (fixedToCamera) {
+		transformation.setPosition(vec3((*cam).getPosition().x, -(*cam).getPosition().y - 2, -(*cam).getPosition().z - 1));
+	} else {
+		transformation.setPosition(vec3(0, - 2, - 1));
+	}
+
+	isFixedToCamera = fixedToCamera;
 }
 
 void SingleTextureObject::loadObject(const char* directory) {

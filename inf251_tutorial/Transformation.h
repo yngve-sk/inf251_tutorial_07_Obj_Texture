@@ -16,6 +16,7 @@ private:
 	mat4 scaleMatrix = mat4();
 public:
 	void translate(vec3);
+	void setPosition(vec3);
 	void adjustScale(float);
 	void setScale(float);
 	void resetScale();

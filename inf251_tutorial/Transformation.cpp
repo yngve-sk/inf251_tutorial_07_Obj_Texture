@@ -5,6 +5,11 @@ void Transformation::translate(glm::vec3 trans) {
 	translationMatrix = glm::translate(translationMatrix, trans);
 }
 
+void Transformation::setPosition(glm::vec3 trans) {
+	translationMatrix = mat4();
+	translationMatrix = glm::translate(translationMatrix, trans);
+}
+
 void Transformation::adjustScale(float newScale) {
 	scaleMatrix = scaleMatrix * glm::scale(vec3(newScale));
 }
