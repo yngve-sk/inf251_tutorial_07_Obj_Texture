@@ -290,6 +290,10 @@ void display() {
 	string spotlighIntensity = "For increasing spotlight press 'k' for decreasing press 'j'";
 	drawText(spotlighIntensity, -0.9, 0.2, 0);
 
+	// Draw house rotation text
+	string launchingACat = "For init cat press 'i' for first launch press 'u' for re-launch press 'i' again";
+	drawText(launchingACat, -0.9, 0.1, 0);
+
 	if (_idle_catm_enable) {
 		// DRAW CATS
 		cout << "catmagic drawAll" << endl;
