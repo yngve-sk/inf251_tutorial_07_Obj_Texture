@@ -255,15 +255,23 @@ void display() {
 	else {
 		lightMode = "You are using Night mode. Press 'n' for Day mode.";
 	}
-	drawText(lightMode, -0.9, 0.6, 0);
+	drawText(lightMode, -0.9, 0.7, 0);
 
 	// Draw house rotation text
 	string houseRotation = "For house rotation press 'r'";
-	drawText(houseRotation, -0.9, 0.5, 0);
+	drawText(houseRotation, -0.9, 0.6, 0);
 
 	// Draw house rotation text
 	string viewFromACat = "For view from a cat press 'x'";
-	drawText(viewFromACat, -0.9, 0.4, 0);
+	drawText(viewFromACat, -0.9, 0.5, 0);
+
+	// Draw house rotation text
+	string cameraPath = "For animated path press 'h'";
+	drawText(cameraPath, -0.9, 0.4, 0);
+
+	// Draw house rotation text
+	string cameraLookAround = "For camera look around press 'r'";
+	drawText(cameraLookAround, -0.9, 0.3, 0);
 
 	// Disable the "position" vertex attribute (not necessary but recommended)
 	glDisableVertexAttribArray(VertexLocs.posLoc);
@@ -680,7 +688,9 @@ inline void updateMousePosition(int newX, int newY) {
 /// Called whenever the mouse is moving while a button is pressed
 void motion(int x, int y) {
 	if (MouseButton == GLUT_RIGHT_BUTTON) {
-		_cam.mouseUpdate(vec2(x, y));
+		//_cam.mouseUpdate(vec2(x, y));
+		_cam.translate(vec2(MouseX, MouseY), vec2(x, y));
+		_cat.syncWithCamera();
 
 		updateMousePosition(x, y);
 	}

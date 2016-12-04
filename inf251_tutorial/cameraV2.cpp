@@ -41,6 +41,11 @@ void Camera::mouseUpdate(const vec2& newMousePosition) {
 	oldMousePosition = newMousePosition;
 }
 
+void Camera::translate(const vec2& oldMousePosition, const vec2& newMousePosition) {
+	position += viewDirection * MOVEMENT_SPEED * (oldMousePosition.y - newMousePosition.y);
+	position += cross(viewDirection, UP) * MOVEMENT_SPEED * (newMousePosition.x - oldMousePosition.x);
+}
+
 mat4 Camera::getWorldToViewMatrix() const {
 	return lookAt(position, position + viewDirection, UP);
 }

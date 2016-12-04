@@ -42,6 +42,7 @@ public:
 	void moveUp();
 	void moveDown();
 	glm::vec3 getPosition() const { return position; }
+	void translate(const vec2& oldMousePosition, const vec2& newMousePosition);
 	bool isProjectionPerspective();
 	void switchPerspective();
 	void setPosition(glm::vec3 newPos) {
