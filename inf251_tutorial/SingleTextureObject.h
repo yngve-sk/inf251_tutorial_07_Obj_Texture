@@ -33,9 +33,10 @@ public:
 
 	Transformation transformation;
 	Camera *cam;
-	bool isFixedToCamera = true;;
+	bool isFixedToCamera = true;
 
 	bool usingBumpMapping;
+	bool bOn;
 
 	void drawObject(VertexGLLocs, MaterialGLLocs);
 	void loadObject(const char*);

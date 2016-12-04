@@ -35,6 +35,10 @@ void Transformation::loadToUniformLoc(GLuint loc) {
 	glUniformMatrix4fv(loc, 1, GL_FALSE, &transformation[0][0]);
 }
 
+mat4 Transformation::getTransformationMatrixWithRotation(float angle, glm::vec3 aroundAxis) {
+	return translationMatrix * (glm::rotate(rotationMatrix, (float)(angle * PI / 180.0), aroundAxis)) * scaleMatrix;
+}
+
 void Transformation::flip(vec3 aroundAxis) {
 	rotate((float)(180 * PI / 180.0), aroundAxis);
 }

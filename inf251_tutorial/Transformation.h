@@ -23,5 +23,6 @@ public:
 	void rotate(float, glm::vec3);
 	mat4 getTransformationMatrix();
 	void loadToUniformLoc(GLuint);
+	mat4 getTransformationMatrixWithRotation(float angle, glm::vec3 aroundAxis);
 	void flip(vec3);
 };
