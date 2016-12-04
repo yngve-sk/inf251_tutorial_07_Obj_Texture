@@ -85,6 +85,7 @@ bool HeadlightInt = true;
 
 vec2 displacement = vec2(0,0);
 vec2 displacementDelta = vec2(-1, 3);
+int time = 0;
 
 // --- main() -------------------------------------------------------------------------------------
 /// The entry point of the application
@@ -246,6 +247,18 @@ void idle() {
 	if (_idle_traverse_camera_lookat_path && 
 		(--_idle_traverse_camera_lookat_timeout % _idle_traverse_camera_lookat_wait)) {
 		_cam.setLookAtPoint(_cameraLookAtPath.getNextCurvePoint());
+	}
+
+	
+	time++;
+
+	if ((time % 5) == 0){
+		//_terrain.stepAnimation();
+		displacement += displacementDelta;
+		displacement.x = ((int)displacement.x % 2324);
+		displacement.y = ((int)displacement.y % 2324);
+		//cout << displacement << endl;
+		time = 0;
 	}
 
 	glutPostRedisplay();

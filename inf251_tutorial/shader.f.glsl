@@ -114,9 +114,11 @@ void main() {
 
 		vec3 rgbI = vec3(1.,1.,1.);
 
-		vec3 ambientRes = dLight.aIntensity * vec3(0,0,0.1);
-		vec3 diffuseRes = dLight.dIntensity * diffuse * vec3(0,0,0.2);
-		vec3 specularRes = dLight.sIntensity * specular * vec3(0.3,0.3,0.3);
+		vec3 oceanColor = vec3(0.11,0.56,1);
+
+		vec3 ambientRes = dLight.aIntensity * oceanColor;
+		vec3 diffuseRes = dLight.dIntensity * diffuse * oceanColor;
+		vec3 specularRes = dLight.sIntensity * specular * oceanColor;
 
 		FragColor = vec4(ambientRes + diffuseRes + specularRes,1.);
 		return;
