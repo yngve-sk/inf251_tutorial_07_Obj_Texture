@@ -47,6 +47,7 @@ SingleTextureObject _house;
 AnimatedTextureSquare _canvas;
 
 Path _cameraPath;
+Path _cameraLookAtPath;
 
 // TODO MOVE THIS
 bool initShaders();
@@ -226,8 +227,15 @@ void display() {
 
 bool _idle_disable_house_rotation = false;
 bool _idle_traverse_camera_movement_path = false;
+
 int _idle_traverse_camera_wait = 20;
 int _idle_traverse_camera_timeout = _idle_traverse_camera_wait;
+
+bool _idle_traverse_camera_lookat_path = false;
+int _idle_traverse_camera_lookat_wait = 20;
+int _idle_traverse_camera_lookat_timeout = _idle_traverse_camera_lookat_wait;
+
+
 void idle() {
 	// rotate around Y-axis
 	//LocalRotationY = _idle_disable_house_rotation ? LocalRotationY : LocalRotationY * glm::rotate(0.005f, vec3(0, 1, 0));
@@ -238,6 +246,12 @@ void idle() {
 	if (_idle_traverse_camera_movement_path && (--_idle_traverse_camera_timeout%_idle_traverse_camera_wait)) {
 		_cam.setPosition(_cameraPath.getNextCurvePoint());
 	}
+
+	if (_idle_traverse_camera_lookat_path && 
+		(--_idle_traverse_camera_lookat_timeout % _idle_traverse_camera_lookat_wait)) {
+		_cam.setLookAtPoint(_cameraLookAtPath.getNextCurvePoint());
+	}
+
 	
 	time++;
 
@@ -341,6 +355,12 @@ bool initShader(GLuint& program, string vShaderPath, string fShaderPath) {
 	return true;
 }
 
+void initCameraBoundingBox() {
+	BoundingBox& b = _cam.bounds;
+
+	b.setYBounding(-4000, -7);
+}
+
 bool initObjects() {
 	// init bezier path
 	vec3 controlpts[10];
@@ -357,13 +377,7 @@ bool initObjects() {
 
 	_cameraPath.bezier(controlpts, 10, 200);
 	
-	for (int i = 0; i < 200; i++) {
-		vec3 nextPoint = _cameraPath.getNextCurvePoint();
-		//cout << std::to_string(nextPoint.z) << endl;
-		glBegin(GL_POINTS);
-		glVertex3f(nextPoint.x, nextPoint.y, nextPoint.z);
-		glEnd();
-	}
+	initCameraBoundingBox();
 
 	_terrain.init("terrain\\bergen_1024x918.bin",
 		"terrain\\bergen_terrain_texture.png");
@@ -556,6 +570,14 @@ void keyboard(unsigned char key, int x, int y) {
 	case 'h':
 		_idle_traverse_camera_movement_path = !_idle_traverse_camera_movement_path;
 		break;
+	case 't':
+		_idle_traverse_camera_lookat_path = !_idle_traverse_camera_lookat_path;
+		break;
+	case 'y':
+		_cam.generateCircularBezierAroundCurrentPosition(_cameraLookAtPath, 40, -10);
+		break;
+	
+	}// (50.7, 802.5) -> (54.84, 797.29) === (5x, -5y)
 	}
 	glutPostRedisplay();
 }

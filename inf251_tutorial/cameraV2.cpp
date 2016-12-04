@@ -1,5 +1,5 @@
 #include "CameraV2.h"
-#include <glm\gtx\transform.hpp>
+
 
 using namespace glm;
 Camera::Camera() :
@@ -26,10 +26,17 @@ void Camera::mouseUpdate(const vec2& newMousePosition) {
 		 rotateAroundStrafe = rotate(-dxdy.y * ROTATIONAL_SPEED, strafeDirection);
 
 	mat4 rotator = rotateAroundUp;
-	if(UP.y/glm::length(UP) > 0.1)
-		rotator = rotator * rotateAroundStrafe;
+		 rotator = rotator * rotateAroundStrafe;
 
-	viewDirection = mat3(rotator) * viewDirection;
+	vec3 newViewDirection = mat3(rotator) * viewDirection;
+
+	float dotUpDownAbs = abs(dot(newViewDirection, UP));
+
+	if(dotUpDownAbs < dotThreshold)
+		viewDirection = newViewDirection;
+
+	//std::cout << "dotThreshold: " << dotThreshold << ", dotUpDownAbs: "<< dotUpDownAbs << std::endl;
+	
 
 	oldMousePosition = newMousePosition;
 }
@@ -51,27 +58,33 @@ mat4 Camera::getViewToProjectionMatrix() const{
 }
 
 void Camera::moveForward() {
-	position += MOVEMENT_SPEED * viewDirection;
+	moveInDirection(MOVEMENT_SPEED, viewDirection);
+//	position += MOVEMENT_SPEED * viewDirection;
 }
 
 void Camera::moveBackward() {
-	position += -MOVEMENT_SPEED * viewDirection;
+	moveInDirection(-MOVEMENT_SPEED, viewDirection);
+//	position += -MOVEMENT_SPEED * viewDirection;
 }
 
 void Camera::strafeLeft() {
-	position += MOVEMENT_SPEED * strafeDirection;
+	moveInDirection(MOVEMENT_SPEED, strafeDirection);
+//	position += MOVEMENT_SPEED * strafeDirection;
 }
 
 void Camera::strafeRight() {
-	position += -MOVEMENT_SPEED * strafeDirection;
+	moveInDirection(-MOVEMENT_SPEED, strafeDirection);
+//	position += -MOVEMENT_SPEED * strafeDirection;
 }
 
 void Camera::moveUp() {
-	position += MOVEMENT_SPEED * UP;
+	moveInDirection(MOVEMENT_SPEED, UP);
+//	position += MOVEMENT_SPEED * UP;
 }
 
 void Camera::moveDown() {
-	position += -MOVEMENT_SPEED * UP;
+	moveInDirection(MOVEMENT_SPEED, -UP);
+//	position += -MOVEMENT_SPEED * UP;
 }
 
 void Camera::switchPerspective() {
@@ -80,4 +93,40 @@ void Camera::switchPerspective() {
 
 bool Camera::isProjectionPerspective() {
 	return perspectiveProjection;
+}
+
+void Camera::moveInDirection(float speed, vec3 direction) {
+	vec3 proposedPosition = position + speed*direction;
+	if (bounds.isWithinBoundingBox(proposedPosition)) {
+		position = proposedPosition;
+	}
+}
+
+void Camera::generateCircularBezierAroundCurrentPosition(Path& curve, float hRadius, float dy) {
+	// default: use 8 control points, link
+	// point 8 to point 1
+
+	
+	const int nControlPoints = 8;
+	float angleStepDegrees = 360 / nControlPoints;
+
+	vec3 controlPoints[nControlPoints+1];
+
+	for (int i = 0; i < nControlPoints; i++) {
+		float x = hRadius * cos(angleStepDegrees * i);
+		float z = hRadius * sin(angleStepDegrees * i);
+		controlPoints[i] = (vec3(
+			position.x + x, 
+			position.y + dy, 
+			position.z + z)
+			);
+	}
+
+	controlPoints[nControlPoints] = controlPoints[0];
+
+	curve.bezier(controlPoints, nControlPoints + 1, 300); // +1 to make it circualr!
+}
+
+void Camera::setLookAtPoint(vec3 point) {
+	viewDirection = (point - position);
 }
