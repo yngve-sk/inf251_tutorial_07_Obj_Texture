@@ -134,11 +134,11 @@ void main() {
 	vec3 ambientRes;
 	vec3 diffuseRes;
 	vec3 specularRes;
-	if (bumpMapping == 0){
+	//if (bumpMapping == 0){
 		ambientRes = dLight.aIntensity * dLight.aColor * material.aColor;
 		diffuseRes = dLight.dIntensity * dLight.dColor * diffuse * material.dColor;
 		specularRes = dLight.sIntensity * dLight.sColor * specular * material.sColor;
-	} else if ((bumpMapping == 1) && (belowSeaLevel == 0)){
+	 if (bumpMapping == 1 && (belowSeaLevel == 0)){
 		vec3 oceanColor = vec3(0.11,0.56,1);
 
 		ambientRes = dLight.aIntensity * oceanColor;
