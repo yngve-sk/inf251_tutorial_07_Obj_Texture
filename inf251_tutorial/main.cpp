@@ -530,38 +530,49 @@ void keyboard(unsigned char key, int x, int y) {
 		break;
 	case 'r':
 		_idle_disable_house_rotation = !_idle_disable_house_rotation;
+		glutPostRedisplay();
 		break;
 	case 'w':
 		std::cout << "forkwards" << std::endl;
 		_cam.moveForward();
+		glutPostRedisplay();
 		break;
 	case 'a':
 		_cam.strafeLeft();
+		glutPostRedisplay();
 		break;
 	case 's':
 		std::cout << "backwards" << std::endl;
 		_cam.moveBackward();
+		glutPostRedisplay();
 		break;
 	case 'd':
 		_cam.strafeRight();
+		glutPostRedisplay();
 		break;
 	case 'c':
 		_cam.moveDown();
+		glutPostRedisplay();
 		break;
 	case ' ':
 		_cam.moveUp();
+		glutPostRedisplay();
 		break;
 	case 'p':
 		_cam.switchPerspective();
+		glutPostRedisplay();
 		break;
 	case 'l':
 		_spotlight.toggleOnOff();
+		glutPostRedisplay();
 		break;
 	case 'k':
 		_spotlight.increaseIntensity();
+		glutPostRedisplay();
 		break;
 	case 'j':
 		_spotlight.decreaseIntensity();
+		glutPostRedisplay();
 		break;
 	case 'b':
 		//colorByHeightOnOff *= -1;
@@ -569,16 +580,17 @@ void keyboard(unsigned char key, int x, int y) {
 		break;
 	case 'h':
 		_idle_traverse_camera_movement_path = !_idle_traverse_camera_movement_path;
+		glutPostRedisplay();
 		break;
 	case 't':
 		_idle_traverse_camera_lookat_path = !_idle_traverse_camera_lookat_path;
+		glutPostRedisplay();
 		break;
 	case 'y':
 		_cam.generateCircularBezierAroundCurrentPosition(_cameraLookAtPath, 40, -10);
+		glutPostRedisplay();
 		break;
-	
 	}
-	glutPostRedisplay();
 }
 
 int MouseX, MouseY;		///< The last position of the mouse
