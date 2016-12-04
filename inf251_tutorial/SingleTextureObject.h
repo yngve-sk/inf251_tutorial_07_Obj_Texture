@@ -31,6 +31,7 @@ public:
 
 	Transformation transformation;
 	Camera *cam;
+	bool isFixedToCamera = true;;
 
 	bool usingBumpMapping;
 
@@ -39,14 +40,14 @@ public:
 	void loadMaterial(const char*);
 	void loadBumpMap(const char*);
 	
-	SingleTextureObject(const char*, const char*, const char*, Camera*);
 	SingleTextureObject();
 
 	void init(const char* directory,
 		const char* materialDirectory,
-		const char* bumpMap,
-		Camera*);
+		const char* bumpMap);
 
 	void syncWithCamera();
+	void setCamera(Camera*);
+	void setFixedToCamera(bool);
 private:
 };

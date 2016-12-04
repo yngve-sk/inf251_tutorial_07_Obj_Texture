@@ -85,6 +85,8 @@ VertexGLLocs VertexLocs = {0, 1, 2};
 bool SpotlightInt = true;
 bool SpotlightIntensity = true;
 
+bool CatView = true;
+
 vec2 displacement = vec2(0,0);
 vec2 displacementDelta = vec2(-1, 3);
 int time = 0;
@@ -229,6 +231,10 @@ void display() {
 	// Draw house rotation text
 	string houseRotation = "For house rotation press 'r'";
 	drawText(houseRotation, -0.9, 0.5, 0);
+
+	// Draw house rotation text
+	string viewFromACat = "For view from a cat press 'x'";
+	drawText(viewFromACat, -0.9, 0.5, 0);
 
 	// Disable the "position" vertex attribute (not necessary but recommended)
 	glDisableVertexAttribArray(VertexLocs.posLoc);
@@ -409,8 +415,8 @@ bool initObjects() {
 
 	_cat.init("Objects\\cat\\cat.obj",
 		"Objects\\cat\\cat_diff.png",
-		"Objects\\cat\\cat_norm.png", 
-		&_cam);
+		"Objects\\cat\\cat_norm.png");
+	_cat.setCamera(&_cam);
 	_cat.transformation.rotate(180, vec3(1, 0, 0));
 	_cat.transformation.translate(vec3(0, -2, -1));
 	_cat.transformation.setScale(2.5);
@@ -619,6 +625,10 @@ void keyboard(unsigned char key, int x, int y) {
 	case 'y':
 		_cam.generateCircularBezierAroundCurrentPosition(_cameraLookAtPath, 40, -10);
 		glutPostRedisplay();
+		break;
+	case 'x':
+		CatView = !CatView;
+		_cat.setFixedToCamera(CatView);
 		break;
 	}
 }
