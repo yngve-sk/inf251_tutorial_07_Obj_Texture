@@ -23,6 +23,7 @@ public:
 
 	void loadToUniformAt(GLuint shaderProgram, std::string uniformName);
 	void toggleOnOff(bool);
+	void setIntensity(float intensity);
 	void increaseIntensity();
 	void decreaseIntensity();
 };

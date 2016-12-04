@@ -86,7 +86,7 @@ VertexGLLocs VertexLocs = {0, 1, 2};
 
 // --- MICS-----------------------------
 bool SpotlightOn = true;
-bool SpotlightIntensity = true;
+float SpotlightIntensity = 0.05;
 
 bool day = true;
 
@@ -191,7 +191,8 @@ void display() {
 		_directionalLight.setIntensity(vec3(0.1, 0.1, 0.1));
 	}
 	_spotlight.toggleOnOff(SpotlightOn);
-	
+	_spotlight.setIntensity(SpotlightIntensity);
+
 	// Update lights
 	_spotlight.loadToUniformAt(ShaderProgram, "spotlight");
 	_directionalLight.loadToUniformAt(ShaderProgram, "dLight");
@@ -282,8 +283,12 @@ void display() {
 	drawText(cameraPath, -0.9, 0.4, 0);
 
 	// Draw house rotation text
-	string cameraLookAround = "For camera look around press 'r'";
+	string cameraLookAround = "For camera look around press 'y'";
 	drawText(cameraLookAround, -0.9, 0.3, 0);
+
+	// Draw house rotation text
+	string spotlighIntensity = "For increasing spotlight press 'k' for decreasing press 'j'";
+	drawText(spotlighIntensity, -0.9, 0.2, 0);
 
 	if (_idle_catm_enable) {
 		// DRAW CATS
@@ -464,6 +469,7 @@ bool initObjects() {
 	
 	initCameraBoundingBox();
 
+	//_terrain.init("terrain\\bergen_3072x2754.bin",
 	_terrain.init("terrain\\bergen_1024x918.bin",
 		"terrain\\bergen_terrain_texture.png");
 	//_terrain.loadBumpMaps(13,
@@ -667,12 +673,14 @@ void keyboard(unsigned char key, int x, int y) {
 		glutPostRedisplay();
 		break;
 	case 'k':
-		//_spotlight.increaseIntensity();
-		//_spotlight.loadToUniformAt(ShaderProgram, "spotlight");
+		if (SpotlightIntensity > 0.05) {
+			SpotlightIntensity -= 0.1;
+		}
+		if (SpotlightIntensity < 0)
+			SpotlightIntensity = 0.05;
 		break;
 	case 'j':
-		//_spotlight.decreaseIntensity();
-		//_spotlight.loadToUniformAt(ShaderProgram, "spotlight");
+		SpotlightIntensity += 0.1;
 		break;
 	case 'b':
 		//colorByHeightOnOff *= -1;

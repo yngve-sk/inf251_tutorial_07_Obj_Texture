@@ -14,6 +14,10 @@ void Spotlight::toggleOnOff(bool bOnOf) {
 	bOn = bOnOf ? 1 : 0;
 }
 
+void Spotlight::setIntensity(float intensity) {
+	vIntensity = intensity;
+}
+
 void Spotlight::increaseIntensity() {
 	if (vIntensity > 0.05) {
 		vIntensity -= 0.1;

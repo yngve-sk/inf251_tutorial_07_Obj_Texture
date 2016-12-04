@@ -83,12 +83,12 @@ void Camera::strafeRight() {
 }
 
 void Camera::moveUp() {
-	moveInDirection(MOVEMENT_SPEED, UP);
+	moveInDirection(MOVEMENT_SPEED, -UP);
 //	position += MOVEMENT_SPEED * UP;
 }
 
 void Camera::moveDown() {
-	moveInDirection(MOVEMENT_SPEED, -UP);
+	moveInDirection(MOVEMENT_SPEED, UP);
 //	position += -MOVEMENT_SPEED * UP;
 }
 
