@@ -82,8 +82,10 @@ GLint ColorByHeightLoc = -1;
 VertexGLLocs VertexLocs = {0, 1, 2};
 
 // --- MICS-----------------------------
-bool SpotlightInt = true;
+bool SpotlightOn = true;
 bool SpotlightIntensity = true;
+
+bool day = true;
 
 bool CatView = true;
 
@@ -171,13 +173,26 @@ void display() {
 	glUniform1i(ColorByHeightLoc, 1);
 	glUniform2fv(DisplacementLoc, 1, &displacement[0]);
 
-	// Camera 
-	//_cam.setAspectRatio(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+	//Lights init
+	if (day) {
+		_directionalLight.setIntensity(vec3(0.7, 0.7, 0.7));
+	} else {
+		_directionalLight.setIntensity(vec3(0.1, 0.1, 0.1));
+	}
+	_spotlight.toggleOnOff(SpotlightOn);
 	
+	// Update lights
+	_spotlight.loadToUniformAt(ShaderProgram, "spotlight");
+	_directionalLight.loadToUniformAt(ShaderProgram, "dLight");
+	
+
+
 	mat4 VMatrix = _cam.getWorldToViewMatrix();
 	mat4 PMatrix = _cam.getViewToProjectionMatrix();
 
 	glUniformMatrix4fv(ViewMatrixLoc, 1, GL_FALSE, &VMatrix[0][0]);
+
+
 
 	//Models with lower intensity
 	//Terrain
@@ -190,20 +205,26 @@ void display() {
 	loadMatricesToUniform(_cat.transformation.getTransformationMatrix(), VMatrix, PMatrix);
 	_cat.drawObject(VertexLocs, MaterialLocs);
 
+	//House
+	_house.usingBumpMapping = false;
+	loadMatricesToUniform(_house.transformation.getTransformationMatrix(), VMatrix, PMatrix);
+	_house.drawObject(VertexLocs, MaterialLocs);
+
+
+
 	//Models with higher intensity
-	vec3 oldIntensity = _directionalLight.setIntensity(vec3(0.3, 0.3, 0.3));
+	vec3 oldIntensity = _directionalLight.setIntensity(vec3(0.7, 0.7, 0.7));
+	_directionalLight.loadToUniformAt(ShaderProgram, "dLight");
 	
 	//Canvas
 	_canvas.usingBumpMapping = false;
 	loadMatricesToUniform(_canvas.transformation.getTransformationMatrix(), VMatrix, PMatrix);
 	_canvas.drawObject(VertexLocs, MaterialLocs);
 
-	//House
-	_house.usingBumpMapping = false;
-	loadMatricesToUniform(_house.transformation.getTransformationMatrix(), VMatrix, PMatrix);
-	_house.drawObject(VertexLocs, MaterialLocs);
-
 	_directionalLight.setIntensity(oldIntensity);
+	_directionalLight.loadToUniformAt(ShaderProgram, "dLight");
+
+
 
 	// Draw projection text
 	string projection;
@@ -215,18 +236,20 @@ void display() {
 	}
 	drawText(projection, -0.9, 0.9, 0);
 
-	// Draw camera position text
-	vec3 camPosition = _cam.getPosition();
-	string position = "Camera position x: ";
-	position.append(to_string(camPosition[0]) + ", y: ");
-	position.append(to_string(camPosition[1])) + ", z: ";
-	position.append(to_string(camPosition[2]));
+	// Draw spotlight text
+	string spotlight;
+	if (SpotlightOn) {
+		spotlight = "Spotlight is on. Press 'l' for change.";
+	}
+	else {
+		spotlight = "Spotlight is off. Press 'l' for change.";
+	}
 
-	drawText(position, -0.9, 0.7, 0);
+	drawText(spotlight, -0.9, 0.8, 0);
 
 	// Draw Day/Night mode text
 	string lightMode;
-	if (1) {
+	if (day) {
 		lightMode = "You are using Day mode. Press 'n' for Night mode.";
 	}
 	else {
@@ -282,7 +305,6 @@ void idle() {
 		_cam.setLookAtPoint(_cameraLookAtPath.getNextCurvePoint());
 		_cat.syncWithCamera();
 	}
-
 	
 	time++;
 
@@ -432,7 +454,7 @@ bool initObjects() {
 	_house.init("House-Model\\House.obj",
 		"Objects\\cat\\cat_diff.png",
 		"Objects\\cat\\cat_norm.png");
-	_house.transformation.translate(vec3(665, -28, 475));
+	_house.transformation.translate(vec3(665, -25, 475));
 
 	_canvas.init(vec3(0, 50, 10),
 		(float)36.f*2.f,
@@ -602,12 +624,12 @@ void keyboard(unsigned char key, int x, int y) {
 		glutPostRedisplay();
 		break;
 	case 'l':
-		_spotlight.toggleOnOff();
+		SpotlightOn = !SpotlightOn;
 		glutPostRedisplay();
 		break;
 	case 'n':
-		//_spotlight.increaseIntensity();
-		//_spotlight.loadToUniformAt(ShaderProgram, "spotlight");
+		day = !day;
+		glutPostRedisplay();
 		break;
 	case 'k':
 		//_spotlight.increaseIntensity();

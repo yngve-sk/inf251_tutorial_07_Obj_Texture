@@ -10,8 +10,8 @@ Spotlight::Spotlight() :
 	fConeCosine = glm::cos(fConeAngle);
 }
 
-void Spotlight::toggleOnOff() {
-	bOn = (bOn == 1 ? 0 : 1);
+void Spotlight::toggleOnOff(bool bOnOf) {
+	bOn = bOnOf ? 1 : 0;
 }
 
 void Spotlight::increaseIntensity() {

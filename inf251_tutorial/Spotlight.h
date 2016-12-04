@@ -22,7 +22,7 @@ public:
 	int vRadialAttenuation;
 
 	void loadToUniformAt(GLuint shaderProgram, std::string uniformName);
-	void toggleOnOff();
+	void toggleOnOff(bool);
 	void increaseIntensity();
 	void decreaseIntensity();
 };

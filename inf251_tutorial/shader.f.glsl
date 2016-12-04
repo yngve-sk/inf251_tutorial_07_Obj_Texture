@@ -157,18 +157,20 @@ void main() {
 	//-----------------------------SPOTLIGHTS---------------------------------//
 	//------------------------------------------------------------------------//
 
-	vec3 SpotlightViewPosition = vec3(ViewMatrix * vec4(spotlight.vPosition,1.));
-	vec3 vLight = normalize(spotlight.vDirection);
-	vec3 vLightToFragment = normalize(spotlight.vPosition - viewPosition);
+	if (spotlight.bOn == 1){
+		vec3 SpotlightViewPosition = vec3(ViewMatrix * vec4(spotlight.vPosition,1.));
+		vec3 vLight = normalize(spotlight.vDirection);
+		vec3 vLightToFragment = normalize(spotlight.vPosition - viewPosition);
 
-	float vDistance = distance(viewPosition, spotlight.vPosition); 
+		float vDistance = distance(viewPosition, spotlight.vPosition); 
 
-	float cosTheta = dot(vLight, vLightToFragment);
+		float cosTheta = dot(vLight, vLightToFragment);
 
 
-	if(cosTheta  < spotlight.fConeCosine) {
-		float radialAttentuation = pow(1.05*cosTheta, spotlight.vRadialAttenuation);
-		fColor += ((radialAttentuation * spotlight.vColor) / (vDistance * spotlight.vIntensity) );
+		if(cosTheta  < spotlight.fConeCosine) {
+			float radialAttentuation = pow(1.05*cosTheta, spotlight.vRadialAttenuation);
+			fColor += ((radialAttentuation * spotlight.vColor) / (vDistance * spotlight.vIntensity) );
+		}
 	}
 
 	//------------------------------------------------------------------------//

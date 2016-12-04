@@ -166,10 +166,14 @@ void SingleTextureObject::drawObject(VertexGLLocs vertexGLLocs, MaterialGLLocs m
 	ModelOBJ::Material material = model.getMaterial(0);
 
 	// Set material parameters for house
-	glUniform3f(materialGLLocs.aColorLoc, material.ambient[0], material.ambient[1], material.ambient[2]);
-	glUniform3f(materialGLLocs.dColorLoc, material.diffuse[0], material.diffuse[1], material.diffuse[2]);
-	glUniform3f(materialGLLocs.sColorLoc, material.specular[0], material.specular[1], material.specular[2]);
-	glUniform1f(materialGLLocs.shineLoc, material.shininess);
+	//glUniform3f(materialGLLocs.aColorLoc, material.ambient[0], material.ambient[1], material.ambient[2]);
+	//glUniform3f(materialGLLocs.dColorLoc, material.diffuse[0], material.diffuse[1], material.diffuse[2]);
+	//glUniform3f(materialGLLocs.sColorLoc, material.specular[0], material.specular[1], material.specular[2]);
+	//glUniform1f(materialGLLocs.shineLoc, material.shininess);
+	glUniform3f(materialGLLocs.aColorLoc, 0.9f, 1.0f, 0.9f);
+	glUniform3f(materialGLLocs.dColorLoc, 0.3f, 1.0f, 0.3f);
+	glUniform3f(materialGLLocs.sColorLoc, 0.1f, 0.1f, 0.1f);
+	glUniform1f(materialGLLocs.shineLoc, 10.0f);
 
 	glEnable(GL_TEXTURE_2D);
 	glActiveTexture(GL_TEXTURE0);
