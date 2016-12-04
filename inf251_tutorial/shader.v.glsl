@@ -19,10 +19,6 @@ out float belowSeaLevel;
 
 void main() {
     // Pass some variables to the fragment shader
-    //fragTexCoord = tex_coords;
-    //fragNormal = vec3(modelToWorldMatrix * vec4(normal,1.));
-    //fragVert = vec3(modelToWorldMatrix * vec4(position,1.));
-    
 	viewPosition = vec3(MVMatrix * vec4(position, 1.0));
 	viewNormal = normalize(vec3(MVMatrix * vec4(normal, 0.0)));
 		
@@ -35,6 +31,5 @@ void main() {
 	}
 
     // Apply all matrix transformations to vert
-	//gl_Position = worldToProjectionMatrix * modelToWorldMatrix * vec4(position, 1.); // old version
 	gl_Position = MVPMatrix * vec4(position, 1.0);	
 }

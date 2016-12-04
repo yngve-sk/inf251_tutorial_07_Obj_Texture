@@ -32,6 +32,7 @@ void idle();
 void keyboard(unsigned char, int, int);
 void mouse(int, int, int, int);
 void motion(int, int);
+void specialInput(int, int, int);
 
 //--- Scene objects ---------------------------------------------------------------------------
 Camera _cam;
@@ -81,7 +82,8 @@ GLint ColorByHeightLoc = -1;
 VertexGLLocs VertexLocs = {0, 1, 2};
 
 // --- MICS-----------------------------
-bool HeadlightInt = true;
+bool SpotlightInt = true;
+bool SpotlightIntensity = true;
 
 vec2 displacement = vec2(0,0);
 vec2 displacementDelta = vec2(-1, 3);
@@ -103,6 +105,7 @@ int main(int argc, char **argv) {
 	glutIdleFunc(idle);
 	glutKeyboardFunc(keyboard);
 	glutMouseFunc(mouse);
+	glutSpecialFunc(specialInput);
 	glutMotionFunc(motion);
 
 	// Initialize glew (must be done after glut is initialized!)
@@ -501,6 +504,26 @@ void drawText(string s, double x, double y, double z) {
 	}
 }
 
+void specialInput(int key, int x, int y) {
+	switch (key)
+	{
+	case GLUT_KEY_UP:
+		_cam.moveForward();
+		break;
+	case GLUT_KEY_DOWN:
+		_cam.moveBackward();
+		break;
+	case GLUT_KEY_LEFT:
+		_cam.strafeLeft();
+		break;
+	case GLUT_KEY_RIGHT:
+		_cam.strafeRight();
+		break;
+	}
+
+	glutPostRedisplay();
+}
+
 float deltaDefault = 10;
 /// Called whenever a keyboard button is pressed (only ASCII characters)
 void keyboard(unsigned char key, int x, int y) {
@@ -514,75 +537,38 @@ void keyboard(unsigned char key, int x, int y) {
 	case 'w':
 		std::cout << "forkwards" << std::endl;
 		_cam.moveForward();
-		glutPostRedisplay();
 		break;
 	case 'a':
 		_cam.strafeLeft();
-		glutPostRedisplay();
 		break;
 	case 's':
 		std::cout << "backwards" << std::endl;
 		_cam.moveBackward();
-		glutPostRedisplay();
 		break;
 	case 'd':
 		_cam.strafeRight();
-		glutPostRedisplay();
 		break;
 	case 'c':
 		_cam.moveDown();
-		glutPostRedisplay();
 		break;
 	case ' ':
 		_cam.moveUp();
-		glutPostRedisplay();
-		break;
-	case '+':
-		//_cam.adjustFov(deltaDefault);
-		glutPostRedisplay();
-		break;
-	case '-':
-		//_cam.adjustFov(-deltaDefault);
-		glutPostRedisplay();
-		break;
-	case 'f':
-		//_cam.adjustZFar(deltaDefault);
-		glutPostRedisplay();
-		break;
-	case 'g':
-		//_cam.adjustZFar(-deltaDefault);
-		glutPostRedisplay();
-		break;
-	case 'n':
-		//_cam.adjustZNear(deltaDefault);
-		glutPostRedisplay();
-		break;
-	case 'm':
-		//_cam.adjustZNear(-deltaDefault);
-		glutPostRedisplay();
 		break;
 	case 'p':
 		_cam.switchPerspective();
-		glutPostRedisplay();
 		break;
 	case 'l':
-		HeadlightInt = !HeadlightInt;
-		glutPostRedisplay();
+		_spotlight.toggleOnOff();
 		break;
-	case '9':
-		//_cam.flip();
-		glutPostRedisplay();
+	case 'k':
+		_spotlight.increaseIntensity();
+		break;
+	case 'j':
+		_spotlight.decreaseIntensity();
 		break;
 	case 'b':
 		//colorByHeightOnOff *= -1;
 		//glUniform1i(ColorByHeightLoc, colorByHeightOnOff);
-		break;
-	case '1':
-		//_terrain.stepAnimation();
-		displacement += displacementDelta;
-		displacement.x = ((int)displacement.x % 2324);
-		displacement.y = ((int)displacement.y % 2324);
-		//cout << displacement << endl;
 		break;
 	case 'h':
 		_idle_traverse_camera_movement_path = !_idle_traverse_camera_movement_path;
@@ -594,7 +580,8 @@ void keyboard(unsigned char key, int x, int y) {
 		_cam.generateCircularBezierAroundCurrentPosition(_cameraLookAtPath, 40, -10);
 		break;
 	
-	}// (50.7, 802.5) -> (54.84, 797.29) === (5x, -5y)
+	}
+	glutPostRedisplay();
 }
 
 int MouseX, MouseY;		///< The last position of the mouse

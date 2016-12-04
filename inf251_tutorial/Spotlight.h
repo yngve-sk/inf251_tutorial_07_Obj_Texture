@@ -10,14 +10,19 @@ private:
 	int bOn;
 	float fConeAngle, 
 		  fConeCosine, 
-		  fLinearAtt;
+		  fLinearAtt,
+		  vIntensity;
 public:
 	Spotlight();
 
 	glm::vec3 vColor,
 		      vPosition,
 		      vDirection;
+	
+	int vRadialAttenuation;
 
 	void loadToUniformAt(GLuint shaderProgram, std::string uniformName);
 	void toggleOnOff();
+	void increaseIntensity();
+	void decreaseIntensity();
 };
