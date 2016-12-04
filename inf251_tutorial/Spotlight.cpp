@@ -5,7 +5,7 @@ Spotlight::Spotlight() :
 	vColor(.7f, .7f, .7f),
 	vDirection(0.2, 0, -1),
 	vPosition(-0.6,0,0),
-	vRadialAttenuation(22),
+	vRadialAttenuation(18),
 	vIntensity(0.05){
 	fConeCosine = glm::cos(fConeAngle);
 }
@@ -15,7 +15,9 @@ void Spotlight::toggleOnOff() {
 }
 
 void Spotlight::increaseIntensity() {
-	vIntensity -= 0.1;
+	if (vIntensity > 0.05) {
+		vIntensity -= 0.1;
+	}
 }
 
 void Spotlight::decreaseIntensity() {

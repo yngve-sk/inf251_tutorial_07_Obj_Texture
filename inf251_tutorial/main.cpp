@@ -378,7 +378,7 @@ bool initObjects() {
 		"Objects\\cat\\cat_diff.png",
 		"Objects\\cat\\cat_norm.png");
 	_cat.transformation.rotate(180, vec3(1, 0, 0));
-	_cat.transformation.translate(vec3(0, 0, 5));
+	_cat.transformation.translate(vec3(0, -2, 0));
 	_cat.transformation.setScale(2.5);
 
 	//_house.init("House-Model\\House.obj",
@@ -520,6 +520,8 @@ void keyboard(unsigned char key, int x, int y) {
 	case 'w':
 		std::cout << "forkwards" << std::endl;
 		_cam.moveForward();
+		_cat.transformation.setPosition(vec3(_cam.getPosition().x, (-_cam.getPosition().y-2), -_cam.getPosition().z));
+		//_cat.transformation.loadToUniformLoc();
 		break;
 	case 'a':
 		_cam.strafeLeft();
@@ -543,11 +545,17 @@ void keyboard(unsigned char key, int x, int y) {
 	case 'l':
 		_spotlight.toggleOnOff();
 		break;
+	case 'n':
+		//_spotlight.increaseIntensity();
+		//_spotlight.loadToUniformAt(ShaderProgram, "spotlight");
+		break;
 	case 'k':
-		_spotlight.increaseIntensity();
+		//_spotlight.increaseIntensity();
+		//_spotlight.loadToUniformAt(ShaderProgram, "spotlight");
 		break;
 	case 'j':
-		_spotlight.decreaseIntensity();
+		//_spotlight.decreaseIntensity();
+		//_spotlight.loadToUniformAt(ShaderProgram, "spotlight");
 		break;
 	case 'b':
 		//colorByHeightOnOff *= -1;
