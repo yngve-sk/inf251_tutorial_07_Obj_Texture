@@ -3,8 +3,8 @@
 
 using namespace glm;
 Camera::Camera() :
-	viewDirection(0.f, 0.f, -1.f),
-	position(0.f, 0.f, 0.f),
+	viewDirection(0.1f, 0.1f, -1.f),
+	position(0.1f, -35.1f, 0.1f),
 	UP(0.0f, 1.0f, 0.0f), fov(30.0f),
 	ar(1.f),
 	zNear(0.1f),

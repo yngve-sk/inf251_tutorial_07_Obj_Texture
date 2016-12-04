@@ -676,7 +676,7 @@ void keyboard(unsigned char key, int x, int y) {
 		break;
 	case 'y':
 		if (!_idle_traverse_camera_lookat_path) {
-			_cam.generateCircularBezierAroundCurrentPosition(_cameraLookAtPath, -40, -10);
+			_cam.generateCircularBezierAroundCurrentPosition(_cameraLookAtPath, 150, -10);
 		}
 		_idle_traverse_camera_lookat_path = !_idle_traverse_camera_lookat_path;
 		glutPostRedisplay();
