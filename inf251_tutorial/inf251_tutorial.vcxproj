@@ -347,6 +347,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimatedTextureSquare.h" />
+    <ClInclude Include="BoundingBox.h" />
     <ClInclude Include="CameraV2.h" />
     <ClInclude Include="lodepng.h" />
     <ClInclude Include="Path.h" />
