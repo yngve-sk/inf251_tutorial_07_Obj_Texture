@@ -187,8 +187,11 @@ void display() {
 	_terrain.drawObject(VertexLocs, MaterialLocs, BumpMappingLoc, NormalTextureLoc);
 
 	_canvas.usingBumpMapping = false;
+
+	vec3 oldIntensity = _directionalLight.setIntensity(vec3(0.3, 0.3, 0.3));
 	loadMatricesToUniform(_canvas.transformation.getTransformationMatrix(), VMatrix, PMatrix);
 	_canvas.drawObject(VertexLocs, MaterialLocs);
+	_directionalLight.setIntensity(oldIntensity);
 
 	_cat.usingBumpMapping = false;
 	loadMatricesToUniform(_cat.transformation.getTransformationMatrix(), VMatrix, PMatrix);
