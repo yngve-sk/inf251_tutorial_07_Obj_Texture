@@ -214,7 +214,21 @@ void display() {
 	position.append(to_string(camPosition[1])) + ", z: ";
 	position.append(to_string(camPosition[2]));
 
-	drawText(position, -0.7, 0.7, 0);
+	drawText(position, -0.9, 0.7, 0);
+
+	// Draw Day/Night mode text
+	string lightMode;
+	if (1) {
+		lightMode = "You are using Day mode. Press 'n' for Night mode.";
+	}
+	else {
+		lightMode = "You are using Night mode. Press 'n' for Day mode.";
+	}
+	drawText(lightMode, -0.9, 0.6, 0);
+
+	// Draw house rotation text
+	string houseRotation = "For house rotation press 'r'";
+	drawText(houseRotation, -0.9, 0.5, 0);
 
 	// Disable the "position" vertex attribute (not necessary but recommended)
 	glDisableVertexAttribArray(VertexLocs.posLoc);
@@ -248,11 +262,13 @@ void idle() {
 
 	if (_idle_traverse_camera_movement_path && (--_idle_traverse_camera_timeout%_idle_traverse_camera_wait)) {
 		_cam.setPosition(_cameraPath.getNextCurvePoint());
+		_cat.syncWithCamera();
 	}
 
 	if (_idle_traverse_camera_lookat_path && 
 		(--_idle_traverse_camera_lookat_timeout % _idle_traverse_camera_lookat_wait)) {
 		_cam.setLookAtPoint(_cameraLookAtPath.getNextCurvePoint());
+		_cat.syncWithCamera();
 	}
 
 	
@@ -393,9 +409,10 @@ bool initObjects() {
 
 	_cat.init("Objects\\cat\\cat.obj",
 		"Objects\\cat\\cat_diff.png",
-		"Objects\\cat\\cat_norm.png");
+		"Objects\\cat\\cat_norm.png", 
+		&_cam);
 	_cat.transformation.rotate(180, vec3(1, 0, 0));
-	_cat.transformation.translate(vec3(0, -2, 0));
+	_cat.transformation.translate(vec3(0, -2, -1));
 	_cat.transformation.setScale(2.5);
 
 	//_house.init("House-Model\\House.obj",
@@ -538,29 +555,33 @@ void keyboard(unsigned char key, int x, int y) {
 	case 'w':
 		std::cout << "forkwards" << std::endl;
 		_cam.moveForward();
-		_cat.transformation.setPosition(vec3(_cam.getPosition().x, (-_cam.getPosition().y-2), -_cam.getPosition().z));
-		//_cat.transformation.loadToUniformLoc();
+		_cat.syncWithCamera();
 		glutPostRedisplay();
 		break;
 	case 'a':
 		_cam.strafeLeft();
+		_cat.syncWithCamera();
 		glutPostRedisplay();
 		break;
 	case 's':
 		std::cout << "backwards" << std::endl;
 		_cam.moveBackward();
+		_cat.syncWithCamera();
 		glutPostRedisplay();
 		break;
 	case 'd':
 		_cam.strafeRight();
+		_cat.syncWithCamera();
 		glutPostRedisplay();
 		break;
 	case 'c':
 		_cam.moveDown();
+		_cat.syncWithCamera();
 		glutPostRedisplay();
 		break;
 	case ' ':
 		_cam.moveUp();
+		_cat.syncWithCamera();
 		glutPostRedisplay();
 		break;
 	case 'p':

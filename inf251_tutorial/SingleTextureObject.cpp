@@ -2,18 +2,25 @@
 
 SingleTextureObject::SingleTextureObject(const char* directory, 
 										 const char* materialDirectory,
-										 const char* bumpMap) {
-	init(directory, materialDirectory, bumpMap);
+										 const char* bumpMap,
+										 Camera *cam) {
+	init(directory, materialDirectory, bumpMap, cam);
 }
 
 SingleTextureObject::SingleTextureObject(){}
 
 void SingleTextureObject::init(const char* directory,
 		  const char* materialDirectory,
-		  const char* bumpMap) {
+		  const char* bumpMap,
+		  Camera *camera) {
 		  loadObject(directory);
 		  loadMaterial(materialDirectory);
 		  loadBumpMap(bumpMap);
+		  cam = camera;
+}
+
+void SingleTextureObject::syncWithCamera() {
+	transformation.setPosition(vec3((*cam).getPosition().x, -(*cam).getPosition().y - 2, -(*cam).getPosition().z - 1));
 }
 
 void SingleTextureObject::loadObject(const char* directory) {
