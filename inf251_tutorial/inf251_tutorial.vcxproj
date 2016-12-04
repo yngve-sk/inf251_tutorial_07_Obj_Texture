@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="House-Model\House.mtl" />
     <None Include="Objects\cat\cat.mtl" />
     <None Include="shader.f.glsl" />
     <None Include="shader.v.glsl" />
@@ -314,6 +315,7 @@
     <Image Include="Animated-waves\3.png" />
     <Image Include="Animated-waves\4.png" />
     <Image Include="Animated-waves\5.png" />
+    <Image Include="House-Model\House\basic_realistic.png" />
     <Image Include="Objects\cat\cat_diff.png" />
     <Image Include="Objects\cat\cat_norm.png" />
     <Image Include="Objects\cat\normalMap1.png" />

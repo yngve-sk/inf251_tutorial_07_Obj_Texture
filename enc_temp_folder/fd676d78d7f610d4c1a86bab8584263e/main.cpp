@@ -432,7 +432,7 @@ bool initObjects() {
 	_house.init("House-Model\\House.obj",
 		"Objects\\cat\\cat_diff.png",
 		"Objects\\cat\\cat_norm.png");
-	_house.transformation.translate(vec3(665, -28, 475));
+	_house.transformation.translate(vec3(665, -30, 475));
 
 	_canvas.init(vec3(0, 50, 10),
 		(float)36.f*2.f,
