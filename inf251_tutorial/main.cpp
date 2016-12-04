@@ -577,7 +577,6 @@ void keyboard(unsigned char key, int x, int y) {
 		_cam.generateCircularBezierAroundCurrentPosition(_cameraLookAtPath, 40, -10);
 		break;
 	
-	}// (50.7, 802.5) -> (54.84, 797.29) === (5x, -5y)
 	}
 	glutPostRedisplay();
 }
