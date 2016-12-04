@@ -82,7 +82,8 @@ VertexGLLocs VertexLocs = {0, 1, 2};
 // --- MICS-----------------------------
 bool HeadlightInt = true;
 
-int displacement = 0;
+vec2 displacement = vec2(0,0);
+vec2 displacementDelta = vec2(-1, 3);
 
 // --- main() -------------------------------------------------------------------------------------
 /// The entry point of the application
@@ -161,7 +162,7 @@ void display() {
 
 	//NEEDS TO BE REFACTORED
 	glUniform1i(ColorByHeightLoc, 1);
-
+	glUniform2fv(DisplacementLoc, 1, &displacement[0]);
 
 	// Camera 
 	//_cam.setAspectRatio(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
@@ -351,10 +352,10 @@ bool initObjects() {
 
 	_terrain.init("terrain\\bergen_1024x918.bin",
 		"terrain\\bergen_terrain_texture.png");
-	_terrain.loadBumpMaps(13,
-		10,
-		"Animated-waves\\");
-	//_terrain.loadBumpMap("terrain\\waves.png");
+	//_terrain.loadBumpMaps(13,
+	//	10,
+	//	"Animated-waves\\");
+	_terrain.loadBumpMap("terrain\\waves.png");
 	_terrain.transformation.rotate(180, vec3(1, 0, 0));
 	_terrain.transformation.translate(vec3(-2613, -1, 2010));
 
@@ -548,12 +549,16 @@ void keyboard(unsigned char key, int x, int y) {
 		//glUniform1i(ColorByHeightLoc, colorByHeightOnOff);
 		break;
 	case '1':
-		_terrain.stepAnimation();
+		//_terrain.stepAnimation();
+		displacement += displacementDelta;
+		displacement.x = ((int)displacement.x % 2324);
+		displacement.y = ((int)displacement.y % 2324);
+		//cout << displacement << endl;
 		break;
 	case 'h':
 		_idle_traverse_camera_movement_path = !_idle_traverse_camera_movement_path;
 		break;
-	}
+	}// (50.7, 802.5) -> (54.84, 797.29) === (5x, -5y)
 }
 
 int MouseX, MouseY;		///< The last position of the mouse
