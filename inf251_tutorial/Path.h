@@ -13,7 +13,6 @@ private:
 
 	bool isReversed = false;
 
-
 public:
 	void computeBinomialCoeffs(int n);
 

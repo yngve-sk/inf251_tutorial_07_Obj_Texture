@@ -327,7 +327,7 @@ int _idle_traverse_camera_lookat_timeout = _idle_traverse_camera_lookat_wait;
 void idle() {
 	// rotate around Y-axis
 	//LocalRotationY = _idle_disable_house_rotation ? LocalRotationY : LocalRotationY * glm::rotate(0.005f, vec3(0, 1, 0));
-	//_house.transformation.rotate(0.005f, vec3(0, 1, 0));
+	//_house.transformation.rotate(0.005f, vec3(0, 1, 0));Fkeu
 
 	_canvas.stepAnimation();
 
@@ -694,12 +694,11 @@ void keyboard(unsigned char key, int x, int y) {
 		_idle_traverse_camera_movement_path = !_idle_traverse_camera_movement_path;
 		glutPostRedisplay();
 		break;
-	case 't':
-		_idle_traverse_camera_lookat_path = !_idle_traverse_camera_lookat_path;
-		glutPostRedisplay();
-		break;
 	case 'y':
-		_cam.generateCircularBezierAroundCurrentPosition(_cameraLookAtPath, 40, -10);
+		if (!_idle_traverse_camera_lookat_path) {
+			_cam.generateCircularBezierAroundCurrentPosition(_cameraLookAtPath, 150, -10);
+		}
+		_idle_traverse_camera_lookat_path = !_idle_traverse_camera_lookat_path;
 		glutPostRedisplay();
 		break;
 	case 'i':
