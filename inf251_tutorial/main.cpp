@@ -319,7 +319,7 @@ bool initShader(GLuint& program, string vShaderPath, string fShaderPath) {
 bool initObjects() {
 	_terrain.init("terrain\\bergen_1024x918.bin",
 		"terrain\\bergen_terrain_texture.png");
-	_terrain.loadBumpMaps(13,
+	_terrain.loadBumpMaps(11,
 		10,
 		"Animated-waves\\");
 	//_terrain.loadBumpMap("terrain\\waves.png");
