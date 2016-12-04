@@ -53,3 +53,12 @@ void DirectionalLight::loadToUniformAt(GLuint shaderProgram, std::string uniform
 void DirectionalLight::toggleOnOff() {
 	bOn = (bOn == 1 ? 0 : 1);
 }
+
+vec3 DirectionalLight::setIntensity(vec3 newIntensity) {
+	vec3 old = vec3(aIntensity, dIntensity, sIntensity);
+	aIntensity = newIntensity[0];
+	dIntensity = newIntensity[1];
+	sIntensity = newIntensity[2];
+
+	return old;
+}

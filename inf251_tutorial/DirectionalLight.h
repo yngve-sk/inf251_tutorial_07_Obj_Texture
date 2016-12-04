@@ -5,6 +5,7 @@
 #include <gl/glut.h>
 #include <gl/GL.h>
 
+using namespace glm;
 class DirectionalLight {
 private:
 	glm::vec3 direction;
@@ -18,4 +19,7 @@ public:
 	
 	void loadToUniformAt(GLuint shaderProgram, std::string uniformName);
 	void toggleOnOff();
+
+	/* Returns old intensity, useful for switching between two intensities*/
+	vec3 setIntensity(vec3 newIntensity);
 };
