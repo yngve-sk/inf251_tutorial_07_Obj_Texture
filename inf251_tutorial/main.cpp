@@ -86,7 +86,7 @@ VertexGLLocs VertexLocs = {0, 1, 2};
 
 // --- MICS-----------------------------
 bool SpotlightOn = true;
-bool SpotlightIntensity = true;
+float SpotlightIntensity = 0.05;
 
 bool day = true;
 
@@ -191,7 +191,8 @@ void display() {
 		_directionalLight.setIntensity(vec3(0.1, 0.1, 0.1));
 	}
 	_spotlight.toggleOnOff(SpotlightOn);
-	
+	_spotlight.setIntensity(SpotlightIntensity);
+
 	// Update lights
 	_spotlight.loadToUniformAt(ShaderProgram, "spotlight");
 	_directionalLight.loadToUniformAt(ShaderProgram, "dLight");
@@ -267,15 +268,27 @@ void display() {
 	else {
 		lightMode = "You are using Night mode. Press 'n' for Day mode.";
 	}
-	drawText(lightMode, -0.9, 0.6, 0);
+	drawText(lightMode, -0.9, 0.7, 0);
 
 	// Draw house rotation text
 	string houseRotation = "For house rotation press 'r'";
-	drawText(houseRotation, -0.9, 0.5, 0);
+	drawText(houseRotation, -0.9, 0.6, 0);
 
 	// Draw house rotation text
 	string viewFromACat = "For view from a cat press 'x'";
-	drawText(viewFromACat, -0.9, 0.4, 0);
+	drawText(viewFromACat, -0.9, 0.5, 0);
+
+	// Draw house rotation text
+	string cameraPath = "For animated path press 'h'";
+	drawText(cameraPath, -0.9, 0.4, 0);
+
+	// Draw house rotation text
+	string cameraLookAround = "For camera look around press 'y'";
+	drawText(cameraLookAround, -0.9, 0.3, 0);
+
+	// Draw house rotation text
+	string spotlighIntensity = "For increasing spotlight press 'k' for decreasing press 'j'";
+	drawText(spotlighIntensity, -0.9, 0.2, 0);
 
 	if (_idle_catm_enable) {
 		// DRAW CATS
@@ -456,6 +469,7 @@ bool initObjects() {
 	
 	initCameraBoundingBox();
 
+	//_terrain.init("terrain\\bergen_3072x2754.bin",
 	_terrain.init("terrain\\bergen_1024x918.bin",
 		"terrain\\bergen_terrain_texture.png");
 	//_terrain.loadBumpMaps(13,
@@ -659,12 +673,14 @@ void keyboard(unsigned char key, int x, int y) {
 		glutPostRedisplay();
 		break;
 	case 'k':
-		//_spotlight.increaseIntensity();
-		//_spotlight.loadToUniformAt(ShaderProgram, "spotlight");
+		if (SpotlightIntensity > 0.05) {
+			SpotlightIntensity -= 0.1;
+		}
+		if (SpotlightIntensity < 0)
+			SpotlightIntensity = 0.05;
 		break;
 	case 'j':
-		//_spotlight.decreaseIntensity();
-		//_spotlight.loadToUniformAt(ShaderProgram, "spotlight");
+		SpotlightIntensity += 0.1;
 		break;
 	case 'b':
 		//colorByHeightOnOff *= -1;
@@ -712,7 +728,9 @@ inline void updateMousePosition(int newX, int newY) {
 /// Called whenever the mouse is moving while a button is pressed
 void motion(int x, int y) {
 	if (MouseButton == GLUT_RIGHT_BUTTON) {
-		_cam.mouseUpdate(vec2(x, y));
+		//_cam.mouseUpdate(vec2(x, y));
+		_cam.translate(vec2(MouseX, MouseY), vec2(x, y));
+		_cat.syncWithCamera();
 
 		updateMousePosition(x, y);
 	}
